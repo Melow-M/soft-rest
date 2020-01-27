@@ -8,10 +8,11 @@ import { Component, OnInit } from '@angular/core';
 export class MainComponent implements OnInit {
   openedMenu: boolean = false;
   salesOpenedFlag: boolean = false;
-  qualityOpenedFlag: boolean = false;
-  maintenanceOpenedFlag: boolean = false;
-  ssggOpenedFlag: boolean = false;
-  utilizationOpenedFlag: boolean = false;
+  warehouseOpenedFlag: boolean = false;
+  kitchenOpenedFlag: boolean = false;
+  adminOpenedFlag: boolean = false;
+  thirdOpenedFlag: boolean = false;
+  
   constructor() { }
 
   ngOnInit() {
@@ -27,36 +28,36 @@ export class MainComponent implements OnInit {
     this.salesOpenedFlag = false;
   }
 
-  qualityOpened(): void {
-    this.qualityOpenedFlag = true;
+  warehouseOpened(): void {
+    this.warehouseOpenedFlag = true;
   }
 
-  qualityClosed(): void {
-    this.qualityOpenedFlag = false;
+  warehouseClosed(): void {
+    this.warehouseOpenedFlag = false;
   }
 
-  maintenanceOpened(): void {
-    this.maintenanceOpenedFlag = true;
+  kitchenOpened(): void {
+    this.kitchenOpenedFlag = true;
   }
 
-  maintenanceClosed(): void {
-    this.maintenanceOpenedFlag = false;
+  kitchenClosed(): void {
+    this.kitchenOpenedFlag = false;
   }
 
-  ssggOpened(): void {
-    this.ssggOpenedFlag = true;
+  adminOpened(): void {
+    this.adminOpenedFlag = true;
   }
 
-  ssggClosed(): void {
-    this.ssggOpenedFlag = false;
+  adminClosed(): void {
+    this.adminOpenedFlag = false;
   }
 
-  utilizationOpened(): void {
-    this.utilizationOpenedFlag = true;
+  thirdOpened(): void {
+    this.thirdOpenedFlag = true;
   }
 
-  utilizationClosed(): void {
-    this.utilizationOpenedFlag = false;
+  thirdClosed(): void {
+    this.thirdOpenedFlag = false;
   }
 
 }

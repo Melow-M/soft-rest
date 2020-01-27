@@ -11,7 +11,6 @@ import { ThirdPartiesComponent } from './third-parties/third-parties.component';
 // ANGULAR MATERIAL
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -22,7 +21,8 @@ import {  MatNativeDateModule,
           MatInputModule,
           MatProgressBarModule, 
           MatDividerModule,
-          MatDialogModule} from '@angular/material';
+          MatDialogModule,
+          MatButtonModule} from '@angular/material';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
@@ -34,7 +34,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MainRoutingModule,
     MatIconModule,
     MatToolbarModule,
-    MatButtonModule,
     MatBadgeModule,
     MatMenuModule,
     MatSidenavModule,
@@ -46,7 +45,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatProgressBarModule,
     MatSnackBarModule,
     MatDividerModule,
-    MatDialogModule
+    MatDialogModule,
+    MatButtonModule,
+    
   ],
 })
 export class MainModule { }

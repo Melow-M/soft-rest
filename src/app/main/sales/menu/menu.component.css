@@ -1,0 +1,9 @@
+.ticket {
+    border-right: 1px solid black;
+    width: 25%;
+    height: 80vh;
+}
+
+.ticket .header {
+    color: #B70705;
+}

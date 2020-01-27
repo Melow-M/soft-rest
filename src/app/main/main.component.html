@@ -1,148 +1,121 @@
 <div class="animated fadeIn dalay-4 slower">
-    <mat-toolbar style="background-image: linear-gradient(to right, #0F2027, #203A43, #2C5364)">
+    <mat-toolbar style="color: #B70705; background: #EFEFEF;">
 
-        <button mat-icon-button style="color:white" (click)="toggleSideMenu()">
-            <mat-icon>menu</mat-icon>
+        <button mat-icon-button class="redText" (click)="toggleSideMenu()">
+            <mat-icon style="transform: scale(1.5);">menu</mat-icon>
         </button>
-        <ng-container>
-            <img src="../../assets/images/logo-highres.svg" alt="logo ferreyros" style="height:80%">
-        </ng-container>
-        <!--span class="ms-fill"></!--span-->
-
+        <div class="title">
+            <span>SoftRest</span>
+        </div>
+        <span style="flex: 1 1 auto;"></span>
+        <div>
+            <button class="sign-button" mat-button [matMenuTriggerFor]="menu">
+                <span>María, Torres</span>
+            </button>
+            <mat-menu #menu="matMenu">
+                <button mat-menu-item>Salir</button>
+            </mat-menu>
+        </div>
 
     </mat-toolbar>
 
     <mat-sidenav-container style="min-height:90vh">
-        <mat-sidenav mode="over" #sideMenu [(opened)]="openedMenu" class="mat-elevation-z8">
+        <mat-sidenav mode="over" #sideMenu [(opened)]="openedMenu" class="mat-elevation-z8"
+            style="background: #EFEFEF;">
             <div>
-
                 <!-- Ventas -->
-                <mat-expansion-panel style="width:15em; box-shadow:none; border-radius:0px 0px 0px 0px"
-                    class="w3-border-top w3-border-light-grey"
-                    [ngClass]="{'ms-expansion-panel-menu':salesOpenedFlag}" (opened)="salesOpened()"
-                    (closed)="salesClosed()">
+                <mat-expansion-panel
+                    style="width:17em; box-shadow:none; border-radius:0px 0px 0px 0px; background: #EFEFEF;  "
+                    class="w3-border-bottom" [ngClass]="{'ms-expansion-panel-menu':salesOpenedFlag}"
+                    (opened)="salesOpened()" (closed)="salesClosed()">
                     <mat-expansion-panel-header>
-                        <mat-panel-title style="font-weight:500"
-                            [ngClass]="{'ms-expansion-panel-title':salesOpenedFlag}">
-                            <mat-icon style="vertical-align:middle; margin-right:0.3em">verified_user</mat-icon>
+                        <mat-panel-title [ngClass]="{'ms-expansion-panel-title':salesOpenedFlag}" class="redText">
+                            <mat-icon style="vertical-align:middle; margin-right:1em">storefront</mat-icon>
                             Ventas
                         </mat-panel-title>
                     </mat-expansion-panel-header>
-
-                    <p class="w3-margin-bottom"></p>
-
-                </mat-expansion-panel>
-
-                <!-- QUALITY -->
-                <mat-expansion-panel style="width:15em; box-shadow:none; border-radius:0px 0px 0px 0px"
-                    class="w3-border-top w3-border-light-grey" [ngClass]="{'ms-expansion-panel-menu':qualityOpenedFlag}"
-                    (opened)="qualityOpened()" (closed)="qualityClosed()">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title style="font-weight:500"
-                            [ngClass]="{'ms-expansion-panel-title':qualityOpenedFlag}">
-                            <mat-icon style="vertical-align:middle; margin-right:0.3em; border-radius:0px 0px 0px 0px">
-                                check_circle_outline</mat-icon> Calidad
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-
-                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
                         routerLink="quality/inspections" style="text-align:left;border-radius:0px 0px 0px 0px"
                         (click)="toggleSideMenu()">
                         <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
-                            assignment_turned_in
-                        </mat-icon> Inspecciones
+                            room_service
+                        </mat-icon> Menú
                     </button>
-                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
-                        routerLink="quality/tasks"
-                        style="text-align:left;border-radius:0px 0px 0px 0px;padding-bottom:1em"
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink="quality/tasks" style="text-align:left;border-radius:0px 0px 0px 0px;"
                         (click)="toggleSideMenu()">
-                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">assignment
-                        </mat-icon> Tareas
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">restore
+                        </mat-icon> Historial
+                    </button>
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink="quality/tasks" style="text-align:left;border-radius:0px 0px 0px 0px;"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">monetization_on
+                        </mat-icon> Caja
                     </button>
                     <p class="w3-margin-bottom"></p>
 
                 </mat-expansion-panel>
 
-                <!-- MAINTENANCE -->
-                <mat-expansion-panel style="width:15em;box-shadow:none;border-radius:0px 0px 0px 0px"
-                    class="w3-border-top w3-border-light-grey"
-                    [ngClass]="{'ms-expansion-panel-menu':maintenanceOpenedFlag}" (opened)="maintenanceOpened()"
-                    (closed)="maintenanceClosed()">
+                <!-- almacen -->
+                <mat-expansion-panel
+                    style="width:17em; box-shadow:none; border-radius:0px 0px 0px 0px; background: #EFEFEF;"
+                    class="w3-border-bottom" [ngClass]="{'ms-expansion-panel-menu':warehouseOpenedFlag}"
+                    (opened)="warehouseOpened()" (closed)="warehouseClosed()">
                     <mat-expansion-panel-header>
-                        <mat-panel-title style="font-weight:500"
-                            [ngClass]="{'ms-expansion-panel-title':maintenanceOpenedFlag}">
-                            <mat-icon style="vertical-align: middle; margin-right:0.3em">build</mat-icon> Mantenimiento
+                        <mat-panel-title [ngClass]="{'ms-expansion-panel-title':warehouseOpenedFlag}" class="redText">
+                            <mat-icon style="vertical-align:middle; margin-right:1em">
+                                kitchen</mat-icon> Almacén
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
-                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
-                        routerLink="maintenance/requests"
-                        style="text-align:left;border-radius:0px 0px 0px 0px;padding-bottom:1em"
-                        (click)="toggleSideMenu()">
-                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">inbox</mat-icon>
-                        Solicitudes
-                    </button>
                     <p class="w3-margin-bottom"></p>
 
                 </mat-expansion-panel>
 
-                <!-- SSGG -->
-                <mat-expansion-panel style="width:15em;box-shadow:none; border-radius:0px 0px 0px 0px"
-                    class="w3-border-top w3-border-light-grey" [ngClass]="{'ms-expansion-panel-menu':ssggOpenedFlag}"
-                    (opened)="ssggOpened()" (closed)="ssggClosed()">
+                <!-- Cocina -->
+                <mat-expansion-panel
+                    style="width:17em;box-shadow:none;border-radius:0px 0px 0px 0px; background: #EFEFEF;"
+                    class="w3-border-bottom" [ngClass]="{'ms-expansion-panel-menu':kitchenOpenedFlag}"
+                    (opened)="kitchenOpened()" (closed)="kitchenClosed()">
                     <mat-expansion-panel-header>
-                        <mat-panel-title style="font-weight:500"
-                            [ngClass]="{'ms-expansion-panel-title':ssggOpenedFlag}">
-                            <mat-icon style="vertical-align: middle; margin-right:0.3em">extension</mat-icon> SSGG
+                        <mat-panel-title [ngClass]="{'ms-expansion-panel-title':kitchenOpenedFlag}" class="redText">
+                            <mat-icon style="vertical-align:middle; margin-right:1em">restaurant_menu</mat-icon>
+                            Cocina
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
-                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
-                        routerLink="ssgg/requests"
-                        style="text-align:left;border-radius:0px 0px 0px 0px;padding-bottom:1em"
-                        (click)="toggleSideMenu()">
-                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">inbox</mat-icon>
-                        Solicitudes
-                    </button>
                     <p class="w3-margin-bottom"></p>
 
                 </mat-expansion-panel>
 
-                <!-- UTILIZATION -->
-                <mat-expansion-panel style="width:15em;box-shadow:none; border-radius:0px 0px 0px 0px"
-                    class="w3-border-top w3-border-light-grey"
-                    [ngClass]="{'ms-expansion-panel-menu':utilizationOpenedFlag}" (opened)="utilizationOpened()"
-                    (closed)="utilizationClosed()">
+                <!-- Administrativo -->
+                <mat-expansion-panel
+                    style="width:17em;box-shadow:none; border-radius:0px 0px 0px 0px; background: #EFEFEF;"
+                    class="w3-border-bottom" [ngClass]="{'ms-expansion-panel-menu':adminOpenedFlag}"
+                    (opened)="adminOpened()" (closed)="adminClosed()">
                     <mat-expansion-panel-header>
-                        <mat-panel-title style="font-weight:500"
-                            [ngClass]="{'ms-expansion-panel-title':utilizationOpenedFlag}">
-                            <mat-icon style="vertical-align: middle; margin-right:0.3em">timer</mat-icon> Utilización
+                        <mat-panel-title [ngClass]="{'ms-expansion-panel-title':adminOpenedFlag}" class="redText">
+                            <mat-icon style="vertical-align:middle; margin-right:1em">assignment</mat-icon>
+                            Administrativo
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
+                    <p class="w3-margin-bottom"></p>
 
-                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
-                        routerLink="utilization/register" style="text-align:left;border-radius:0px 0px 0px 0px"
-                        (click)="toggleSideMenu()">
-                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">list</mat-icon>
-                        Registros
-                    </button>
+                </mat-expansion-panel>
 
-                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
-                        routerLink="utilization/horometers" style="text-align:left;border-radius:0px 0px 0px 0px"
-                        (click)="toggleSideMenu()">
-                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">speed</mat-icon>
-                        Horómetros
-                    </button>
+                <!-- Terceros -->
+                <mat-expansion-panel
+                    style="width:17em;box-shadow:none; border-radius:0px 0px 0px 0px; background: #EFEFEF;"
+                    class="w3-border-bottom" [ngClass]="{'ms-expansion-panel-menu':thirdOpenedFlag}"
+                    (opened)="thirdOpened()" (closed)="thirdClosed()">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title [ngClass]="{'ms-expansion-panel-title':thirdOpenedFlag}" class="redText">
+                            <mat-icon style="vertical-align:middle; margin-right:1em">contacts</mat-icon> Terceros
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
 
-                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
-                        routerLink="utilization/trends"
-                        style="text-align:left;border-radius:0px 0px 0px 0px;padding-bottom:1em"
-                        (click)="toggleSideMenu()">
-                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">timeline
-                        </mat-icon>
-                        Tendencias
-                    </button>
                     <p class="w3-margin-bottom"></p>
 
                 </mat-expansion-panel>
@@ -157,6 +130,17 @@
         <mat-sidenav-content>
             <!--mat-progress-bar mode="indeterminate" *ngIf="loadingRouteConfig"></!--mat-progress-bar-->
             <router-outlet></router-outlet>
+            <div style="height: 90vh" class="w3-display-container">
+                <div class="w3-display-middle w3-center">
+                    <img src="./../../assets/images/cocinar 1.png" style="width: 35vh;" alt="">
+                    <div>
+                        <p class="sentence">
+                            Cocinar con amor
+                            te alimenta el Alma
+                        </p>
+                    </div>
+                </div>
+            </div>
         </mat-sidenav-content>
 
     </mat-sidenav-container>

@@ -1,0 +1,164 @@
+<div class="animated fadeIn dalay-4 slower">
+    <mat-toolbar style="background-image: linear-gradient(to right, #0F2027, #203A43, #2C5364)">
+
+        <button mat-icon-button style="color:white" (click)="toggleSideMenu()">
+            <mat-icon>menu</mat-icon>
+        </button>
+        <ng-container>
+            <img src="../../assets/images/logo-highres.svg" alt="logo ferreyros" style="height:80%">
+        </ng-container>
+        <!--span class="ms-fill"></!--span-->
+
+
+    </mat-toolbar>
+
+    <mat-sidenav-container style="min-height:90vh">
+        <mat-sidenav mode="over" #sideMenu [(opened)]="openedMenu" class="mat-elevation-z8">
+            <div>
+
+                <!-- Ventas -->
+                <mat-expansion-panel style="width:15em; box-shadow:none; border-radius:0px 0px 0px 0px"
+                    class="w3-border-top w3-border-light-grey"
+                    [ngClass]="{'ms-expansion-panel-menu':salesOpenedFlag}" (opened)="salesOpened()"
+                    (closed)="salesClosed()">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title style="font-weight:500"
+                            [ngClass]="{'ms-expansion-panel-title':salesOpenedFlag}">
+                            <mat-icon style="vertical-align:middle; margin-right:0.3em">verified_user</mat-icon>
+                            Ventas
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <p class="w3-margin-bottom"></p>
+
+                </mat-expansion-panel>
+
+                <!-- QUALITY -->
+                <mat-expansion-panel style="width:15em; box-shadow:none; border-radius:0px 0px 0px 0px"
+                    class="w3-border-top w3-border-light-grey" [ngClass]="{'ms-expansion-panel-menu':qualityOpenedFlag}"
+                    (opened)="qualityOpened()" (closed)="qualityClosed()">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title style="font-weight:500"
+                            [ngClass]="{'ms-expansion-panel-title':qualityOpenedFlag}">
+                            <mat-icon style="vertical-align:middle; margin-right:0.3em; border-radius:0px 0px 0px 0px">
+                                check_circle_outline</mat-icon> Calidad
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
+                        routerLink="quality/inspections" style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            assignment_turned_in
+                        </mat-icon> Inspecciones
+                    </button>
+                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
+                        routerLink="quality/tasks"
+                        style="text-align:left;border-radius:0px 0px 0px 0px;padding-bottom:1em"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">assignment
+                        </mat-icon> Tareas
+                    </button>
+                    <p class="w3-margin-bottom"></p>
+
+                </mat-expansion-panel>
+
+                <!-- MAINTENANCE -->
+                <mat-expansion-panel style="width:15em;box-shadow:none;border-radius:0px 0px 0px 0px"
+                    class="w3-border-top w3-border-light-grey"
+                    [ngClass]="{'ms-expansion-panel-menu':maintenanceOpenedFlag}" (opened)="maintenanceOpened()"
+                    (closed)="maintenanceClosed()">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title style="font-weight:500"
+                            [ngClass]="{'ms-expansion-panel-title':maintenanceOpenedFlag}">
+                            <mat-icon style="vertical-align: middle; margin-right:0.3em">build</mat-icon> Mantenimiento
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
+                        routerLink="maintenance/requests"
+                        style="text-align:left;border-radius:0px 0px 0px 0px;padding-bottom:1em"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">inbox</mat-icon>
+                        Solicitudes
+                    </button>
+                    <p class="w3-margin-bottom"></p>
+
+                </mat-expansion-panel>
+
+                <!-- SSGG -->
+                <mat-expansion-panel style="width:15em;box-shadow:none; border-radius:0px 0px 0px 0px"
+                    class="w3-border-top w3-border-light-grey" [ngClass]="{'ms-expansion-panel-menu':ssggOpenedFlag}"
+                    (opened)="ssggOpened()" (closed)="ssggClosed()">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title style="font-weight:500"
+                            [ngClass]="{'ms-expansion-panel-title':ssggOpenedFlag}">
+                            <mat-icon style="vertical-align: middle; margin-right:0.3em">extension</mat-icon> SSGG
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
+                        routerLink="ssgg/requests"
+                        style="text-align:left;border-radius:0px 0px 0px 0px;padding-bottom:1em"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">inbox</mat-icon>
+                        Solicitudes
+                    </button>
+                    <p class="w3-margin-bottom"></p>
+
+                </mat-expansion-panel>
+
+                <!-- UTILIZATION -->
+                <mat-expansion-panel style="width:15em;box-shadow:none; border-radius:0px 0px 0px 0px"
+                    class="w3-border-top w3-border-light-grey"
+                    [ngClass]="{'ms-expansion-panel-menu':utilizationOpenedFlag}" (opened)="utilizationOpened()"
+                    (closed)="utilizationClosed()">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title style="font-weight:500"
+                            [ngClass]="{'ms-expansion-panel-title':utilizationOpenedFlag}">
+                            <mat-icon style="vertical-align: middle; margin-right:0.3em">timer</mat-icon> Utilización
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+
+                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
+                        routerLink="utilization/register" style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">list</mat-icon>
+                        Registros
+                    </button>
+
+                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
+                        routerLink="utilization/horometers" style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">speed</mat-icon>
+                        Horómetros
+                    </button>
+
+                    <button mat-button class="w3-block w3-text-white ms-expansion-panel-menu w3-hover-text-amber"
+                        routerLink="utilization/trends"
+                        style="text-align:left;border-radius:0px 0px 0px 0px;padding-bottom:1em"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">timeline
+                        </mat-icon>
+                        Tendencias
+                    </button>
+                    <p class="w3-margin-bottom"></p>
+
+                </mat-expansion-panel>
+
+
+
+            </div>
+        </mat-sidenav>
+
+
+
+        <mat-sidenav-content>
+            <!--mat-progress-bar mode="indeterminate" *ngIf="loadingRouteConfig"></!--mat-progress-bar-->
+            <router-outlet></router-outlet>
+        </mat-sidenav-content>
+
+    </mat-sidenav-container>
+
+</div>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -12,10 +13,15 @@ export class MainComponent implements OnInit {
   kitchenOpenedFlag: boolean = false;
   adminOpenedFlag: boolean = false;
   thirdOpenedFlag: boolean = false;
-  
-  constructor() { }
+
+
+
+  constructor(
+    public router: Router
+  ) { }
 
   ngOnInit() {
+    
   }
   toggleSideMenu(): void {
     this.openedMenu = !this.openedMenu;

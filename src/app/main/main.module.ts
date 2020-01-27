@@ -27,8 +27,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
-    MainComponent,
-    SalesComponent, WarehouseComponent, KitchenComponent, AdminComponent, ThirdPartiesComponent],
+    MainComponent
+  ],
   imports: [
     CommonModule,
     MainRoutingModule,

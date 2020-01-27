@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../core/auth.service';
 
 @Component({
   selector: 'app-main',
@@ -13,7 +14,9 @@ export class MainComponent implements OnInit {
   adminOpenedFlag: boolean = false;
   thirdOpenedFlag: boolean = false;
   
-  constructor() { }
+  constructor(
+    private auth: AuthService,
+  ) { }
 
   ngOnInit() {
   }

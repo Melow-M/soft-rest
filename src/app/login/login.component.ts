@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ViewEncapsulation } from '@angular/core';
-//import { AuthService } from '../core/auth.service';
+import { AuthService } from '../core/auth.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  
   encapsulation: ViewEncapsulation.None,
   styleUrls: [ './login.component.css'],
 })
@@ -19,7 +18,7 @@ export class LoginComponent implements OnInit {
   hide: boolean = true;
 
   constructor(
-    //public auth: AuthService,
+    public auth: AuthService,
     private router: Router
   ) { }
 
@@ -27,7 +26,7 @@ export class LoginComponent implements OnInit {
   }
 
   checkAuth() {
-    //this.auth.emailLogin(this.email.value, this.password.value);
+    this.auth.emailLogin(this.email.value, this.password.value);
   }
 
   goToDashboard() {

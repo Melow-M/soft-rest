@@ -21,8 +21,12 @@ const routes: Routes = [
         loadChildren: () => import('./sales/cash/cash.module').then(mod => mod.CashModule)
       },
       {
-        path: 'almacen',
-        loadChildren: () => import('./warehouse/warehouse.module').then(mod => mod.WarehouseModule)
+        path: 'almacen/compras',
+        loadChildren: () => import('./warehouse/purchases/purchases.module').then(mod => mod.PurchasesModule)
+      },
+      {
+        path: 'almacen/inventario',
+        loadChildren: () => import('./warehouse/stocktaking/stocktaking.module').then(mod => mod.StocktakingModule)
       },
       {
         path: 'cocina',

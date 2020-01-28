@@ -22,7 +22,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
-    MainComponent
+    MainComponent,
   ],
   imports: [
     CommonModule,

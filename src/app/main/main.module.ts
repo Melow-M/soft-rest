@@ -1,13 +1,8 @@
 import { MainComponent } from './main.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { MainRoutingModule } from './main-routing.module';
-import { SalesComponent } from './sales/sales.component';
-import { WarehouseComponent } from './warehouse/warehouse.component';
-import { KitchenComponent } from './kitchen/kitchen.component';
-import { AdminComponent } from './admin/admin.component';
-import { ThirdPartiesComponent } from './third-parties/third-parties.component';
+
 // ANGULAR MATERIAL
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';

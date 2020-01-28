@@ -9,8 +9,16 @@ const routes: Routes = [
     component: MainComponent,
     children: [
       {
-        path: 'ventas',
-        loadChildren: () => import('./sales/sales.module').then(mod => mod.SalesModule)
+        path: 'ventas/menu',
+        loadChildren: () => import('./sales/menu/menu.module').then(mod => mod.MenuModule)
+      },
+      {
+        path: 'ventas/historial',
+        loadChildren: () => import('./sales/sales-record/sales-record.module').then(mod => mod.SalesRecordModule)
+      },
+      {
+        path: 'ventas/caja',
+        loadChildren: () => import('./sales/cash/cash.module').then(mod => mod.CashModule)
       },
       {
         path: 'almacen',

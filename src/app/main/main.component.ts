@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 
 @Component({
@@ -18,7 +19,14 @@ export class MainComponent implements OnInit {
     private auth: AuthService,
   ) { }
 
+
+
+  constructor(
+    public router: Router
+  ) { }
+
   ngOnInit() {
+    
   }
   toggleSideMenu(): void {
     this.openedMenu = !this.openedMenu;

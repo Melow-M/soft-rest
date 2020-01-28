@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
   }
 
   goToDashboard() {
-    //this.router.navigateByUrl('/main');
+    this.router.navigateByUrl('/main');
   }
 
 }

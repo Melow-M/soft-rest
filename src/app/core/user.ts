@@ -1,9 +1,8 @@
 export interface User {
     uid?: string,
     name?: string,
-    lastname?: string,
+    lastName?: string,
     displayName?: string,
-    phone?: string,
     email?: string,
     photoURL?: string,
     permit?: {

@@ -10,7 +10,7 @@ import { Observable, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
 import { Platform } from '@angular/cdk/platform';
 import { switchMap, map, tap, shareReplay, filter } from 'rxjs/operators';
-import { User } from 'firebase';
+import { User } from './user';
 //import { UserAndPermits } from "./models/userandpermits.model";
 
 @Injectable({

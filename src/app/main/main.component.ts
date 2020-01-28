@@ -17,17 +17,13 @@ export class MainComponent implements OnInit {
   
   constructor(
     private auth: AuthService,
-  ) { }
-
-
-
-  constructor(
     public router: Router
   ) { }
 
+
   ngOnInit() {
-    
   }
+  
   toggleSideMenu(): void {
     this.openedMenu = !this.openedMenu;
   }

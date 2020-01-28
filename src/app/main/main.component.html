@@ -1,4 +1,4 @@
-<div class="animated fadeIn dalay-4 slower">
+<div class="animated fadeIn dalay-4 slower" *ngIf="auth.user$ | async as user">
     <mat-toolbar style="color: #B70705; background: #EFEFEF;">
 
         <button mat-icon-button class="redText" (click)="toggleSideMenu()">
@@ -10,10 +10,12 @@
         <span style="flex: 1 1 auto;"></span>
         <div>
             <button class="sign-button" mat-button [matMenuTriggerFor]="menu">
-                <span>María, Torres</span>
+                <span>{{user.displayName}}</span>
             </button>
             <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="auth.signOut()">Salir</button>
+                <button mat-menu-item (click)="auth.signOut()">
+                    <mat-icon>exit_to_app</mat-icon> Cerrar sesión
+                </button>
             </mat-menu>
         </div>
 

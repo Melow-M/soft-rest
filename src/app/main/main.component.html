@@ -13,7 +13,7 @@
                 <span>María, Torres</span>
             </button>
             <mat-menu #menu="matMenu">
-                <button mat-menu-item>Salir</button>
+                <button mat-menu-item (click)="auth.signOut()">Salir</button>
             </mat-menu>
         </div>
 

@@ -10,6 +10,7 @@ import { Observable, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
 import { Platform } from '@angular/cdk/platform';
 import { switchMap, map, tap, shareReplay, filter } from 'rxjs/operators';
+import { User } from 'firebase';
 //import { UserAndPermits } from "./models/userandpermits.model";
 
 @Injectable({
@@ -20,10 +21,10 @@ export class AuthService {
   public permitsDocument: AngularFirestoreDocument<any>;
   public permits$: Observable<any>;
 
-  //user$: Observable<User>;
+  user$: Observable<User>;
   //userAndPermits$: Observable<UserAndPermits>;
-  notifications$: Observable<any>; // FALTA MODEL
-  tasks$: Observable<any>;
+  //notifications$: Observable<any>; // FALTA MODEL
+  //tasks$: Observable<any>;
 
   authLoader: boolean = false;
 
@@ -38,16 +39,16 @@ export class AuthService {
     public platform: Platform
   ) {
 
-    // this.user$ =
-    //   this.afAuth.authState.pipe(
-    //     switchMap(user => {
-    //       if (user) {
-    //         return this.afs.doc<User>(`users/${user.uid}`).valueChanges();
-    //       } else {
-    //         return of(null);
-    //       }
-    //     })
-    //   );
+    this.user$ =
+      this.afAuth.authState.pipe(
+        switchMap(user => {
+          if (user) {
+            return this.afs.doc<User>(`users/${user.uid}`).valueChanges();
+          } else {
+            return of(null);
+          }
+        })
+      );
 
     // this.permits$ =
     //   this.user$.pipe(
@@ -88,15 +89,17 @@ export class AuthService {
 
   emailLogin(email: string, password: string) {
     this.authLoader = true;
-    return this.afAuth.auth.signInWithEmailAndPassword(email, password)
-      .then(credential => {
-        if (credential) {
-          this.authLoader = false;
-          this.router.navigateByUrl('/main');
-        }
-      })
-      .catch(error => {
-        this.handleError(error)});
+    try {
+      this.afAuth.auth.signInWithEmailAndPassword(email, password)
+        .then(credential => {
+          if (credential) {
+            this.authLoader = false;
+            this.router.navigateByUrl('/main');
+          }
+        })
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   // ******** SIGN OUT
@@ -110,8 +113,9 @@ export class AuthService {
   // ********** ERROR HANDLING
 
   private handleError(error) {
-    console.log(error.code)
     let message = '';
+
+
 
     switch (error.code) {
       case 'auth/invalid-email':
@@ -128,6 +132,10 @@ export class AuthService {
 
       case 'auth/user-not-found':
         message = 'Error: El usuario no está registrado';
+        break;
+
+      case 'auth/argument-error':
+        message = 'Error: Complete el formulario';
         break;
 
       default:

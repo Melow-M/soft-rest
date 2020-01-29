@@ -1,1 +1,50 @@
-<p>purchases works!</p>
+<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2">
+    <div class="w3-row">
+        <div class="w3-col s0 m1 l1">
+            <p></p>
+        </div>
+        <div class="w3-col s12 m10 l10" style="min-height:86vh; font-family: Raleway;">
+            <h1 style="font-size:1.8em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
+                <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">shopping_basket
+                </mat-icon> Compras
+            </h1>
+            <mat-divider></mat-divider>
+            <div style="display: flex; flex-direction: column">
+                <div class="w3-margin" style="display: flex; flex-direction: row; flex-wrap:wrap">
+
+                    <!-- Form -->
+                    <form [formGroup]="dateForm">
+
+                        <!-- Date Range -->
+                        <mat-form-field style="margin-right: 16px">
+                            <input matInput placeholder="Seleccione un rango de fechas" [satDatepicker]="picker"
+                                    formControlName="date">
+                            <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+                            <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+                        </mat-form-field>
+
+                        <!-- Select Provider -->
+                        <mat-form-field>
+                            <mat-select placeholder="Búsqueda por proveedor">
+                                <mat-option 
+                                    *ngFor="let provider of providersList" 
+                                    [value]="provider">{{provider}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <button
+                            mat-raised-button color="warn">
+                            <mat-icon>search</mat-icon>
+                            Buscar
+                        </button
+                        >
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="w3-col s0 m1 l1">
+            <p></p>
+        </div>
+    </div>
+</div>

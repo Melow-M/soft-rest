@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormGroupDirective } from '@angular/forms';
 
 @Component({
   selector: 'app-create-provider-dialog',
@@ -23,7 +23,12 @@ export class CreateProviderDialogComponent implements OnInit {
     bank: string;   
     type: string;
     accountNumber: string;
-  }>;
+  }> = [];
+  contacts: Array<{
+    contactName: string;
+    contactPhone: string;
+    contactMail: string;
+  }> = [];
 
   constructor(
     private fb: FormBuilder,
@@ -43,20 +48,32 @@ export class CreateProviderDialogComponent implements OnInit {
     });
 
     this.bankAccountsFormGroup = this.fb.group({
-      bank: [null, Validators.required],
-      type: [null, Validators.required],
-      accountNumber: [null, Validators.required]
+      bank: [null],
+      type: [null],
+      accountNumber: [null]
     })
 
     this.contactsFormGroup = this.fb.group({
-      contactName: [null, Validators.required],
-      contactPhone: [null, Validators.required],
-      contactMail: [null, Validators.required]
+      contactName: [null],
+      contactPhone: [null],
+      contactMail: [null]
     })
   }
 
   onAddAccount(){
-    console.log()
+    this.bankAccounts.push(this.bankAccountsFormGroup.value);
+    this.bankAccountsFormGroup.reset();
   }
 
+  onDeleteAccount(account){
+    this.bankAccounts = this.bankAccounts.filter(el => el != account)
+  }
+
+  onAddContact(){
+    this.contacts.push(this.contactsFormGroup.value);
+    this.contactsFormGroup.reset();
+  }
+  onDeleteContact(contact){
+    this.contacts = this.contacts.filter(el => el != contact)
+  }
 }

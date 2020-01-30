@@ -94,14 +94,65 @@
                 </mat-form-field>
 
                 <!-- Agregar -->
-                <button type="submit" mat-raised-button color="secondary">
+                <button type="submit" class="w3-block"
+                    mat-raised-button color="warn" [disabled]="bankAccountsFormGroup.get('bank').value == null ||
+                    bankAccountsFormGroup.get('type').value == null ||
+                    bankAccountsFormGroup.get('accountNumber').value == null">
                     <mat-icon>credit_card</mat-icon> Agregar Cuenta
                 </button>
+
+                <div style="display: flex; flex-direction: row; margin-top: 16px; justify-content: space-between;" *ngFor="let account of bankAccounts">
+                    <span>{{account.bank}}/{{account.type}}/{{account.accountNumber}}</span>
+                    <button mat-icon-button type="button" (click)="onDeleteAccount(account)" color="warn">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
             </form>
         </div>
         <div class="childComponent">
             <p><b>Contactos</b></p>
             <mat-divider></mat-divider>
+            <form [formGroup]="contactsFormGroup" (ngSubmit)="onAddContact()">
+                <!-- nombres -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Nombres y Apellidos</mat-label>
+                    <input matInput
+                        formControlName="contactName" placeholder="Nombres y Apellidos">
+                    <mat-hint>*Opcional</mat-hint>
+                </mat-form-field>
+
+                <!-- Celular -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Celular</mat-label>
+                    <input matInput formControlName="contactPhone" placeholder="Celular"
+                        type="number">
+                    <mat-hint>*Opcional</mat-hint>
+                </mat-form-field>
+
+                <!-- contactMail -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Correo</mat-label>
+                    <input formControlName="contactMail" placeholder="Correo"
+                        matInput >
+                    <mat-hint>*Opcional</mat-hint>
+                </mat-form-field>
+
+                <!-- Agregar -->
+                <button type="submit" class="w3-block"
+                    mat-raised-button color="warn" 
+                    [disabled]="contactsFormGroup.get('contactName').value == null ||
+                                contactsFormGroup.get('contactPhone').value == null ||
+                                contactsFormGroup.get('contactMail').value == null">
+                    <mat-icon>contacts</mat-icon> Agregar Cuenta
+                </button>
+
+                <div style="display: flex; flex-direction: row; margin-top: 16px; justify-content: space-between;" *ngFor="let contact of contacts">
+                    <span>{{contact.contactName}}/{{contact.contactPhone}}/{{contact.contactMail}}</span>
+                    <button mat-icon-button type="button" (click)="onDeleteContact(contact)" color="warn">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

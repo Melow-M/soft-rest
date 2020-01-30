@@ -1,0 +1,177 @@
+<div mat-dialog-title>
+    <div
+        style="font-size: x-large; margin-bottom: 8px; display: flex; flex-direction: row; justify-content: space-between;">
+        <span>
+            <mat-icon style="vertical-align: middle; margin-right: 4px;">add_circle</mat-icon>
+            Registrar Compra
+        </span>
+        <button mat-button mat-dialog-close>
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <mat-divider></mat-divider>
+</div>
+
+<div mat-dialog-content>
+    <div class="parentDialog">
+        <!-- Document Form -->
+        <!-- Document Details -->
+        <div class="leftChildDialog">
+            <form [formGroup]="documentForm">
+                <div formGroupName="documentDetails" style="display: flex; flex-direction: column;">
+
+                    <!-- Detalle del comprobante -->
+                    <p><b>Detalle del Comprobante</b></p>
+                    <!-- documentDate -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha de Emisión</mat-label>
+                        <input formControlName="documentDate" matInput placeholder="Fecha de Emisión">
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+
+                    <!-- documentType -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Tipo de Comprobante</mat-label>
+                        <mat-select formControlName="documentType" placeholder="Tipo de Comprobante">
+                            <mat-option *ngFor="let type of documentType" [value]="type">{{type}}</mat-option>
+                        </mat-select>
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+
+                    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                        <!-- documentSerial -->
+                        <mat-form-field appearance="outline" style="width: 45%">
+                            <mat-label>N. Serie</mat-label>
+                            <input formControlName="documentSerial" matInput placeholder="Doc. Serie">
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+
+                        <!-- documentCorrelative -->
+                        <mat-form-field appearance="outline" style="width: 45%">
+                            <mat-label>N. Correlativo</mat-label>
+                            <input formControlName="documentCorrelative" matInput placeholder="Doc. Correlativo">
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- provider -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Proveedor</mat-label>
+                        <mat-select formControlName="provider" placeholder="Proveedor">
+                            <mat-option (click)="onAddProvider()"><mat-icon>add</mat-icon>Añadir Proveedor</mat-option>
+                        </mat-select>
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+
+                    <!-- socialReason -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Razón social</mat-label>
+                        <input formControlName="socialReason" matInput placeholder="Razón social">
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+
+                    <!-- Detalle de pago -->
+                    <p style="margin-top: 16px"><b>Detalle de Pago</b></p>
+                    <!-- paymentType -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Tipo de Pago</mat-label>
+                        <mat-select formControlName="paymentType" placeholder="Tipo de Pago">
+                            <mat-option *ngFor="let type of paymentType" [value]="type">{{type}}</mat-option>
+                        </mat-select>
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+
+                    <!-- creditExpirationDate -->
+                    <mat-form-field appearance="outline" *ngIf="!documentForm.get('documentDetails.creditExpirationDate').disabled">
+                        <mat-label>Fecha de Expiración de Crédito</mat-label>
+                        <input formControlName="creditExpirationDate" matInput
+                            placeholder="Fecha de Expiración de Crédito">
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+                </div>
+            </form>
+        </div>
+
+        <!-- Importes Details -->
+        <div class="rightChildDialog">
+            <form [formGroup]="documentForm">
+                <div formGroupName="imports" style="display: flex; flex-direction: column; width: 100%;">
+
+                    <!-- Importes -->
+                    <p><b>Importes</b></p>
+
+                    <div style="display: flex; flex-direction: row; justify-content: space-between;" *ngIf="!documentForm.get('imports.subtotalImport').disabled">
+                        <!-- subtotalImport -->
+                        <mat-form-field appearance="outline"  style="width: 45%">
+                            <mat-label>Sub Total</mat-label>
+                            <input formControlName="subtotalImport" matInput placeholder="Sub Total">
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+
+                        <!-- igvImport -->
+                        <mat-form-field appearance="outline"  style="width: 45%">
+                            <mat-label>IGV</mat-label>
+                            <input formControlName="igvImport" matInput placeholder="IGV">
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- totalImport -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Total</mat-label>
+                        <input formControlName="totalImport" matInput placeholder="Total">
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+
+                    <!-- paidImport -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Doc. Correlativo</mat-label>
+                        <input formControlName="paidImport" matInput placeholder="Doc. Correlativo">
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+
+                    <!-- indebtImport -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Razón social</mat-label>
+                        <input formControlName="indebtImport" matInput placeholder="Razón social">
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+
+                    <p><b>Lista de Items</b></p>
+
+
+                </div>
+            </form>
+            <form [formGroup]="itemsListForm" 
+                style="display: flex; flex-direction: row; width: 100%; justify-content: space-between; align-items: center;">
+                <!-- item -->
+                <mat-form-field appearance="outline" style="width: 25%;">
+                    <mat-label>Item</mat-label>
+                    <mat-select formControlName="item" matInput placeholder="Seleccione Ítem">
+                        <mat-option><mat-icon>add</mat-icon>Crear Item</mat-option>
+                    </mat-select>
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+                <!-- quantity -->
+                <mat-form-field appearance="outline" style="width: 25%;">
+                    <mat-label>Cantidad</mat-label>
+                    <input formControlName="quantity" matInput placeholder="Cantidad">
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+                <!-- cost -->
+                <mat-form-field appearance="outline" style="width: 25%;">
+                    <mat-label>Costo</mat-label>
+                    <input formControlName="cost" matInput placeholder="Costo">
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+                <div>
+                    <button mat-raised-button color="secondary" type="button" style="height:100%">
+                        <mat-icon>add_circle</mat-icon>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <!-- Items List and Form -->
+</div>

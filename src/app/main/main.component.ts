@@ -16,7 +16,7 @@ export class MainComponent implements OnInit {
   thirdOpenedFlag: boolean = false;
   
   constructor(
-    private auth: AuthService,
+    public auth: AuthService,
     public router: Router
   ) { }
 

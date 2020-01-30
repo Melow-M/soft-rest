@@ -1,9 +1,87 @@
 .ticket {
     border-right: 1px solid black;
-    width: 25%;
-    height: 80vh;
+    width: 50%;
+    max-width: 380px;
+    min-width: 150px;
+    min-height: 83vh;
+    padding: 20px 16px;
 }
 
-.ticket .header {
+.flex-div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.header {
     color: #B70705;
+    font-weight: 600;
+    font-size: 1.8vh;
+    font-family: Raleway;
+}
+
+.categories {
+    padding: 20px 3vw;
+    overflow: auto;
+    min-height: 83vh;
+}
+
+.type {
+    padding: 20px 3vw;
+}
+
+.categories .flex-div {
+    justify-content: space-between;
+}
+
+.category {
+    width: 14vw;
+    min-width: 100px;
+    margin-top: 2vw;
+    height: 16vw;
+    min-height: 120px;
+    background: #EFEFEF;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.category div {
+    margin-top: 2.6vw;
+    font-size: 1.4vw;
+    color: #828282;
+    font-family: Raleway;
+}
+
+.category .icon {
+    width: 8vw;
+    font-size: 8vw;
+    color: #828282;
+}
+
+.type .category {
+    width: 12vw;
+    height: 14vw;
+}
+
+.type .category .icon {
+    width: 7vw;
+    font-size: 7vw;
+}
+
+.type .category div {
+    margin-top: 2vw;
+    font-size: 1.2vw;
+}
+
+.plates {
+    border-top: 1px solid black;
+    width: 100%;
+    padding: 20px 3vw;
+}
+
+.plates .box {
+    background: #EFEFEF;
+    border-radius: 5px;
+    width: 10vw;
+    height: 10vw;
+    margin-right: 1vw;
 }

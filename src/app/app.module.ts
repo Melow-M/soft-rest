@@ -41,7 +41,6 @@ import { AuthGuard } from './core/auth.guard';
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features
     MatSnackBarModule
-
   ],
   providers: [
     AuthService,

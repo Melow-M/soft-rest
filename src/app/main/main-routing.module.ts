@@ -37,8 +37,8 @@ const routes: Routes = [
         loadChildren: () => import('./admin/admin.module').then(mod => mod.AdminModule)
       },
       {
-        path: 'terceros',
-        loadChildren: () => import('./third-parties/third-parties.module').then(mod => mod.ThirdPartiesModule)
+        path: 'terceros/proveedores',
+        loadChildren: () => import('./third-parties/providers/providers.module').then(mod => mod.ProvidersModule)
       }
     ]
   }

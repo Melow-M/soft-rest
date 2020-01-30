@@ -4,11 +4,11 @@ export interface kitchenInput {
   id: string;
   name: string;
   description: string | null;
-  sku: string;
+  sku: string;      //Código
   unit: string;
   stock: number;
   emergencyStock: number;
-  picture: string | null; 
+  picture?: string | null; 
   status: string; // ACTIVO, INACTIVO
   createdAt: Date;
   createdBy: User | null;

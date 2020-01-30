@@ -22,3 +22,8 @@
 .mat-calendar-cell-over > .mat-calendar-body-cell-content {
     border: #B70705 1px solid;
 }
+
+.mat-calendar-body-selected {
+    background-color: #B70705;
+    color: #fff;
+}

@@ -3,13 +3,17 @@ import { CommonModule } from '@angular/common';
 
 import { PurchasesComponent } from './purchases.component';
 import { PurchasesRoutingModule } from './purchases-routing.module';
-import { MatDividerModule, MatIconModule, MatDatepickerModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule } from '@angular/material';
+import { MatDividerModule, MatIconModule, MatDatepickerModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatDialogModule, MatOptionModule } from '@angular/material';
 import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RegisterDocumentsComponent } from './register-documents/register-documents.component';
+import { CreateProviderDialogComponent } from '../../third-parties/providers/create-provider-dialog/create-provider-dialog.component';
 
 @NgModule({
   declarations: [
-    PurchasesComponent
+    PurchasesComponent,
+    RegisterDocumentsComponent,
+    CreateProviderDialogComponent
   ],
   imports: [
     CommonModule,
@@ -23,7 +27,13 @@ import { ReactiveFormsModule } from '@angular/forms';
     ReactiveFormsModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
+    MatButtonModule,
+    MatDialogModule,
+    MatOptionModule
+  ],
+  entryComponents: [
+    RegisterDocumentsComponent,
+    CreateProviderDialogComponent
   ]
 })
 export class PurchasesModule { }

@@ -1,0 +1,107 @@
+<div mat-dialog-title>
+    <div
+        style="font-size: x-large; margin-bottom: 8px; display: flex; flex-direction: row; justify-content: space-between;">
+        <span>
+            <mat-icon style="vertical-align: middle; margin-right: 4px;">add_circle</mat-icon>
+            Crear Proveedor
+        </span>
+        <button mat-button mat-dialog-close>
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <mat-divider></mat-divider>
+</div>
+
+<div mat-dialog-content>
+    <div class="parentComponent">
+        <div class="childComponent">
+            <p><b>Información</b></p>
+            <mat-divider></mat-divider>
+            <form [formGroup]="providerInfoFormGroup">
+                <!-- ruc -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>RUC</mat-label>
+                    <input formControlName="ruc" placeholder="RUC"
+                        matInput type="number">
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+
+                <!-- name -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Razón Social</mat-label>
+                    <input formControlName="name" placeholder="Razón Social"
+                        matInput >
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+
+                <!-- address -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Dirección</mat-label>
+                    <input formControlName="address" placeholder="Dirección"
+                        matInput >
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+
+                <!-- phone -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Teléfono</mat-label>
+                    <input formControlName="phone" placeholder="Teléfono"
+                        matInput type="number">
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+
+                <!-- detractionAccount -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Cuenta de detracciones</mat-label>
+                    <input formControlName="detractionAccount" placeholder="Cuenta de detracciones"
+                        matInput type="number">
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+            </form>
+        </div>
+        <div class="childComponent">
+            <p><b>Cuentas de Depósito</b></p>
+            <mat-divider></mat-divider>
+            <form [formGroup]="bankAccountsFormGroup" (ngSubmit)="onAddAccount()">
+                <!-- BANK -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Banco</mat-label>
+                    <mat-select formControlName="bank" placeholder="Banco">
+                        <mat-option *ngFor="let bank of bankList" [value]="bank">
+                            {{bank}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-hint>*Opcional</mat-hint>
+                </mat-form-field>
+
+                <!-- Account Type -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Tipo de cuenta</mat-label>
+                    <mat-select formControlName="type" placeholder="Tipo de cuenta">
+                        <mat-option *ngFor="let type of typeList" [value]="type">
+                            {{type}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-hint>*Opcional</mat-hint>
+                </mat-form-field>
+
+                <!-- accountNumber -->
+                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                    <mat-label>Número de Cuenta</mat-label>
+                    <input formControlName="accountNumber" placeholder="Número de Cuenta"
+                        matInput type="number">
+                    <mat-hint>*Opcional</mat-hint>
+                </mat-form-field>
+
+                <!-- Agregar -->
+                <button type="submit" mat-raised-button color="secondary">
+                    <mat-icon>credit_card</mat-icon> Agregar Cuenta
+                </button>
+            </form>
+        </div>
+        <div class="childComponent">
+            <p><b>Contactos</b></p>
+            <mat-divider></mat-divider>
+        </div>
+    </div>
+</div>

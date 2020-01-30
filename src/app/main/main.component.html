@@ -130,11 +130,15 @@
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
-                    <p class="w3-margin-bottom"></p>
+                    
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink="terceros/proveedores" style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">assignment_turned_in
+                        </mat-icon> Proveedores
+                    </button>
 
                 </mat-expansion-panel>
-
-
 
             </div>
         </mat-sidenav>

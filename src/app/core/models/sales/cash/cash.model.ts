@@ -16,3 +16,4 @@ export interface Cash {
   editedAt: Date;
   editedBy: User;
 }
+

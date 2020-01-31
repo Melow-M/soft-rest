@@ -8,9 +8,9 @@
       <div>
         <h1 style="font-size:1.8em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
           <mat-icon style="vertical-align:middle; transform: scale(1.5); margin-right: 1em; margin-left: 0.3em;">
-            assignment_turned_in
+            person_pin
           </mat-icon>
-          Proveedores
+          Clientes
         </h1>
       </div>
       <mat-divider></mat-divider>
@@ -25,17 +25,17 @@
       <p></p>
     </div>
     <div class="w3-col s12 m10 l10">
-      <mat-progress-bar mode="indeterminate" *ngIf="loadingProviders$ | async"></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate" *ngIf="loadingCustomers$ | async"></mat-progress-bar>
       <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
-        <ng-container *ngIf="providers$ | async as providers">
+        <ng-container *ngIf="customers$ | async as customers">
           <div>
             <button mat-raised-button class="ms-icons-color mat-PRIMARY
-            " style="margin:0em 0.2em 1em 0.2em" (click)="createProvider()">
+            " style="margin:0em 0.2em 1em 0.2em" (click)="createCustomer()">
               <mat-icon>add_circle</mat-icon> Crear
             </button>
 
             <button mat-button style="margin:0em 0.2em 1em 0.2em" disabled>
-              <mat-icon>account_circle</mat-icon> {{providers.length | number: '2.0'}} Proveedores
+              <mat-icon>account_circle</mat-icon> {{customers.length | number: '2.0'}} Clientes
             </button>
 
             <span style="margin-right:1em">
@@ -49,7 +49,7 @@
             </span>
           </div>
 
-          <ng-container *ngIf="providers.length; else default">
+          <ng-container *ngIf="customers.length; else default">
             <div class="mat-elevation-z8" style="border-radius: 10px 10px 10px 10px">
               <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
                 <table mat-table [dataSource]="dataSource" style="width:100%">
@@ -66,48 +66,37 @@
                     <td mat-cell style="padding:0px 8px; min-width: 250px" *matCellDef="let raw">
                       <button mat-button class="ms-color-11">
                         <mat-icon style="vertical-align: middle; margin-right: 8px">
-                          local_convenience_store</mat-icon>
-                        {{raw.name ? raw.name : '---'}}
+                          {{raw.type === 'EMPRESA' ? 'domain' : 'account_circle'}}</mat-icon>
+                        {{raw.name ? raw.name : raw.businessName}}
                       </button>
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="ruc">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>RUC</th>
+                  <ng-container matColumnDef="dni">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>DNI/RUC</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.ruc ? raw.ruc : '---'}}
+                      {{raw.ruc ? raw.ruc : raw.dni}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="address">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Dirección</th>
                     <td mat-cell style="padding:0px 8px; min-width:300px" *matCellDef="let raw">
-                      {{raw.address ? raw.address : '---'}}
+                      {{raw.businessAddress ? raw.businessAddress : raw.address}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="phone">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Teléfono</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.phone ? raw.phone : '---'}}
+                      {{raw.businessPhone ? raw.businessPhone : raw.phone}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="detractionAccount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Cuenta de detracciones
-                    </th>
+                  <ng-container matColumnDef="mail">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Correo</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.detractionAccount ? raw.detractionAccount : '---'}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="bankAccounts">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Cuentas de deposito</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <button mat-raised-button color="primary" (click)="openBankAccounts(raw)"
-                        [disabled]="raw.bankAccounts ? !raw.bankAccounts.length : true">
-                        <mat-icon>credit_card</mat-icon> Cuentas
-                      </button>
+                      {{raw.businessMail ? '---' : raw.mail}}
                     </td>
                   </ng-container>
 
@@ -115,7 +104,7 @@
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Contactos</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <button mat-raised-button color="primary" (click)="openContactList(raw)"
-                        [disabled]="raw.contacts ? !raw.contacts.length : true">
+                        [disabled]="raw.type === 'NATURAL' || (raw.contacts ? (!raw.contacts.length) : true)">
                         <mat-icon>contacts</mat-icon> Contactos
                       </button>
                     </td>
@@ -147,10 +136,10 @@
                     <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
                     <td mat-cell class="w3-center" style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
-                        <button mat-menu-item (click)="editProvider(raw)" [disabled]="thirdPartiesEditAction">
+                        <button mat-menu-item (click)="editCustomer(raw)" [disabled]="thirdPartiesEditAction">
                           <mat-icon class="ms-icons-color">edit</mat-icon> Editar
                         </button>
-                        <button mat-menu-item (click)="deleteProvider(raw)" [disabled]="thirdPartiesDeleteAction">
+                        <button mat-menu-item (click)="deleteCustomer(raw)" [disabled]="thirdPartiesDeleteAction">
                           <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
                       </mat-menu>
@@ -165,8 +154,7 @@
 
                 </table>
               </div>
-              <mat-paginator style="border-radius: 0px 0px 10px 10px" [pageSizeOptions]="[5, 10, 20]"
-                showFirstLastButtons></mat-paginator>
+              <mat-paginator style="border-radius: 0px 0px 10px 10px" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
             </div>
           </ng-container>
 
@@ -175,7 +163,7 @@
         <ng-template #default>
           <div class="w3-container w3-center  w3-round-large mat-elevation-z8 w3-margin-top w3-margin-bottom">
             <h2 style="font-family: Raleway; color: dimgray">
-              No hay proveedores registrados
+              No hay clientes registrados
             </h2>
           </div>
         </ng-template>

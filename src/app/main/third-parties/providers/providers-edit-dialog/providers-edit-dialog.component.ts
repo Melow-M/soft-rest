@@ -1,21 +1,21 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { BankAccount } from 'src/app/core/models/third-parties/bankAccount.model';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { BankAccount } from 'src/app/core/models/third-parties/bankAccount.model';
 import { Contact } from 'src/app/core/models/third-parties/contact.model';
 import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
-import { MatDialogRef, MatSnackBar } from '@angular/material';
-import { map, tap, debounceTime, take } from 'rxjs/operators';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { MatDialogRef, MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
+import { map, tap, debounceTime, take } from 'rxjs/operators';
 import { Provider } from 'src/app/core/models/third-parties/provider.model';
 
 @Component({
-  selector: 'app-create-provider-dialog',
-  templateUrl: './create-provider-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-providers-edit-dialog',
+  templateUrl: './providers-edit-dialog.component.html',
+  styles: []
 })
-export class CreateProviderDialogComponent implements OnInit {
+export class ProvidersEditDialogComponent implements OnInit {
 
   bankList: String[] = [
     'BBVA CONTINENTAL', 'BCP', 'INTERBANK', 'SCOTIABANK', 'CAJA AREQUIPA'
@@ -42,8 +42,9 @@ export class CreateProviderDialogComponent implements OnInit {
     public dbs: DatabaseService,
     public auth: AuthService,
     private af: AngularFirestore,
-    private dialogRef: MatDialogRef<CreateProviderDialogComponent>,
-    private snackbar: MatSnackBar
+    private dialogRef: MatDialogRef<ProvidersEditDialogComponent>,
+    private snackbar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) public data: { provider: Provider }
   ) { }
 
   ngOnInit() {
@@ -72,11 +73,11 @@ export class CreateProviderDialogComponent implements OnInit {
 
   createForm(): void {
     this.dataFormGroup = this.fb.group({
-      name: [null, [Validators.required]],
-      ruc: [null, [Validators.required]],
-      address: [null, [Validators.required]],
-      phone: null,
-      detractionAccount: null,
+      name: [this.data.provider.name, [Validators.required]],
+      ruc: [this.data.provider.ruc, [Validators.required]],
+      address: [this.data.provider.address, [Validators.required]],
+      phone: this.data.provider.phone,
+      detractionAccount: this.data.provider.detractionAccount,
       bank: null,
       type: null,
       accountNumber: null,
@@ -84,6 +85,9 @@ export class CreateProviderDialogComponent implements OnInit {
       contactPhone: null,
       contactMail: null
     });
+
+    this.contactList = this.data.provider.contacts;
+    this.bankAccounts = this.data.provider.bankAccounts;
   }
 
   addContact(): void {
@@ -152,15 +156,14 @@ export class CreateProviderDialogComponent implements OnInit {
 
       const batch = this.af.firestore.batch();
 
-      const providerRef = this.af.firestore.collection(this.dbs.providersCollection.ref.path).doc();
+      const providerRef = this.af.firestore.doc(this.dbs.providersCollection.ref.path + `/${this.data.provider.id}`);
 
       this.auth.user$
         .pipe(
           take(1)
         )
         .subscribe(user => {
-          const data: Provider = {
-            id: providerRef.id,
+          const data = {
             name: this.dataFormGroup.value['name'],
             address: this.dataFormGroup.value['address'],
             ruc: this.dataFormGroup.value['ruc'],
@@ -168,22 +171,22 @@ export class CreateProviderDialogComponent implements OnInit {
             detractionAccount: this.dataFormGroup.value['detractionAccount'],
             contacts: this.contactList,
             bankAccounts: this.bankAccounts,
-            createdAt: new Date(),
-            createdBy: user
+            editedAt: new Date(),
+            editedBy: user
           }
 
-          batch.set(providerRef, data);
+          batch.update(providerRef, data);
 
           batch.commit()
             .then(() => {
-              this.snackbar.open('Cliente creado!', 'Cerrar', {
+              this.snackbar.open('Cliente actualizado!', 'Cerrar', {
                 duration: 6000
               });
               this.dialogRef.close(true);
             })
             .catch(err => {
               console.log(err);
-              this.snackbar.open('Parece que hubo un error creando el nuevo cliente!', 'Cerrar', {
+              this.snackbar.open('Parece que hubo un error accediendo a la base de datos!', 'Cerrar', {
                 duration: 6000
               });
             });

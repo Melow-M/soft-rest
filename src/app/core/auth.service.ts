@@ -10,26 +10,23 @@ import { Observable, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
 import { Platform } from '@angular/cdk/platform';
 import { switchMap, map, tap, shareReplay, filter } from 'rxjs/operators';
-import { User } from './user';
-//import { UserAndPermits } from "./models/userandpermits.model";
+import { User } from './models/general/user.model';
+import { UserAndRole } from "./models/general/userAndRole.model";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  public permitsDocument: AngularFirestoreDocument<any>;
-  public permits$: Observable<any>;
+  public role$: Observable<any>;
 
-  user$: Observable<User>;
-  //userAndPermits$: Observable<UserAndPermits>;
-  //notifications$: Observable<any>; // FALTA MODEL
-  //tasks$: Observable<any>;
+  public user$: Observable<User>;
+  public userAndRole$: Observable<UserAndRole>;
 
   authLoader: boolean = false;
 
-  // actionsGetUser = new BehaviorSubject<boolean>(true);
-  // getUser$ = this.actionsGetUser.asObservable();
+  actionsGetUser = new BehaviorSubject<boolean>(true);
+  getUser$ = this.actionsGetUser.asObservable();
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -50,39 +47,23 @@ export class AuthService {
         })
       );
 
-    // this.permits$ =
-    //   this.user$.pipe(
-    //     filter(user => user !== null),
-    //     switchMap(user => {
-    //       return this.afs.doc(`db/systemConfigurations/permits/${user.permit.id}`).valueChanges();
-    //     })
-    //   );
+    this.role$ =
+      this.user$.pipe(
+        filter(user => user !== null),
+        switchMap(user => {
+          return this.afs.doc(`db/deliciasTete/roles/${user.roleId}`).valueChanges();
+        })
+      );
 
-    // this.notifications$ =
-    //   this.user$.pipe(
-    //     filter(user => user !== null),
-    //       switchMap(user => {
-    //         return this.afs.collection(`users/${user.uid}/notifications`).valueChanges();
-    //       })
-    //   )
-
-    //   this.tasks$ =
-    //   this.user$.pipe(
-    //     filter(user => user !== null),
-    //       switchMap(user => {
-    //         return this.afs.collection(`users/${user.uid}/tasks`).valueChanges();
-    //       })
-    //   )
-
-    // this.userAndPermits$ = combineLatest(
-    //   this.user$,
-    //   this.permits$
-    // ).pipe(
-    //   map(([user, permits]) => {
-    //     return { ...user, permits: permits }
-    //   }),
-    //   shareReplay(1)
-    // );
+    this.userAndRole$ = combineLatest(
+      this.user$,
+      this.role$
+    ).pipe(
+      map(([user, role]) => {
+        return { ...user, role: role }
+      }),
+      shareReplay(1)
+    );
   }
 
   // ********* EMAIL LOGIN

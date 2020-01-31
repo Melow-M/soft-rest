@@ -7,7 +7,8 @@ export interface kitchenInput {
   sku: string;      //Código
   unit: string;
   stock: number;
-  emergencyStock: number;
+  cost: number;
+  emergencyStock?: number;
   picture?: string | null; 
   status: string; // ACTIVO, INACTIVO
   createdAt: Date;

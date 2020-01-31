@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material';
 import { Provider } from 'src/app/core/models/third-parties/provider.model';
 import { kitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model';
 import { CreateProviderDialogComponent } from 'src/app/main/third-parties/providers/create-provider-dialog/create-provider-dialog.component'
+import { CreateInputDialogComponent } from '../../stocktaking/create-input-dialog/create-input-dialog.component';
 
 @Component({
   selector: 'app-register-documents',
@@ -40,7 +41,7 @@ export class RegisterDocumentsComponent implements OnInit {
         documentType: [null, Validators.required],
         documentSerial: [null, Validators.required],
         documentCorrelative: [null, Validators.required],
-        socialReason: [{value: null, disabled: true}, Validators.required],     //Depends on RUC
+        socialReason: [{value: null, disabled: true}, Validators.required],     //Depends on RUC, should not be sent
         provider: [null, Validators.required],
         paymentType: [null, Validators.required],
         creditExpirationDate: [{value: null, disabled: true}, Validators.required]  //Depend on Credito
@@ -87,6 +88,13 @@ export class RegisterDocumentsComponent implements OnInit {
     this.dialog.open(CreateProviderDialogComponent, {
       width: '100vw',
       height: '90vh'
+    });
+  }
+
+  onCreateInput(){
+    this.dialog.open(CreateInputDialogComponent, {
+      width: '450px',
+      height: '80vh'
     });
   }
 

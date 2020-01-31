@@ -8,12 +8,14 @@ import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RegisterDocumentsComponent } from './register-documents/register-documents.component';
 import { CreateProviderDialogComponent } from '../../third-parties/providers/create-provider-dialog/create-provider-dialog.component';
+import { CreateInputDialogComponent } from '../stocktaking/create-input-dialog/create-input-dialog.component';
 
 @NgModule({
   declarations: [
     PurchasesComponent,
     RegisterDocumentsComponent,
-    CreateProviderDialogComponent
+    CreateProviderDialogComponent,
+    CreateInputDialogComponent
   ],
   imports: [
     CommonModule,
@@ -33,7 +35,8 @@ import { CreateProviderDialogComponent } from '../../third-parties/providers/cre
   ],
   entryComponents: [
     RegisterDocumentsComponent,
-    CreateProviderDialogComponent
+    CreateProviderDialogComponent,
+    CreateInputDialogComponent
   ]
 })
 export class PurchasesModule { }

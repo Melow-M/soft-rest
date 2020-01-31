@@ -23,14 +23,14 @@
                     <!-- Detalle del comprobante -->
                     <p><b>Detalle del Comprobante</b></p>
                     <!-- documentDate -->
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Fecha de Emisión</mat-label>
                         <input formControlName="documentDate" matInput placeholder="Fecha de Emisión">
                         <mat-hint>*Requerido</mat-hint>
                     </mat-form-field>
 
                     <!-- documentType -->
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Tipo de Comprobante</mat-label>
                         <mat-select formControlName="documentType" placeholder="Tipo de Comprobante">
                             <mat-option *ngFor="let type of documentType" [value]="type">{{type}}</mat-option>
@@ -40,14 +40,14 @@
 
                     <div style="display: flex; flex-direction: row; justify-content: space-between;">
                         <!-- documentSerial -->
-                        <mat-form-field appearance="outline" style="width: 45%">
+                        <mat-form-field appearance="outline" class="w3-margin-bottom" style="width: 45%">
                             <mat-label>N. Serie</mat-label>
                             <input formControlName="documentSerial" matInput placeholder="Doc. Serie">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
 
                         <!-- documentCorrelative -->
-                        <mat-form-field appearance="outline" style="width: 45%">
+                        <mat-form-field appearance="outline" class="w3-margin-bottom" style="width: 45%">
                             <mat-label>N. Correlativo</mat-label>
                             <input formControlName="documentCorrelative" matInput placeholder="Doc. Correlativo">
                             <mat-hint>*Requerido</mat-hint>
@@ -55,7 +55,7 @@
                     </div>
 
                     <!-- provider -->
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Proveedor</mat-label>
                         <mat-select formControlName="provider" placeholder="Proveedor">
                             <mat-option (click)="onAddProvider()"><mat-icon>add</mat-icon>Añadir Proveedor</mat-option>
@@ -64,7 +64,7 @@
                     </mat-form-field>
 
                     <!-- socialReason -->
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Razón social</mat-label>
                         <input formControlName="socialReason" matInput placeholder="Razón social">
                         <mat-hint>*Requerido</mat-hint>
@@ -73,7 +73,7 @@
                     <!-- Detalle de pago -->
                     <p style="margin-top: 16px"><b>Detalle de Pago</b></p>
                     <!-- paymentType -->
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Tipo de Pago</mat-label>
                         <mat-select formControlName="paymentType" placeholder="Tipo de Pago">
                             <mat-option *ngFor="let type of paymentType" [value]="type">{{type}}</mat-option>
@@ -82,7 +82,7 @@
                     </mat-form-field>
 
                     <!-- creditExpirationDate -->
-                    <mat-form-field appearance="outline" *ngIf="!documentForm.get('documentDetails.creditExpirationDate').disabled">
+                    <mat-form-field appearance="outline" class="w3-margin-bottom" *ngIf="!documentForm.get('documentDetails.creditExpirationDate').disabled">
                         <mat-label>Fecha de Expiración de Crédito</mat-label>
                         <input formControlName="creditExpirationDate" matInput
                             placeholder="Fecha de Expiración de Crédito">
@@ -102,42 +102,45 @@
 
                     <div style="display: flex; flex-direction: row; justify-content: space-between;" *ngIf="!documentForm.get('imports.subtotalImport').disabled">
                         <!-- subtotalImport -->
-                        <mat-form-field appearance="outline"  style="width: 45%">
+                        <mat-form-field appearance="outline"  style="width: 45%" class="w3-margin-bottom">
                             <mat-label>Sub Total</mat-label>
                             <input formControlName="subtotalImport" matInput placeholder="Sub Total">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
 
                         <!-- igvImport -->
-                        <mat-form-field appearance="outline"  style="width: 45%">
+                        <mat-form-field appearance="outline"  style="width: 45%" class="w3-margin-bottom">
                             <mat-label>IGV</mat-label>
-                            <input formControlName="igvImport" matInput placeholder="IGV">
+                            <input formControlName="igvImport" matInput placeholder="IGV" type="number">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
                     </div>
 
                     <!-- totalImport -->
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Total</mat-label>
                         <input formControlName="totalImport" matInput placeholder="Total">
                         <mat-hint>*Requerido</mat-hint>
                     </mat-form-field>
 
-                    <!-- paidImport -->
-                    <mat-form-field appearance="outline">
-                        <mat-label>Doc. Correlativo</mat-label>
-                        <input formControlName="paidImport" matInput placeholder="Doc. Correlativo">
-                        <mat-hint>*Requerido</mat-hint>
-                    </mat-form-field>
+                    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                        <!-- paidImport -->
+                        <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
+                            <mat-label>A Cuenta (S/.)</mat-label>
+                            <input formControlName="paidImport" matInput placeholder="A Cuenta (S/.)">
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
 
-                    <!-- indebtImport -->
-                    <mat-form-field appearance="outline">
-                        <mat-label>Razón social</mat-label>
-                        <input formControlName="indebtImport" matInput placeholder="Razón social">
-                        <mat-hint>*Requerido</mat-hint>
-                    </mat-form-field>
+                        <!-- indebtImport -->
+                        <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
+                            <mat-label>En Deuda (S/.)</mat-label>
+                            <input formControlName="indebtImport" matInput placeholder="En Deuda (S/.)">
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+                    </div>
 
-                    <p><b>Lista de Items</b></p>
+
+                    <p><b>Lista de Insumos</b></p>
 
 
                 </div>
@@ -146,9 +149,9 @@
                 style="display: flex; flex-direction: row; width: 100%; justify-content: space-between; align-items: center;">
                 <!-- item -->
                 <mat-form-field appearance="outline" style="width: 25%;">
-                    <mat-label>Item</mat-label>
-                    <mat-select formControlName="item" matInput placeholder="Seleccione Ítem">
-                        <mat-option><mat-icon>add</mat-icon>Crear Item</mat-option>
+                    <mat-label>Insumos</mat-label>
+                    <mat-select formControlName="item" matInput placeholder="Seleccione Insumo">
+                        <mat-option (click)="onCreateInput()"><mat-icon>add</mat-icon>Crear Item</mat-option>
                     </mat-select>
                     <mat-hint>*Requerido</mat-hint>
                 </mat-form-field>

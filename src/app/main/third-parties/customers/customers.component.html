@@ -115,9 +115,9 @@
                       Creado por</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <span>{{raw.createdBy ? raw.createdBy.displayName : '---' }}</span><br>
-                      <span *ngIf="raw.regDate">{{raw.regDate | date : 'dd/MM/yyyy'}}</span><br>
-                      <span *ngIf="raw.regDate" class="w3-small"><b>
-                          ({{raw.regDate | date : 'hh:mm a'}})</b></span>
+                      <span *ngIf="raw.createdAt">{{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}</span><br>
+                      <span *ngIf="raw.createdAt" class="w3-small"><b>
+                          ({{raw.createdAt.seconds * 1000 | date : 'hh:mm a'}})</b></span>
                     </td>
                   </ng-container>
 

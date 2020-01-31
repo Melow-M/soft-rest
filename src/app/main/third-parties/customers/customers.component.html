@@ -126,9 +126,9 @@
                       Editado por</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <span>{{raw.editedBy ? raw.editedBy.displayName : '---' }}</span><br>
-                      <span *ngIf="raw.editedDate">{{raw.editedDate | date : 'dd/MM/yyyy'}}</span><br>
+                      <span *ngIf="raw.editedDate">{{raw.editedDate.seconds * 1000 | date : 'dd/MM/yyyy'}}</span><br>
                       <span *ngIf="raw.editedDate" class="w3-small"><b>
-                          ({{raw.editedDate | date : 'hh:mm a'}})</b></span>
+                          ({{raw.editedDate.seconds * 1000 | date : 'hh:mm a'}})</b></span>
                     </td>
                   </ng-container>
 

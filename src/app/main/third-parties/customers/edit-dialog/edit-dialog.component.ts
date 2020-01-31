@@ -141,6 +141,8 @@ export class EditDialogComponent implements OnInit {
       contactPhone: null,
       contactMail: null
     });
+
+    this.contactsList = this.data.customer.contacts;
   }
 
   addContact(): void {
@@ -190,30 +192,24 @@ export class EditDialogComponent implements OnInit {
         .subscribe(user => {
           if (this.dataFormGroup.value['type'] === 'NATURAL') {
             data = {
-              id: customerRef.id,
               type: this.dataFormGroup.value['type'],
               name: this.dataFormGroup.value['name'],
               dni: this.dataFormGroup.value['dni'],
               phone: this.dataFormGroup.value['phone'],
               mail: this.dataFormGroup.value['mail'],
-              createdAt: new Date(),
-              createdBy: user,
-              editedBy: null,
-              editedDate: null
+              editedAt: new Date(),
+              editedBy: user
             }
           } else {
             data = {
-              id: customerRef.id,
               type: this.dataFormGroup.value['type'],
               businessName: this.dataFormGroup.value['businessName'],
               businessAddress: this.dataFormGroup.value['businessAddress'],
               ruc: this.dataFormGroup.value['ruc'],
               businessPhone: this.dataFormGroup.value['businessPhone'],
               contacts: this.contactsList,
-              createdAt: new Date(),
-              createdBy: user,
-              editedBy: null,
-              editedDate: null
+              editedAt: new Date(),
+              editedBy: user
             }
           }
 

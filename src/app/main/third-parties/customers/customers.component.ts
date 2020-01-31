@@ -55,7 +55,7 @@ export class CustomersComponent implements OnInit {
             }
           });
 
-          const filteredList = list.length ? list : customers;
+          const filteredList = list;
           this.dataSource.data = filteredList;
 
           return filteredList;

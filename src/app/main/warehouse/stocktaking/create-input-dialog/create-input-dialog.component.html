@@ -18,12 +18,18 @@
         <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
             <mat-label>Nombre</mat-label>
             <input formControlName="name" placeholder="Nombre" matInput type="text">
+            <mat-error>
+                <span *ngIf="!inputFormGroup.errors?.repeatedName">Este nombre ya existe</span>
+            </mat-error>
             <mat-hint>*Requerido</mat-hint>
         </mat-form-field>
         <!-- sku -->
         <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
             <mat-label>Código</mat-label>
             <input formControlName="sku" placeholder="Código" matInput type="text">
+            <mat-error>
+                <span *ngIf="!inputFormGroup.errors?.repeatedCode">Este sku ya existe</span>
+            </mat-error>
             <mat-hint>*Requerido</mat-hint>
         </mat-form-field>
 
@@ -33,8 +39,8 @@
             <input formControlName="unit" placeholder="Unidad" matInput type="text"
                 [matAutocomplete]="auto">
             <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let unit of filteredUnitList | async" [value]="unit">
-                    {{unit}}
+                <mat-option *ngFor="let unit of filteredUnitList" [value]="unit.unit">
+                    {{unit.unit}}
                 </mat-option>
             </mat-autocomplete>
             <mat-hint>*Requerido</mat-hint>
@@ -43,20 +49,35 @@
         <!-- description -->
         <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
             <mat-label>Descripción</mat-label>
-            <input formControlName="description" placeholder="Descripción" matInput type="text">
+            <textarea formControlName="description" placeholder="Descripción" matInput type="text">
+            </textarea>
             <mat-hint>*Requerido</mat-hint>
         </mat-form-field>
-        <!-- stock -->
-        <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
-            <mat-label>Stock Inicial</mat-label>
-            <input formControlName="stock" placeholder="Stock Inicial" matInput type="number">
-            <mat-hint>*Requerido</mat-hint>
-        </mat-form-field>
-        <!-- cost -->
-        <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
-            <mat-label>Costo Inicial</mat-label>
-            <input formControlName="cost" placeholder="Costo Inicial" matInput type="number">
-            <mat-hint>*Requerido</mat-hint>
-        </mat-form-field>
+
+        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <!-- stock -->
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline" style="width:45%;">
+                <mat-label>Stock Inicial</mat-label>
+                <input formControlName="stock" placeholder="Stock Inicial" matInput type="number">
+                <mat-hint>*Requerido</mat-hint>
+            </mat-form-field>
+            <!-- cost -->
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline" style="width:45%;">
+                <mat-label>Costo Inicial</mat-label>
+                <input formControlName="cost" placeholder="Costo Inicial" matInput type="number">
+                <mat-hint>*Requerido</mat-hint>
+            </mat-form-field>
+        </div>
+
     </form>
+</div>
+
+<div mat-dialog-actions align="end">
+    <button mat-raised-button color="PRIMARY" style="margin-right: 16px" mat-dialog-close>
+        Cancelar
+    </button>
+    <button (click)="onCreateInput()" mat-dialog-close
+        mat-raised-button color="primary" [disabled]="inputFormGroup.status != 'VALID'">
+        Guardar
+    </button>
 </div>

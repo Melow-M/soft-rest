@@ -1,6 +1,6 @@
 import { User } from '../general/user.model';
 
-export interface kitchenInput {
+export interface KitchenInput {
   id: string;
   name: string;
   description: string | null;
@@ -15,4 +15,10 @@ export interface kitchenInput {
   createdBy: User | null;
   editedAt: Date;
   editedBy: User | null;
+}
+
+export interface CostTrend{
+  cost: number,
+  createdAt: Date,
+  id: string
 }

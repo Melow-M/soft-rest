@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { tap, startWith, map } from 'rxjs/operators';
+import { FormGroup, FormBuilder, Validators, FormControl, ValidationErrors, AbstractControl } from '@angular/forms';
+import { tap, startWith, map, debounceTime, filter, take } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { DatabaseService } from 'src/app/core/database.service';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-create-input-dialog',
@@ -9,25 +11,29 @@ import { Observable } from 'rxjs';
   styleUrls: ['./create-input-dialog.component.css']
 })
 export class CreateInputDialogComponent implements OnInit {
-  unitList: String[] = [
-    'Kilos', 'Litros'
-  ]
-  filteredUnitList: Observable<String[]>;
+  unitList: {id: string, unit: string}[] = [ ];
+  filteredUnitList: {id: string, unit: string}[];
 
   inputFormGroup: FormGroup;
 
   constructor(
     private fb: FormBuilder,
+    private dbs: DatabaseService,
+    private snackbar: MatSnackBar,
   ) { }
 
   ngOnInit() {
+    this.dbs.onGetUnits().pipe(take(1)).subscribe(res => {
+      this.unitList = res;
+      this.filteredUnitList = res;
+    })
     this.initForm();
   }
 
   initForm(){
     this.inputFormGroup = this.fb.group({
-      name: [null, Validators.required],
-      sku: [null, Validators.required],       //Falta validador asincrono
+      name: [null, Validators.required, this.repeatedName(this.dbs)],
+      sku: [null, Validators.required, this.repeatedCode(this.dbs)],       //Falta validador asincrono
       unit: [null, Validators.required],
       description: [null, Validators.required],
       stock: [null, Validators.required],
@@ -35,31 +41,102 @@ export class CreateInputDialogComponent implements OnInit {
     });
 
     this.inputFormGroup.get('name').valueChanges.pipe(
+      debounceTime(500),
       startWith(''), 
+      filter((name: string )=> name != this.formatInput(name)),
       tap((name: string) => {
       console.log('now');
       this.inputFormGroup.get('name').setValue(this.formatInput(name))
-      }));
+      }))
+      .subscribe();
+
 
     this.inputFormGroup.get('unit').valueChanges.pipe(
-      startWith(''),
+      debounceTime(500),
+      startWith(' '),
+      filter((unit: string )=> unit != this.formatInput(unit)),
       tap((unit: string)=> {
         let newUnit = this.formatInput(unit);
-        this.inputFormGroup.get('unit').setValue(this.formatInput(newUnit));
-        this.filterUnits(this.formatInput(newUnit));
+        this.inputFormGroup.get('unit').setValue(newUnit);
+        this.filteredUnitList = this.filterUnits(newUnit);
       })
-      )
+      ).subscribe();
   }
 
-  filterUnits(value: string): String[] {
+  onCreateInput(){
+    let aux = this.unitList.find((unit) => (unit.unit == this.inputFormGroup.get('unit').value));
+
+    if(aux != undefined){
+      this.dbs.onAddInput(this.inputFormGroup.value, aux)
+      .subscribe(batch => {
+        batch.commit().then(()=> {
+            this.snackbar.open('Se creo el insumo exitosamente', 'Aceptar', {duration: 6000});
+          }
+        ).catch(()=>{
+          this.snackbar.open('Error. Vuelva a crear el insumo', 'Aceptar', {duration: 6000});
+        })
+      });
+    }
+    else{
+      this.dbs.onAddInput(this.inputFormGroup.value)
+      .subscribe(batch => {
+        batch.commit().then(()=> {
+            this.snackbar.open('Se creo el insumo exitosamente', 'Aceptar', {duration: 6000});
+          }
+        ).catch(()=>{
+          this.snackbar.open('Error. Vuelva a crear el insumo', 'Aceptar', {duration: 6000});
+        })
+      });
+    }
+  }
+
+  //Synchronous Validators
+  repeatedName(dbs: DatabaseService){
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      return dbs.onGetInputs().pipe(
+        debounceTime(500),
+        take(1),
+        map(inputList => {
+          let aux = inputList.find(input => (input.name == control.value));
+          if(aux != undefined){
+            return {repeatedName: true};
+          }
+          else return null;
+        })
+      )
+    }
+  }
+
+  repeatedCode(dbs: DatabaseService){
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      return dbs.onGetInputs().pipe(
+        debounceTime(500),
+        take(1),
+        map(inputList => {
+          let aux = inputList.find(input => (input.sku == control.value));
+          if(aux != undefined){
+            return {repeatedCode: true};
+          }
+          else return null;
+        })
+      )
+    }
+  }
+
+  //utils for Form
+  filterUnits(value: string): {id: string, unit: string}[] {
+    console.log(value)
+    if(!value.length){
+      return this.unitList;
+    }
     const filterValue = value.toUpperCase();
-    return this.unitList.filter(unit => unit.toUpperCase().includes(filterValue))
+    return this.unitList.filter(unit => unit.unit.toUpperCase().includes(filterValue))
   }
 
   formatInput(value: string){
     let aux = value;
-    let regex = new RegExp(/\s.+/, 'ig');
-    aux.replace(regex, ' ');
+    let regex = new RegExp(/\s+/, 'ig');
+    aux = aux.replace(regex, ' ');
     return aux.toUpperCase().trim();
   }
 

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { Provider } from 'src/app/core/models/third-parties/provider.model';
-import { kitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model';
+import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model';
 import { CreateProviderDialogComponent } from 'src/app/main/third-parties/providers/create-provider-dialog/create-provider-dialog.component'
 import { CreateInputDialogComponent } from '../../stocktaking/create-input-dialog/create-input-dialog.component';
 
@@ -17,7 +17,7 @@ export class RegisterDocumentsComponent implements OnInit {
 
   //Templates
   providers: Provider[];
-  items: kitchenInput[];
+  items: KitchenInput[];
   documentType: String[] = [
     'BOLETA', 'FACTURA', 'TICKET'
   ]
@@ -94,7 +94,7 @@ export class RegisterDocumentsComponent implements OnInit {
   onCreateInput(){
     this.dialog.open(CreateInputDialogComponent, {
       width: '450px',
-      height: '80vh'
+      height: '90vh'
     });
   }
 

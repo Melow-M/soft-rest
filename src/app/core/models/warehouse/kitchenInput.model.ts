@@ -1,13 +1,14 @@
 import { User } from '../general/user.model';
 
-export interface kitchenInput {
+export interface KitchenInput {
   id: string;
   name: string;
   description: string | null;
   sku: string;      //Código
   unit: string;
   stock: number;
-  emergencyStock: number;
+  cost: number;
+  emergencyStock?: number;
   picture?: string | null; 
   status: string; // ACTIVO, INACTIVO
   createdAt: Date;
@@ -15,3 +16,4 @@ export interface kitchenInput {
   editedAt: Date;
   editedBy: User | null;
 }
+

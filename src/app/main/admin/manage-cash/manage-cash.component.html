@@ -109,9 +109,9 @@
                       matTooltip="Ordenar tabla por apertura" matTooltipPosition="above" mat-sort-header>Última apertura
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <span *ngIf="raw.lastOpening">{{raw.lastOpening | date : 'dd/MM/yyyy'}}</span><br>
+                      <span *ngIf="raw.lastOpening">{{raw.lastOpening.seconds * 1000 | date : 'dd/MM/yyyy'}}</span><br>
                       <span *ngIf="raw.lastOpening" class="w3-small"><b>
-                          ({{raw.lastOpening | date : 'hh:mm a'}})</b></span>
+                          ({{raw.lastOpening.seconds * 1000 | date : 'hh:mm a'}})</b></span>
                     </td>
                   </ng-container>
 
@@ -120,9 +120,9 @@
                       matTooltip="Ordenar tabla por apertura" matTooltipPosition="above" mat-sort-header>Último cierre
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <span *ngIf="raw.lastClosure">{{raw.lastClosure | date : 'dd/MM/yyyy'}}</span><br>
+                      <span *ngIf="raw.lastClosure">{{raw.lastClosure.seconds * 1000 | date : 'dd/MM/yyyy'}}</span><br>
                       <span *ngIf="raw.lastClosure" class="w3-small"><b>
-                          ({{raw.lastClosure | date : 'hh:mm a'}})</b></span>
+                          ({{raw.lastClosure.seconds * 1000 | date : 'hh:mm a'}})</b></span>
                     </td>
                   </ng-container>
 

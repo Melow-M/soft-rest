@@ -23,7 +23,8 @@ import {
   MatMenuModule,
   MatDatepickerModule,
   MatNativeDateModule,
-  MatRadioModule
+  MatRadioModule,
+  MatSelectModule
 } from '@angular/material';
 import { AccountsPayableShowItemsDialogComponent } from './accounts-payable-show-items-dialog/accounts-payable-show-items-dialog.component';
 import { AccountsPayableShowPaymentsDialogComponent } from './accounts-payable-show-payments-dialog/accounts-payable-show-payments-dialog.component';
@@ -61,7 +62,8 @@ import { AccountsPayablePayDialogComponent } from './accounts-payable-pay-dialog
     MatMenuModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatRadioModule
+    MatRadioModule,
+    MatSelectModule
   ],
   entryComponents: [
     AccountsPayableShowItemsDialogComponent,

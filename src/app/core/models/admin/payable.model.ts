@@ -29,6 +29,7 @@ export interface Payable {
     type: string;
     paymentType: string;
     amount: number;
+    cashReference: Cash;
     paidAt: Date;
     paidBy: User;
   }>;
@@ -41,10 +42,6 @@ export interface Payable {
   paidAmount: number;
   indebtAmount: number;
   status: string; // PENDIENTE, PAGADO, ANULADO
-  cashReference: {
-    id: string;
-    name: string;
-  }
   createdAt: Date;
   createdBy: User;
   editedAt: Date;

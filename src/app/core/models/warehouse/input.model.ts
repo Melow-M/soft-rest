@@ -1,6 +1,6 @@
 import { User } from '../general/user.model';
 
-export interface kitchenInput {
+export interface Input {
   id: string;
   name: string;
   description: string | null;

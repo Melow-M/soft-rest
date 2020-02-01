@@ -3,7 +3,7 @@ import { Menu } from './menu.model';
 import { Meal } from './meal.model';
 import { Combo } from './combo.model';
 import { Promo } from './promo.model';
-import { Grocery } from './grocery.model';
+import { Grocery } from '../../warehouse/grocery.model';
 
 export interface Order {
   id: string;

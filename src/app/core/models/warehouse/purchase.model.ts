@@ -1,5 +1,5 @@
 import { User } from '../general/user.model';
-import { KitchenInput } from './kitchenInput.model';
+import { Input } from './input.model';
 import { Provider } from '../third-parties/provider.model';
 
 export interface Purchase {
@@ -25,7 +25,7 @@ export interface Purchase {
 
     itemsList: Array<{
         kitchenInputId: string;
-        item: KitchenInput;
+        item: Input;
         quantity: number;
         cost: number;
     }>;

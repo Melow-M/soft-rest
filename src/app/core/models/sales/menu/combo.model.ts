@@ -1,4 +1,5 @@
 import { User } from '../../general/user.model';
+import { Grocery } from '../../warehouse/grocery.model';
 import { Meal } from './meal.model';
 import { Grocery } from '../../warehouse/grocery.model';
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
@@ -15,7 +15,7 @@ import { CreateProviderDialogComponent } from './create-provider-dialog/create-p
 @Component({
   selector: 'app-providers',
   templateUrl: './providers.component.html',
-  styleUrls: ['./providers.component.css']
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProvidersComponent implements OnInit {
 

@@ -1,4 +1,6 @@
 import { User } from '../general/user.model';
+import { Contact } from './contact.model';
+import { BankAccount } from './bankAccount.model';
 
 export interface Provider {
     id: string;
@@ -7,21 +9,9 @@ export interface Provider {
     address: string;
     phone?: string;
     detractionAccount?: string;
-
-    bankAccounts?: Array<{  //Opciones dadas en interiores
-        bank: string;   
-        type: string;
-        accountNumber: string;
-    }>;
-
-    contacts?: Array<{
-        contactName: string;
-        contactPhone: string;
-        contactMail: string;
-    }>;
-
-    regDate: number;
-    createdBy: string;
+    bankAccounts?: Array<BankAccount>;
+    contacts?: Array<Contact>;
+    createdBy: User;
     createdAt: Date;
     editedBy?: User;
     editedAt?: Date;

@@ -1,79 +1,199 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormGroupDirective } from '@angular/forms';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { BankAccount } from 'src/app/core/models/third-parties/bankAccount.model';
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { Contact } from 'src/app/core/models/third-parties/contact.model';
+import { DatabaseService } from 'src/app/core/database.service';
+import { AuthService } from 'src/app/core/auth.service';
+import { MatDialogRef, MatSnackBar } from '@angular/material';
+import { map, tap, debounceTime, take } from 'rxjs/operators';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { Provider } from 'src/app/core/models/third-parties/provider.model';
 
 @Component({
   selector: 'app-create-provider-dialog',
   templateUrl: './create-provider-dialog.component.html',
-  styleUrls: ['./create-provider-dialog.component.css']
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateProviderDialogComponent implements OnInit {
+
   bankList: String[] = [
     'BBVA CONTINENTAL', 'BCP', 'INTERBANK', 'SCOTIABANK', 'CAJA AREQUIPA'
   ]
-  typeList: String[] = [
+  bankAccountTypes: String[] = [
     'AHORROS', 'CTA. CORRIENTE'
   ]
 
-  providerInfoFormGroup: FormGroup;
-  bankAccountsFormGroup: FormGroup;
-  contactsFormGroup: FormGroup;
+  dataFormGroup: FormGroup;
 
-  //Variables
-  bankAccounts: Array<{  //Opciones dadas en interiores
-    bank: string;   
-    type: string;
-    accountNumber: string;
-  }> = [];
-  contacts: Array<{
-    contactName: string;
-    contactPhone: string;
-    contactMail: string;
-  }> = [];
+  rucLoading = new BehaviorSubject(false);
+  rucLoading$ = this.rucLoading.asObservable();
+
+  savingCustomer = new BehaviorSubject(false);
+  savingCustomer$ = this.savingCustomer.asObservable();
+
+  bankAccounts: Array<BankAccount> = [];
+  contactList: Array<Contact> = [];
+
+  ruc$: Observable<boolean>;
 
   constructor(
     private fb: FormBuilder,
+    public dbs: DatabaseService,
+    public auth: AuthService,
+    private af: AngularFirestore,
+    private dialogRef: MatDialogRef<CreateProviderDialogComponent>,
+    private snackbar: MatSnackBar
   ) { }
 
   ngOnInit() {
-    this.initForms();
+    this.createForm();
+
+    this.ruc$ = combineLatest(
+      this.dbs.providers$,
+      this.dataFormGroup.get('ruc').valueChanges.pipe(tap(() => { this.rucLoading.next(true) }), debounceTime(300))
+    ).pipe(
+      map(([providers, ruc]) => {
+
+        const find = providers.filter(option => option.ruc === ruc);
+
+        if (find.length > 0) {
+          this.snackbar.open('El RUC ya existe en el sistema', 'Aceptar', {
+            duration: 4000
+          });
+        }
+
+        this.rucLoading.next(false);
+
+        return !!find.length;
+      })
+    );
   }
 
-  initForms() {
-    this.providerInfoFormGroup = this.fb.group({
-      ruc: [null, Validators.required],
-      name: [null, Validators.required],
-      address: [null, Validators.required],
-      phone: [null],
-      detractionAccount: [null]
+  createForm(): void {
+    this.dataFormGroup = this.fb.group({
+      name: [null, [Validators.required]],
+      ruc: [null, [Validators.required]],
+      address: [null, [Validators.required]],
+      phone: null,
+      detractionAccount: null,
+      bank: null,
+      type: null,
+      accountNumber: null,
+      contactName: null,
+      contactPhone: null,
+      contactMail: null
     });
-
-    this.bankAccountsFormGroup = this.fb.group({
-      bank: [null],
-      type: [null],
-      accountNumber: [null]
-    })
-
-    this.contactsFormGroup = this.fb.group({
-      contactName: [null],
-      contactPhone: [null],
-      contactMail: [null]
-    })
   }
 
-  onAddAccount(){
-    this.bankAccounts.push(this.bankAccountsFormGroup.value);
-    this.bankAccountsFormGroup.reset();
+  addContact(): void {
+    if (this.dataFormGroup.value['contactName']) {
+      const contact = {
+        index: this.contactList.length,
+        contactName: this.dataFormGroup.value['contactName'],
+        contactPhone: this.dataFormGroup.value['contactPhone'],
+        contactMail: this.dataFormGroup.value['contactMail'],
+      };
+
+      this.contactList.push(contact);
+
+      this.dataFormGroup.get('contactName').reset();
+      this.dataFormGroup.get('contactPhone').reset();
+      this.dataFormGroup.get('contactMail').reset();
+
+    } else {
+      this.snackbar.open('Para agregar un contacto, debes asignar nombres y apellidos', 'Cerrar', {
+        duration: 6000
+      });
+    }
   }
 
-  onDeleteAccount(account){
-    this.bankAccounts = this.bankAccounts.filter(el => el != account)
+  removeContact(index: number): void {
+    this.contactList.splice(index, 1);
+
+    this.contactList.forEach((element, index) => {
+      element['index'] = index;
+    });
   }
 
-  onAddContact(){
-    this.contacts.push(this.contactsFormGroup.value);
-    this.contactsFormGroup.reset();
+  addBank(): void {
+    if (this.dataFormGroup.value['bank'] && this.dataFormGroup.value['type'] && this.dataFormGroup.value['accountNumber']) {
+      const bank = {
+        index: this.bankAccounts.length,
+        bank: this.dataFormGroup.value['bank'],
+        type: this.dataFormGroup.value['type'],
+        accountNumber: this.dataFormGroup.value['accountNumber'],
+      };
+
+      this.bankAccounts.push(bank);
+
+      this.dataFormGroup.get('bank').reset();
+      this.dataFormGroup.get('type').reset();
+      this.dataFormGroup.get('accountNumber').reset();
+
+    } else {
+      this.snackbar.open('Para agregar una cuenta de deposito, debe llenar todos los campos', 'Cerrar', {
+        duration: 6000
+      });
+    }
   }
-  onDeleteContact(contact){
-    this.contacts = this.contacts.filter(el => el != contact)
+
+  removeBank(index: number): void {
+    this.bankAccounts.splice(index, 1);
+
+    this.bankAccounts.forEach((element, index) => {
+      element['index'] = index;
+    });
   }
+
+  save(): void {
+    if (this.dataFormGroup.valid) {
+      this.savingCustomer.next(true);
+
+      const batch = this.af.firestore.batch();
+
+      const providerRef = this.af.firestore.collection(this.dbs.providersCollection.ref.path).doc();
+
+      this.auth.user$
+        .pipe(
+          take(1)
+        )
+        .subscribe(user => {
+          const data: Provider = {
+            id: providerRef.id,
+            name: this.dataFormGroup.value['name'],
+            address: this.dataFormGroup.value['address'],
+            ruc: this.dataFormGroup.value['ruc'],
+            phone: this.dataFormGroup.value['phone'],
+            detractionAccount: this.dataFormGroup.value['detractionAccount'],
+            contacts: this.contactList,
+            bankAccounts: this.bankAccounts,
+            createdAt: new Date(),
+            createdBy: user
+          }
+
+          batch.set(providerRef, data);
+
+          batch.commit()
+            .then(() => {
+              this.snackbar.open('Cliente creado!', 'Cerrar', {
+                duration: 6000
+              });
+              this.dialogRef.close(true);
+            })
+            .catch(err => {
+              console.log(err);
+              this.snackbar.open('Parece que hubo un error creando el nuevo cliente!', 'Cerrar', {
+                duration: 6000
+              });
+            });
+        })
+
+    } else {
+      this.snackbar.open('Debe completar el formulario!', 'Cerrar', {
+        duration: 6000
+      });
+    }
+  }
+
 }

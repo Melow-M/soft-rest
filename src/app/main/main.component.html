@@ -81,7 +81,8 @@
                     <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
                         routerLink="almacen/inventario" style="text-align:left;border-radius:0px 0px 0px 0px"
                         (click)="toggleSideMenu()">
-                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">assignment_turned_in
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            assignment_turned_in
                         </mat-icon> Inventarios
                     </button>
 
@@ -130,11 +131,20 @@
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
-                    
+
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink="terceros/clientes" style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            person_pin
+                        </mat-icon> Clientes
+                    </button>
+
                     <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
                         routerLink="terceros/proveedores" style="text-align:left;border-radius:0px 0px 0px 0px"
                         (click)="toggleSideMenu()">
-                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">assignment_turned_in
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            assignment_turned_in
                         </mat-icon> Proveedores
                     </button>
 
@@ -146,7 +156,7 @@
 
 
         <mat-sidenav-content>
-            <!--mat-progress-bar mode="indeterminate" *ngIf="loadingRouteConfig"></!--mat-progress-bar-->
+            <mat-progress-bar mode="indeterminate" *ngIf="loadingRouteConfig"></mat-progress-bar>
             <router-outlet></router-outlet>
             <div *ngIf="this.router.url=='/main'" style="height: 90vh" class="w3-display-container">
                 <div class="w3-display-middle w3-center">

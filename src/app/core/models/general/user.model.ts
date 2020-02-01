@@ -3,7 +3,6 @@ export interface User {
   displayName: string;
   dni: string;
   roleId: string;
-  roleName: string;
   createdAt: Date;
   createdBy: User;
   editedAt: Date;

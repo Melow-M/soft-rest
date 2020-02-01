@@ -15,33 +15,34 @@
                 </div>
                 <div class="order-list">
                     <ol>
-                        <li class="order" *ngFor="let plate of order; let i = index" (click)="selectablePlate = plate; MenuList=true; categoriesList=false"
+                        <li class="order" *ngFor="let plate of order; let i = index"
+                            (click)="selectablePlate = plate; MenuList=true; categoriesList=false"
                             [ngStyle]="{'border':selectablePlate==plate?'1px solid black':'none'}">
                             <div class="flex-div"
                                 style="justify-content: space-between; width: 100%; font-weight: bold; font-size: medium;">
-                                <span>{{i+1}} {{plate['name']}}</span>
-                                <span>S/. {{plate['price'] | number : '.2'}}</span>
-                                <mat-icon style="cursor: pointer;">delete</mat-icon>
+                                <span>{{plate['amount']}} {{plate['name']}}</span>
+                                <span>S/. {{plate['price'] * plate['amount'] | number : '.2'}}</span>
+                                <mat-icon style="cursor: pointer;" (click)="deleteDish(i)">delete</mat-icon>
                             </div>
-                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                *ngIf="plate['plate']['entry']">
-                                <span>{{plate['plate']['entry']}}</span>
-                                <mat-icon style="cursor: pointer;">delete</mat-icon>
-                            </div>
-                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                *ngIf="plate['plate']['soup']">
-                                <span>{{plate['plate']['soup']}}</span>
-                                <mat-icon style="cursor: pointer;">delete</mat-icon>
-                            </div>
-                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                *ngIf="plate['plate']">
-                                <span>{{plate['plate']['second']}}</span>
-                                <mat-icon style="cursor: pointer;">delete</mat-icon>
-                            </div>
-                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                *ngIf="plate['type']=='executive'">
-                                <span>{{plate['plate']['dessert']}}</span>
-                                <mat-icon style="cursor: pointer;">delete</mat-icon>
+                            <div *ngIf="plate['type'] == 'executive' || plate['type'] == 'simple'">
+                                <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                    *ngIf="plate['plate']['entry']">
+                                    <span>{{plate['plate']['entry']}}</span>
+                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'entry')">delete
+                                    </mat-icon>
+                                </div>
+                                <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                    *ngIf="plate['plate']">
+                                    <span>{{plate['plate']['second']}}</span>
+                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'second')">delete
+                                    </mat-icon>
+                                </div>
+                                <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                    *ngIf="plate['type']=='executive'">
+                                    <span>{{plate['plate']['dessert']}}</span>
+                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'dessert')">delete
+                                    </mat-icon>
+                                </div>
                             </div>
                         </li>
                     </ol>
@@ -62,43 +63,43 @@
                             <p>Menú del día</p>
                         </div>
                     </div>
-                    <div class="category">
+                    <div class="category" (click)="otherList=true; categoriesList=false; otherTitle='Piqueos'">
                         <div class="w3-center">
                             <img class="icon" src="../../../../assets/images/pollo-frito.png" alt="">
                             <p>Piqueos</p>
                         </div>
                     </div>
-                    <div class="category">
+                    <div class="category" (click)="otherList=true; categoriesList=false; otherTitle='Extras'">
                         <div class="w3-center">
                             <mat-icon class="icon">deck</mat-icon>
                             <p>Extras</p>
                         </div>
                     </div>
-                    <div class="category">
+                    <div class="category" (click)="otherList=true; categoriesList=false; otherTitle='Bebidas'">
                         <div class="w3-center">
                             <mat-icon class="icon">free_breakfast</mat-icon>
                             <p>Bebidas</p>
                         </div>
                     </div>
-                    <div class="category">
+                    <div class="category" (click)="otherList=true; categoriesList=false; otherTitle='Combos'">
                         <div class="w3-center">
                             <mat-icon class="icon">fastfood</mat-icon>
                             <p>Combos</p>
                         </div>
                     </div>
-                    <div class="category">
+                    <div class="category" (click)="otherList=true; categoriesList=false; otherTitle='Promociones'">
                         <div class="w3-center">
                             <img class="icon" src="../../../../assets/images/promocion.png" alt="">
                             <p>Promociones</p>
                         </div>
                     </div>
-                    <div class="category">
+                    <div class="category" (click)="otherList=true; categoriesList=false; otherTitle='Postres'">
                         <div class="w3-center">
                             <img class="icon" src="../../../../assets/images/comida-y-restaurante 1.png" alt="">
                             <p>Postres</p>
                         </div>
                     </div>
-                    <div class="category">
+                    <div class="category" (click)="otherList=true; categoriesList=false; otherTitle='Otros'">
                         <div class="w3-center">
                             <img class="icon" src="../../../../assets/images/cesta 1.png" alt="">
                             <p>Otros</p>
@@ -110,7 +111,8 @@
                 <div class="type">
                     <span class="header">Tipo</span>
                     <div class="flex-div">
-                        <div class="category" style="background: rgba(183, 7, 5, 0.2);" (click)="firstOrder('executive',10,'Menú Ejecutivo')">
+                        <div class="category" style="background: rgba(183, 7, 5, 0.2);"
+                            (click)="firstOrder('executive',10,'Menú Ejecutivo')">
                             <div class="w3-center">
                                 <img class="icon" src="../../../../assets/images/comida.png" alt="">
                                 <p>Ejecutivo</p>
@@ -184,6 +186,42 @@
                             (click)="MenuList=false; categoriesList=true; selectablePlate = null">Categorías</button>
                         <button mat-raised-button style="background: #EE8434; color: white"
                             (click)="MenuList=false; generateSale=true">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+            <div class="categories others" *ngIf="otherList">
+                <span class="header">{{otherTitle}}</span>
+                <mat-form-field class="w3-block" appearance="outline">
+                    <input type="text" placeholder="Búsqueda por producto" aria-label="Number" matInput>
+                </mat-form-field>
+                <div>
+                    <span class="header">Los 5 Favoritos <mat-icon style="vertical-align: middle;">grade</mat-icon>
+                    </span>
+                    <div class="flex-div">
+                        <div class="box" *ngFor="let plate of favorites" (click)="addOrder(plate)">
+                            <span class="stock">{{plate['stock'] | number: '2.0'}}</span>
+                            <p>{{plate['name']}}</p>
+                            <span class="price">S/. {{plate['price'] | number: '.2'}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 3vh;">
+                    <span class="header">Todos</span>
+                    <div class="flex-div" style="height: 24vw; overflow: auto;">
+                        <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                            <span class="stock">{{plate['stock'] | number: '2.0'}}</span>
+                            <p>{{plate['name']}}</p>
+                            <span class="price">S/. {{plate['price'] | number: '.2'}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="buttons" style="margin-top: 3vh;">
+                    <div class="flex-div" style="justify-content: space-around;">
+                        <button mat-raised-button style="background-color: #B70705; color:white;">Cancelar</button>
+                        <button mat-raised-button style="background-color: #C8C8C8;"
+                            (click)="otherList=false; categoriesList=true; selectablePlate = null">Categorías</button>
+                        <button mat-raised-button style="background: #EE8434; color: white"
+                            (click)="otherList=false; generateSale=true">Siguiente</button>
                     </div>
                 </div>
             </div>

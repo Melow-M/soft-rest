@@ -9,7 +9,8 @@ import {
   MatInputModule,
   MatFormFieldModule,
   MatDialogModule,
-  MatDividerModule
+  MatDividerModule,
+  MatAutocompleteModule
 } from '@angular/material';
 import { VoucherComponent } from './voucher/voucher.component';
 
@@ -26,7 +27,8 @@ import { VoucherComponent } from './voucher/voucher.component';
     MatInputModule,
     MatFormFieldModule,
     MatDialogModule,
-    MatDividerModule
+    MatDividerModule,
+    MatAutocompleteModule
   ],
   entryComponents:[
     VoucherComponent

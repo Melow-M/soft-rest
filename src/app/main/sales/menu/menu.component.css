@@ -116,7 +116,7 @@
     margin: 0 auto;
 }
 
-.buttons button{
+.buttons button {
     font-size: large;
     font-family: Raleway;
 }
@@ -220,13 +220,41 @@
     color: #2B2B2B;
 }
 
-.selected{
+.selected {
     background-color: white !important;
     color: #B70705 !important;
     border: 1px solid #A5A6AA;
     box-shadow: 3px 4px 4px rgba(0, 0, 0, 0.4);
 }
 
-.selected .mat-icon, .selected p{
+.selected .mat-icon, .selected p {
     color: #B70705 !important;
+}
+
+.others .box {
+    width: 10vw;
+    height: 10vw;
+    margin-top: 1vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.others .box .stock {
+    font-size: medium;
+}
+
+.others .box .price {
+    font-family: 'Roboto';
+    position: absolute;
+    right: 0.5vw;
+    bottom: 0.4vw;
+    font-size: small;
+}
+
+.others .box p {
+    font-weight: bold;
+    font-size: 1.2vw;
+    position: relative;
+    top: -15%;
 }

@@ -11,6 +11,9 @@ import { MatSnackBar } from '@angular/material';
   styleUrls: ['./create-input-dialog.component.css']
 })
 export class CreateInputDialogComponent implements OnInit {
+  //Variables
+  typesList: String[] = ['Insumos', 'Otros', 'Postres', 'Menajes'];
+
   unitList: {id: string, unit: string}[] = [ ];
   filteredUnitList: {id: string, unit: string}[];
 
@@ -32,8 +35,9 @@ export class CreateInputDialogComponent implements OnInit {
 
   initForm(){
     this.inputFormGroup = this.fb.group({
-      name: [null, Validators.required, this.repeatedName(this.dbs)],
-      sku: [null, Validators.required, this.repeatedCode(this.dbs)],       //Falta validador asincrono
+      type: [null, Validators.required],
+      name: [{value: null, disabled: true}, Validators.required, this.repeatedName(this.dbs)],
+      sku: [{value: null, disabled: true}, Validators.required, this.repeatedCode(this.dbs)],       //Falta validador asincrono
       unit: [null, Validators.required],
       description: [null, Validators.required],
       stock: [null, Validators.required],
@@ -61,13 +65,27 @@ export class CreateInputDialogComponent implements OnInit {
         this.filteredUnitList = this.filterUnits(newUnit);
       })
       ).subscribe();
+
+    this.inputFormGroup.get('type').valueChanges.pipe(
+      tap((type)=> {
+        if(type!=null){
+          this.inputFormGroup.get('name').enable();
+          this.inputFormGroup.get('sku').enable();
+        }
+        else{
+          this.inputFormGroup.get('name').disable();
+          this.inputFormGroup.get('sku').disable();
+        }
+      })
+    ).subscribe();
+
   }
 
   onCreateInput(){
     let aux = this.unitList.find((unit) => (unit.unit == this.inputFormGroup.get('unit').value));
 
     if(aux != undefined){
-      this.dbs.onAddInput(this.inputFormGroup.value, aux)
+      this.dbs.onAddInput(this.inputFormGroup.value, this.inputFormGroup.get('type').value, aux)
       .subscribe(batch => {
         batch.commit().then(()=> {
             this.snackbar.open('Se creo el insumo exitosamente', 'Aceptar', {duration: 6000});
@@ -78,7 +96,7 @@ export class CreateInputDialogComponent implements OnInit {
       });
     }
     else{
-      this.dbs.onAddInput(this.inputFormGroup.value)
+      this.dbs.onAddInput(this.inputFormGroup.value, this.inputFormGroup.get('type').value)
       .subscribe(batch => {
         batch.commit().then(()=> {
             this.snackbar.open('Se creo el insumo exitosamente', 'Aceptar', {duration: 6000});
@@ -93,10 +111,12 @@ export class CreateInputDialogComponent implements OnInit {
   //Synchronous Validators
   repeatedName(dbs: DatabaseService){
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      return dbs.onGetInputs().pipe(
+      console.log(control.parent.get('type').value);
+      return dbs.onGetElements(control.parent.get('type').value).pipe(
         debounceTime(500),
         take(1),
         map(inputList => {
+          console.log(inputList)
           let aux = inputList.find(input => (input.name == control.value));
           if(aux != undefined){
             return {repeatedName: true};
@@ -109,7 +129,7 @@ export class CreateInputDialogComponent implements OnInit {
 
   repeatedCode(dbs: DatabaseService){
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      return dbs.onGetInputs().pipe(
+      return dbs.onGetElements(control.parent.get('type').value).pipe(
         debounceTime(500),
         take(1),
         map(inputList => {
@@ -136,8 +156,11 @@ export class CreateInputDialogComponent implements OnInit {
   formatInput(value: string){
     let aux = value;
     let regex = new RegExp(/\s+/, 'ig');
-    aux = aux.replace(regex, ' ');
-    return aux.toUpperCase().trim();
+    if(aux != null){
+      aux = aux.replace(regex, ' ');
+      return aux.toUpperCase().trim();
+    }
+    else return value;
   }
 
 }

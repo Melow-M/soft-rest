@@ -58,7 +58,9 @@
                     <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Proveedor</mat-label>
                         <mat-select formControlName="provider" placeholder="Proveedor">
-                            <mat-option (click)="onAddProvider()"><mat-icon>add</mat-icon>Añadir Proveedor</mat-option>
+                            <mat-option (click)="onAddProvider()">
+                                <mat-icon>add</mat-icon>Añadir Proveedor
+                            </mat-option>
                         </mat-select>
                         <mat-hint>*Requerido</mat-hint>
                     </mat-form-field>
@@ -82,7 +84,8 @@
                     </mat-form-field>
 
                     <!-- creditExpirationDate -->
-                    <mat-form-field appearance="outline" class="w3-margin-bottom" *ngIf="!documentForm.get('documentDetails.creditExpirationDate').disabled">
+                    <mat-form-field appearance="outline" class="w3-margin-bottom"
+                        *ngIf="!documentForm.get('documentDetails.creditExpirationDate').disabled">
                         <mat-label>Fecha de Expiración de Crédito</mat-label>
                         <input formControlName="creditExpirationDate" matInput
                             placeholder="Fecha de Expiración de Crédito">
@@ -100,16 +103,17 @@
                     <!-- Importes -->
                     <p><b>Importes</b></p>
 
-                    <div style="display: flex; flex-direction: row; justify-content: space-between;" *ngIf="!documentForm.get('imports.subtotalImport').disabled">
+                    <div style="display: flex; flex-direction: row; justify-content: space-between;"
+                        *ngIf="!documentForm.get('imports.subtotalImport').disabled">
                         <!-- subtotalImport -->
-                        <mat-form-field appearance="outline"  style="width: 45%" class="w3-margin-bottom">
+                        <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
                             <mat-label>Sub Total</mat-label>
                             <input formControlName="subtotalImport" matInput placeholder="Sub Total">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
 
                         <!-- igvImport -->
-                        <mat-form-field appearance="outline"  style="width: 45%" class="w3-margin-bottom">
+                        <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
                             <mat-label>IGV</mat-label>
                             <input formControlName="igvImport" matInput placeholder="IGV" type="number">
                             <mat-hint>*Requerido</mat-hint>
@@ -145,35 +149,128 @@
 
                 </div>
             </form>
-            <form [formGroup]="itemsListForm" 
-                style="display: flex; flex-direction: row; width: 100%; justify-content: space-between; align-items: center;">
-                <!-- item -->
-                <mat-form-field appearance="outline" style="width: 25%;">
-                    <mat-label>Insumos</mat-label>
-                    <mat-select formControlName="item" matInput placeholder="Seleccione Insumo">
-                        <mat-option (click)="onCreateInput()"><mat-icon>add</mat-icon>Crear Item</mat-option>
-                    </mat-select>
-                    <mat-hint>*Requerido</mat-hint>
-                </mat-form-field>
-                <!-- quantity -->
-                <mat-form-field appearance="outline" style="width: 25%;">
-                    <mat-label>Cantidad</mat-label>
-                    <input formControlName="quantity" matInput placeholder="Cantidad">
-                    <mat-hint>*Requerido</mat-hint>
-                </mat-form-field>
-                <!-- cost -->
-                <mat-form-field appearance="outline" style="width: 25%;">
-                    <mat-label>Costo</mat-label>
-                    <input formControlName="cost" matInput placeholder="Costo">
-                    <mat-hint>*Requerido</mat-hint>
-                </mat-form-field>
-                <div>
-                    <button mat-raised-button color="secondary" type="button" style="height:100%">
+            <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                    <form [formGroup]="itemsListForm"
+                    style="display: flex; flex-direction: column; width: 85%;">
+
+                    <div style="display: flex; flex-direction: row; width: 100%; justify-content: space-between;">
+                        <!-- type -->
+                        <mat-form-field appearance="outline" style="width: 45%;">
+                            <mat-label>Tipo</mat-label>
+                            <mat-select formControlName="type" matInput placeholder="Seleccione Tipo">
+                                <mat-option *ngFor="let type of types" [value]="type">{{type}}</mat-option>
+                            </mat-select>
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+                        <!-- item -->
+                        <mat-form-field appearance="outline" style="width: 45%;">
+                            <mat-label>Insumos</mat-label>
+                            <mat-select formControlName="item" matInput placeholder="Seleccione Insumo">
+                                <mat-option (click)="onCreateInput()">
+                                    <mat-icon>add</mat-icon>Crear Item
+                                </mat-option>
+                                <mat-option *ngFor="let input of inputList | async" [value]="input">{{input.name}}</mat-option>
+                            </mat-select>
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+                    </div>
+                    <div style="display: flex; flex-direction: row; width: 100%; justify-content: space-between;">
+                        <!-- quantity -->
+                        <mat-form-field appearance="outline" style="width: 45%;">
+                            <mat-label>Cantidad</mat-label>
+                            <input formControlName="quantity" matInput placeholder="Cantidad">
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+                        <!-- cost -->
+                        <mat-form-field appearance="outline" style="width: 45%;">
+                            <mat-label>Costo</mat-label>
+                            <input formControlName="cost" matInput placeholder="Costo">
+                            <mat-hint>*Requerido</mat-hint>
+                        </mat-form-field>
+                        
+                    </div>
+                    
+
+                </form>
+                <div style="height:100%; width: 10%"> 
+                    <button (click)="onAddInput()" mat-raised-button color="secondary" type="button" 
+                        [disabled]="itemsListForm.status != 'VALID'">
                         <mat-icon>add_circle</mat-icon>
                     </button>
                 </div>
+            </div>
+            
 
-            </form>
+            <!-- Tabla de total de items -->
+
+            <table mat-table [dataSource]="inputsTableDataSource" class="mat-elevation-z8 w3-margin-top"
+                style="width:100%; max-height: 30vh; overflow:auto">
+                <!-- Cantidad -->
+                <ng-container matColumnDef="N°">
+                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>N°</th>
+                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element; let i = index">
+                        {{i+1}}</td>
+                        <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <ng-container matColumnDef="Tipo">
+                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Tipo</th>
+                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                        {{element.type}}</td>
+                        <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <ng-container matColumnDef="Producto">
+                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Producto</th>
+                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                        {{element.item.name}}</td>
+                        <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+                <ng-container matColumnDef="Medida">
+                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Medida</th>
+                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                        {{element.item.unit}}</td>
+                        <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+                <ng-container matColumnDef="Cantidad">
+                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Cantidad</th>
+                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                        {{element.quantity}}</td>
+                    <td mat-footer-cell *matFooterCellDef> Total </td>
+                </ng-container>
+                <ng-container matColumnDef="Costo">
+                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Costo (S/.)</th>
+                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <span>S/.</span>
+                            <span>{{element.cost}}</span>
+                        </div>
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef> 
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <span>S/.</span>
+                            <span>{{getTotalCost()}}</span>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="Acciones">
+                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                        <button mat-button (click)="onDeleteInput(element)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="inputsTableDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns:inputsTableDisplayedColumns"></tr>
+                <tr mat-footer-row *matFooterRowDef="inputsTableDisplayedColumns"></tr>
+
+
+            </table>
+            <mat-paginator #inputsTablePaginator class="mat-elevation-z8" [pageSizeOptions]="[5, 10, 25, 100]" sticky>
+            </mat-paginator>
         </div>
     </div>
     <!-- Items List and Form -->

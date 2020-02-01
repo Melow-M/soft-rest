@@ -1,4 +1,4 @@
-import { User } from '../../general/user.model';
+import { User } from '../general/user.model';
 
 export interface Grocery {
   id: string;
@@ -8,6 +8,7 @@ export interface Grocery {
   picture: string;
   unit: string; // UND., KG., GR., L., M., PULG. ...
   stock: number;
+  cost: number;
   emergencyStock: number;
   status: string; // DISPONIBLE, INACTIVO
   price: number;

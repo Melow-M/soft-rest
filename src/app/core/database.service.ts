@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 
-import { KitchenInput, CostTrend } from 'src/app/core/models/warehouse/kitchenInput.model'
+import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model'
 import { AuthService } from './auth.service';
 import { take, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { CostTrend } from './models/warehouse/costTrend.model';
 
 @Injectable({
   providedIn: 'root'
@@ -19,22 +20,59 @@ export class DatabaseService {
   //Warehouse
 
   //Warehouse-Stocktaking
-  onGetUnits(): Observable<{id: string, unit: string}[]>{
-    return this.afs.collection<{id: string, unit: string}>(`/db/deliciasTete/kitchenUnits`).valueChanges()
+  onGetUnits(): Observable<{ id: string, unit: string }[]> {
+    return this.afs.collection<{ id: string, unit: string }>(`/db/deliciasTete/kitchenUnits`).valueChanges()
   }
 
-  onGetInputs(): Observable<KitchenInput[]>{
+  onGetInputs(): Observable<KitchenInput[]> {
     return this.afs.collection<KitchenInput>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
   }
 
-  onAddInput(input: KitchenInput, newUnit?: {id: string, unit: string}): Observable<firebase.firestore.WriteBatch>{
+  onGetElements(types : string): Observable<KitchenInput[]>{
+    let typ: string;
+
+    switch (types) {
+      case 'Insumos':
+        typ= 'warehouseInputs';
+        break;
+      case 'Otros':
+        typ= 'warehouseGrocery';
+        break;
+      case 'Postres':
+        typ= 'warehouseDesserts';
+        break;
+      case 'Menajes':
+        typ= 'warehouseTools';
+        break;
+    }
+
+    return this.afs.collection<KitchenInput>(`/db/deliciasTete/${typ}/`).valueChanges()
+  }
+
+  onAddInput(input: KitchenInput, types: string, newUnit?: { id: string, unit: string }): Observable<firebase.firestore.WriteBatch> {
     let batch = this.afs.firestore.batch();
-    let date= new Date()
+    let date = new Date()
+    let typ: string;
+
+    switch (types) {
+      case 'Insumos':
+        typ= 'warehouseInputs';
+        break;
+      case 'Otros':
+        typ= 'warehouseGrocery';
+        break;
+      case 'Postres':
+        typ= 'warehouseDesserts';
+        break;
+      case 'Menajes':
+        typ= 'warehouseTools';
+        break;
+    }
 
     //Input
-    let inputRef: DocumentReference = this.afs.firestore.collection(`/db/deliciasTete/kitchenInputs/`).doc();
+    let inputRef: DocumentReference = this.afs.firestore.collection(`/db/deliciasTete/${typ}/`).doc();
     let inputData: KitchenInput;
-    
+
     //KitchenUnits
     let kitchenUnitsRef: DocumentReference = this.afs.firestore.collection(`/db/deliciasTete/kitchenUnits/`).doc();
     let kitchenUnitsData = {
@@ -44,7 +82,7 @@ export class DatabaseService {
 
     //CostTrend
     let costTrendRef: DocumentReference = this.afs.firestore
-      .collection(`/db/deliciasTete/kitchenInputs/${inputRef.id}/costTrend`).doc();
+      .collection(`/db/deliciasTete/${typ}/${inputRef.id}/costTrend`).doc();
     let costTrendData: CostTrend = {
       cost: input.cost,
       createdAt: date,
@@ -74,7 +112,7 @@ export class DatabaseService {
         batch.set(inputRef, inputData);
 
         //if it doesn't have Id, this unit doesnt exist, so we create it
-        if(newUnit == undefined){
+        if (newUnit == undefined) {
           batch.set(kitchenUnitsRef, kitchenUnitsData)
         }
 
@@ -83,5 +121,5 @@ export class DatabaseService {
     )
   }
 
-  
+
 }

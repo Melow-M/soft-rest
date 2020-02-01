@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatTableDataSource, MatPaginator } from '@angular/material';
 import { Provider } from 'src/app/core/models/third-parties/provider.model';
 import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model';
 import { CreateProviderDialogComponent } from 'src/app/main/third-parties/providers/create-provider-dialog/create-provider-dialog.component'
 import { CreateInputDialogComponent } from '../../stocktaking/create-input-dialog/create-input-dialog.component';
+import { DatabaseService } from 'src/app/core/database.service';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-register-documents',
@@ -12,6 +14,13 @@ import { CreateInputDialogComponent } from '../../stocktaking/create-input-dialo
   styleUrls: ['./register-documents.component.css']
 })
 export class RegisterDocumentsComponent implements OnInit {
+  //Table
+  inputsTableDataSource = new MatTableDataSource([]);
+  inputsTableDisplayedColumns = ['N°', 'Tipo', 'Producto', 'Medida', 'Cantidad', 'Costo', 'Acciones'];
+
+  //Paginators
+  @ViewChild('inputsTablePaginator', {static: false}) inputsTablePaginator: MatPaginator;
+
   documentForm: FormGroup;
   itemsListForm: FormGroup;
 
@@ -24,14 +33,18 @@ export class RegisterDocumentsComponent implements OnInit {
   paymentType: String[] = [
     'CREDITO', 'EFECTIVO', 'TARJETA'
   ]
+  inputList: Observable<KitchenInput[]>;
+  types: String[] = ['Insumos', 'Otros', 'Postres', 'Menajes'];
 
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
+    private dbs: DatabaseService
   ) { }
 
   ngOnInit() {
     this.initForms();
+    this.inputList = of([]);
   }
 
   initForms(){
@@ -56,7 +69,8 @@ export class RegisterDocumentsComponent implements OnInit {
     });
     this.itemsListForm = this.fb.group({
       kitchenInputId: null,
-      item: [null, Validators.required],
+      type: [null, Validators.required],
+      item: [{value: null, disabled: true}, Validators.required],
       quantity: [null, Validators.required],
       cost: [null, Validators.required]    //Have to check, if we need to disable
     })
@@ -80,6 +94,24 @@ export class RegisterDocumentsComponent implements OnInit {
       else{
         this.documentForm.get('documentDetails.creditExpirationDate').disable();
       }
+    });
+
+    this.itemsListForm.get('item').valueChanges.subscribe((item: KitchenInput) => {
+      if(item != null){
+        this.itemsListForm.get('cost').setValue(item.cost);
+        this.itemsListForm.get('kitchenInputId').setValue(item.id);
+      }
+    })
+
+    this.itemsListForm.get('type').valueChanges.subscribe((type: string)=> {
+      if(type!= null){
+        this.inputList = this.dbs.onGetElements(type);
+        this.itemsListForm.get('item').enable()
+      }
+      else{
+        this.inputList = of([]);
+        this.itemsListForm.get('item').disable();
+      }
     })
 
   }
@@ -96,6 +128,27 @@ export class RegisterDocumentsComponent implements OnInit {
       width: '450px',
       height: '90vh'
     });
+  }
+
+  onAddInput(){
+    this.inputsTableDataSource.data = [
+      ...this.inputsTableDataSource.data,
+      this.itemsListForm.value
+    ];
+    this.inputsTableDataSource.paginator = this.inputsTablePaginator;
+  }
+
+  onDeleteInput(element){
+    let aux = this.inputsTableDataSource.data;
+    this.inputsTableDataSource.data = aux.filter(el => element!=el);
+
+  }
+
+  getTotalCost(){
+    let aux = this.inputsTableDataSource.data;
+    return aux.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue['cost'];
+    }, 0)
   }
 
   

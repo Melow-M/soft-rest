@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { PurchasesComponent } from './purchases.component';
 import { PurchasesRoutingModule } from './purchases-routing.module';
-import { MatDividerModule, MatIconModule, MatDatepickerModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatDialogModule, MatOptionModule, MatAutocompleteModule, MatSnackBarModule } from '@angular/material';
+import { MatDividerModule, MatIconModule, MatDatepickerModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatDialogModule, MatOptionModule, MatAutocompleteModule, MatSnackBarModule, MatTableModule, MatPaginatorModule } from '@angular/material';
 import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RegisterDocumentsComponent } from './register-documents/register-documents.component';
@@ -33,7 +33,9 @@ import { CreateInputDialogComponent } from '../stocktaking/create-input-dialog/c
     MatDialogModule,
     MatOptionModule,
     MatAutocompleteModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatTableModule,
+    MatPaginatorModule,
   ],
   entryComponents: [
     RegisterDocumentsComponent,

@@ -14,6 +14,14 @@
 
 <div mat-dialog-content>
     <form [formGroup]="inputFormGroup">
+        <!-- Select -->
+        <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="type" placeholder="Tipo" matInput type="text">
+                <mat-option *ngFor="let el of typesList" [value]="el">{{el}}</mat-option>
+            </mat-select>
+            <mat-hint>*Requerido</mat-hint>
+        </mat-form-field>
         <!-- name -->
         <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
             <mat-label>Nombre</mat-label>

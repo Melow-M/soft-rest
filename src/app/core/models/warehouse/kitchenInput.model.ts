@@ -17,8 +17,3 @@ export interface KitchenInput {
   editedBy: User | null;
 }
 
-export interface CostTrend{
-  cost: number,
-  createdAt: Date,
-  id: string
-}

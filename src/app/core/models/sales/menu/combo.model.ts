@@ -1,6 +1,6 @@
 import { User } from '../../general/user.model';
-import { Grocery } from './grocery.model';
 import { Meal } from './meal.model';
+import { Grocery } from '../../warehouse/grocery.model';
 
 export interface Combo {
   id: string;
@@ -10,6 +10,7 @@ export interface Combo {
   picture: string;
   unit: string; // UND.
   stock: number;
+  cost: number;
   emergencyStock: number;
   status: string; // DISPONIBLE, INACTIVO
   price: number;

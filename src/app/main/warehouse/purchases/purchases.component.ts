@@ -2,6 +2,8 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { RegisterDocumentsComponent } from './register-documents/register-documents.component';
+import { DatabaseService } from 'src/app/core/database.service';
+import { ThirdPartiesComponent } from '../../third-parties/third-parties.component';
 
 @Component({
   selector: 'app-purchases',
@@ -9,6 +11,7 @@ import { RegisterDocumentsComponent } from './register-documents/register-docume
   styleUrls: ['./purchases.component.css'],
   encapsulation: ViewEncapsulation.None
 })
+
 export class PurchasesComponent implements OnInit {
   dateForm: FormGroup;
   providersList: string[] = ['Primero', 'Segundo', 'Tercero']
@@ -16,6 +19,7 @@ export class PurchasesComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private dialog: MatDialog,
+    private dbs: DatabaseService
   ) { 
     
   }
@@ -33,7 +37,10 @@ export class PurchasesComponent implements OnInit {
   onRegistering(){
     this.dialog.open(RegisterDocumentsComponent, {
       width: '100vw',
-
     });
+  }
+
+  onSearching(){
+    this.dbs.onGetPurchases(this.dateForm.get('date').value['begin'], this.dateForm.get('date').value['end']).subscribe();
   }
 }

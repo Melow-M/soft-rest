@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
 import { AngularFirestoreCollection, AngularFirestore, DocumentReference } from '@angular/fire/firestore';
-import { shareReplay } from 'rxjs/operators';
+import { shareReplay, tap } from 'rxjs/operators';
 import { Provider } from './models/third-parties/provider.model';
 
 import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model'
@@ -240,5 +240,11 @@ export class DatabaseService {
       }))
   }
 
+  //Warehouse purchases
+  onGetPurchases(startDate: Date, endDate: Date): Observable<Purchase[]>{
+    let formattedendDate: number = Math.ceil(endDate.valueOf()/1000.0)
+    return this.af.collection<Purchase>(`/db/deliciasTete/warehousePurchases/`, ref => ref.where('documentDetails.documentDate', '>=', startDate))
+      .valueChanges().pipe(map(purchase => purchase.filter(el => el.documentDetails.documentDate['seconds']<=formattedendDate)),tap(console.log))
+  }
 
 }

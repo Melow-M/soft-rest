@@ -150,7 +150,7 @@
                     </div>
 
 
-                    <p><b>Lista de Insumos</b></p>
+                    <p><b>Lista de Items</b></p>
 
 
                 </div>
@@ -169,7 +169,7 @@
                         </mat-form-field>
                         <!-- item -->
                         <mat-form-field appearance="outline" style="width: 45%;">
-                            <mat-label>Insumos</mat-label>
+                            <mat-label>{{itemsListForm.get('type').value}}</mat-label>
                             <mat-select formControlName="item" matInput placeholder="Seleccione Insumo">
                                 <mat-option (click)="onCreateInput()">
                                     <mat-icon>add</mat-icon>Crear Item

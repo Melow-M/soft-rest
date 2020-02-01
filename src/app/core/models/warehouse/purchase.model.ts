@@ -5,7 +5,7 @@ import { Provider } from '../third-parties/provider.model';
 export interface Purchase {
     id: string;
     documentDetails: {
-        documentDate: number;
+        documentDate: Date;
         documentType: string;           //Factura, boelta y ticket
         documentSerial: number;
         documentCorrelative: number;            

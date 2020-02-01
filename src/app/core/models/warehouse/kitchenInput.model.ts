@@ -15,5 +15,6 @@ export interface KitchenInput {
   createdBy: User | null;
   editedAt: Date;
   editedBy: User | null;
+  type: string;
 }
 

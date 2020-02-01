@@ -152,7 +152,7 @@ export class CreateProviderDialogComponent implements OnInit {
 
       const batch = this.af.firestore.batch();
 
-      const providerRef = this.af.firestore.collection(this.dbs.providersCollection.ref.path).doc();
+      const providerRef =this.af.firestore.collection('db/deliciasTete/thirdPartiesProviders').doc();
 
       this.auth.user$
         .pipe(
@@ -176,14 +176,14 @@ export class CreateProviderDialogComponent implements OnInit {
 
           batch.commit()
             .then(() => {
-              this.snackbar.open('Cliente creado!', 'Cerrar', {
+              this.snackbar.open('Proveedor creado!', 'Cerrar', {
                 duration: 6000
               });
               this.dialogRef.close(true);
             })
             .catch(err => {
               console.log(err);
-              this.snackbar.open('Parece que hubo un error creando el nuevo cliente!', 'Cerrar', {
+              this.snackbar.open('Parece que hubo un error creando el nuevo proveedor!', 'Cerrar', {
                 duration: 6000
               });
             });

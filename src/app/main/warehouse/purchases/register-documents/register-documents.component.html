@@ -22,13 +22,15 @@
 
                     <!-- Detalle del comprobante -->
                     <p><b>Detalle del Comprobante</b></p>
+
                     <!-- documentDate -->
                     <mat-form-field appearance="outline" class="w3-margin-bottom">
-                        <mat-label>Fecha de Emisión</mat-label>
-                        <input formControlName="documentDate" matInput placeholder="Fecha de Emisión">
-                        <mat-hint>*Requerido</mat-hint>
+                        <input formControlName="documentDate"
+                            matInput [matDatepicker]="dp3" placeholder="Fecha de Emisión">
+                        <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
+                        <mat-datepicker #dp3 disabled="false"></mat-datepicker>
                     </mat-form-field>
-
+                    
                     <!-- documentType -->
                     <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Tipo de Comprobante</mat-label>
@@ -61,6 +63,9 @@
                             <mat-option (click)="onAddProvider()">
                                 <mat-icon>add</mat-icon>Añadir Proveedor
                             </mat-option>
+                            <mat-option *ngFor=" let provider of providersList$ | async" [value]="provider">
+                                {{provider.ruc}}
+                            </mat-option>
                         </mat-select>
                         <mat-hint>*Requerido</mat-hint>
                     </mat-form-field>
@@ -68,7 +73,8 @@
                     <!-- socialReason -->
                     <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Razón social</mat-label>
-                        <input formControlName="socialReason" matInput placeholder="Razón social">
+                        <input formControlName="socialReason" matInput placeholder="Razón social"
+                            [value]="socialReason$ | async">
                         <mat-hint>*Requerido</mat-hint>
                     </mat-form-field>
 
@@ -104,18 +110,18 @@
                     <p><b>Importes</b></p>
 
                     <div style="display: flex; flex-direction: row; justify-content: space-between;"
-                        *ngIf="!documentForm.get('imports.subtotalImport').disabled">
+                        *ngIf="documentForm.get('documentDetails.documentType').value == 'FACTURA'">
                         <!-- subtotalImport -->
                         <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
                             <mat-label>Sub Total</mat-label>
-                            <input formControlName="subtotalImport" matInput placeholder="Sub Total">
+                            <input formControlName="subtotalImport" matInput placeholder="Sub Total" [value]="getSubTotal()">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
 
                         <!-- igvImport -->
                         <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
                             <mat-label>IGV</mat-label>
-                            <input formControlName="igvImport" matInput placeholder="IGV" type="number">
+                            <input formControlName="igvImport" matInput placeholder="IGV" type="number" [value]="getIGV()">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
                     </div>
@@ -123,7 +129,7 @@
                     <!-- totalImport -->
                     <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Total</mat-label>
-                        <input formControlName="totalImport" matInput placeholder="Total">
+                        <input formControlName="totalImport" matInput placeholder="Total" type="number" [value]="getTotalCost()">
                         <mat-hint>*Requerido</mat-hint>
                     </mat-form-field>
 
@@ -131,14 +137,14 @@
                         <!-- paidImport -->
                         <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
                             <mat-label>A Cuenta (S/.)</mat-label>
-                            <input formControlName="paidImport" matInput placeholder="A Cuenta (S/.)">
+                            <input formControlName="paidImport" matInput placeholder="A Cuenta (S/.)" type="number">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
 
                         <!-- indebtImport -->
                         <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
                             <mat-label>En Deuda (S/.)</mat-label>
-                            <input formControlName="indebtImport" matInput placeholder="En Deuda (S/.)">
+                            <input formControlName="indebtImport" matInput placeholder="En Deuda (S/.)" type="number">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
                     </div>
@@ -150,8 +156,7 @@
                 </div>
             </form>
             <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
-                    <form [formGroup]="itemsListForm"
-                    style="display: flex; flex-direction: column; width: 85%;">
+                <form [formGroup]="itemsListForm" style="display: flex; flex-direction: column; width: 85%;">
 
                     <div style="display: flex; flex-direction: row; width: 100%; justify-content: space-between;">
                         <!-- type -->
@@ -169,7 +174,8 @@
                                 <mat-option (click)="onCreateInput()">
                                     <mat-icon>add</mat-icon>Crear Item
                                 </mat-option>
-                                <mat-option *ngFor="let input of inputList | async" [value]="input">{{input.name}}</mat-option>
+                                <mat-option *ngFor="let input of inputList | async" [value]="input">{{input.name}}
+                                </mat-option>
                             </mat-select>
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
@@ -178,28 +184,28 @@
                         <!-- quantity -->
                         <mat-form-field appearance="outline" style="width: 45%;">
                             <mat-label>Cantidad</mat-label>
-                            <input formControlName="quantity" matInput placeholder="Cantidad">
+                            <input formControlName="quantity" matInput placeholder="Cantidad" type="number">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
                         <!-- cost -->
                         <mat-form-field appearance="outline" style="width: 45%;">
                             <mat-label>Costo</mat-label>
-                            <input formControlName="cost" matInput placeholder="Costo">
+                            <input formControlName="cost" matInput placeholder="Costo" type="number">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
-                        
+
                     </div>
-                    
+
 
                 </form>
-                <div style="height:100%; width: 10%"> 
-                    <button (click)="onAddInput()" mat-raised-button color="secondary" type="button" 
+                <div style="height:100%; width: 10%">
+                    <button (click)="onAddInput()" mat-raised-button color="secondary" type="button"
                         [disabled]="itemsListForm.status != 'VALID'">
                         <mat-icon>add_circle</mat-icon>
                     </button>
                 </div>
             </div>
-            
+
 
             <!-- Tabla de total de items -->
 
@@ -210,27 +216,27 @@
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>N°</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element; let i = index">
                         {{i+1}}</td>
-                        <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef></td>
                 </ng-container>
 
                 <ng-container matColumnDef="Tipo">
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Tipo</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
                         {{element.type}}</td>
-                        <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef></td>
                 </ng-container>
 
                 <ng-container matColumnDef="Producto">
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Producto</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
                         {{element.item.name}}</td>
-                        <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef></td>
                 </ng-container>
                 <ng-container matColumnDef="Medida">
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Medida</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
                         {{element.item.unit}}</td>
-                        <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef></td>
                 </ng-container>
                 <ng-container matColumnDef="Cantidad">
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Cantidad</th>
@@ -246,7 +252,7 @@
                             <span>{{element.cost}}</span>
                         </div>
                     </td>
-                    <td mat-footer-cell *matFooterCellDef> 
+                    <td mat-footer-cell *matFooterCellDef>
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
                             <span>S/.</span>
                             <span>{{getTotalCost()}}</span>
@@ -273,5 +279,11 @@
             </mat-paginator>
         </div>
     </div>
-    <!-- Items List and Form -->
 </div>
+
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
+    <button mat-raised-button class="w3-margin-right" color="primary" (click)="onSubmitPurchase()"
+        [disabled]="!documentForm.valid || (savingPurchase$ | async) || !inputsTableDataSource.data.length">Crear</button>
+</mat-dialog-actions>

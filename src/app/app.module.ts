@@ -11,7 +11,8 @@ import { MatDividerModule,
         MatIconModule, 
         MatInputModule, 
         MatButtonModule, 
-        MatSnackBarModule } from '@angular/material';
+        MatSnackBarModule, 
+        MAT_DATE_LOCALE} from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from './core/auth.service';
 import { AngularFireModule } from '@angular/fire';
@@ -45,7 +46,7 @@ import { AuthGuard } from './core/auth.guard';
   ],
   providers: [
     AuthService,
-    AuthGuard
+    AuthGuard,
   ],
   bootstrap: [AppComponent]
 })

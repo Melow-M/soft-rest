@@ -85,6 +85,7 @@ export class MenuComponent implements OnInit {
       name: 'Menú Ejecutivo',
       plate: {
         entry: 'Tequeños',
+        soup: '',
         second: 'Lomo Saltado',
         dessert: 'Fruta'
       },
@@ -95,12 +96,16 @@ export class MenuComponent implements OnInit {
       price: 8,
       name: 'Menú Básico',
       plate: {
+        entry: '',
         soup: 'Caldo Blanco',
-        second: 'Ají de gallina'
+        second: 'Ají de gallina',
+        dessert: ''
       },
       index: 1
     }
   ]
+
+  total: number = this.order.map(el => el['price']).reduce((a, b) => a + b, 0);
 
   constructor(
     private dialog: MatDialog
@@ -109,6 +114,28 @@ export class MenuComponent implements OnInit {
   ngOnInit() {
   }
 
+  firstOrder(type, price, name) {
+    let selectEntry = this.entry.map(el => el['stock'])
+    let selectSoup = this.soup.map(el => el['stock'])
+    let selectSecond = this.second.map(el => el['stock'])
+    let selectDessert = this.dessert.map(el => el['stock'])
+    let newDish = {
+      type: type,
+      price: price,
+      name: name,
+      plate: {
+        entry: this.plates.filter(el => el['stock'] == Math.min(...selectEntry))[0]['name'],
+        soup: this.plates.filter(el => el['stock'] == Math.min(...selectSoup))[0]['name'],
+        second: this.plates.filter(el => el['stock'] == Math.min(...selectSecond))[0]['name'],
+        dessert: type == 'executive' ? this.plates.filter(el => el['stock'] == Math.min(...selectDessert))[0]['name'] : ''
+      },
+      index: this.order.length
+    }
+    this.order.push(newDish)
+    this.selectablePlate = newDish
+    this.total = this.order.map(el => el['price']).reduce((a, b) => a + b, 0);
+  }
+  
   printVoucher() {
     this.dialog.open(VoucherComponent)
   }
@@ -116,9 +143,14 @@ export class MenuComponent implements OnInit {
   selectedDish(plate) {
     if (this.selectablePlate) {
       let i = this.selectablePlate['index']
-      this.order[i]['plate'][plate['type']] = plate['name']
-      console.log(this.order[i]);
-      console.log(plate);
+      if (this.selectablePlate['type'] == 'executive') {
+        this.order[i]['plate'][plate['type']] = plate['name']
+      } else {
+        if (plate['type'] != 'dessert') {
+          this.order[i]['plate'][plate['type']] = plate['name']
+        }
+      }
+
     }
   }
 

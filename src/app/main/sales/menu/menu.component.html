@@ -1,9 +1,3 @@
-<!--h2 style="font-family: Raleway;">
-    <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
-        room_service
-    </mat-icon>
-    Menú
-</!--h2-->
 <div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2">
     <div style="padding: 0 3vw;">
         <h1 style="font-size:3vh; color: #2B2B2B; font-family: Raleway; font-weight: bolder; font-family: Raleway;">
@@ -19,14 +13,52 @@
                     <span style="flex: 1 1 auto;"></span>
                     <span>#00001</span>
                 </div>
+                <div class="order-list">
+                    <ol>
+                        <li class="order" *ngFor="let plate of order; let i = index" (click)="selectablePlate = plate"
+                            [ngStyle]="{'border':selectablePlate==plate?'1px solid black':'none'}">
+                            <div class="flex-div"
+                                style="justify-content: space-between; width: 100%; font-weight: bold; font-size: medium;">
+                                <span>{{i+1}} {{plate['name']}}</span>
+                                <span>S/. {{plate['price'] | number : '.2'}}</span>
+                                <mat-icon style="cursor: pointer;">delete</mat-icon>
+                            </div>
+                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                *ngIf="plate['plate']['entry']">
+                                <span>{{plate['plate']['entry']}}</span>
+                                <mat-icon style="cursor: pointer;">delete</mat-icon>
+                            </div>
+                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                *ngIf="plate['plate']['soup']">
+                                <span>{{plate['plate']['soup']}}</span>
+                                <mat-icon style="cursor: pointer;">delete</mat-icon>
+                            </div>
+                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                *ngIf="plate['plate']">
+                                <span>{{plate['plate']['second']}}</span>
+                                <mat-icon style="cursor: pointer;">delete</mat-icon>
+                            </div>
+                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                *ngIf="plate['type']=='executive'">
+                                <span>{{plate['plate']['dessert']}}</span>
+                                <mat-icon style="cursor: pointer;">delete</mat-icon>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                <div class="total">
+                    <div class="flex-div" style="justify-content:space-between">
+                        <span>Total</span>
+                        <span>S/18.00</span>
+                    </div>
+                </div>
             </div>
-            <div class="categories" *ngIf="!changeView">
+            <div class="categories" *ngIf="categoriesList">
                 <span class="header">Categorías</span>
                 <div class="flex-div">
-                    <div class="category" (click)="changeView=true"
-                        style="background-color: white; box-shadow: 3px 4px 4px rgba(0, 0, 0, 0.4);border: 1px solid #A5A6AA;">
-                        <div class="w3-center" style="color: #B70705; ">
-                            <mat-icon class="icon" style="color: #B70705; ">restaurant</mat-icon>
+                    <div class="category selected" (click)="MenuList=true; categoriesList=false">
+                        <div class="w3-center">
+                            <mat-icon class="icon">restaurant</mat-icon>
                             <p>Menú del día</p>
                         </div>
                     </div>
@@ -74,11 +106,11 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="changeView">
+            <div *ngIf="MenuList">
                 <div class="type">
                     <span class="header">Tipo</span>
                     <div class="flex-div">
-                        <div class="category" (click)="changeView = false" style="background: rgba(183, 7, 5, 0.2);">
+                        <div class="category" style="background: rgba(183, 7, 5, 0.2);">
                             <div class="w3-center">
                                 <img class="icon" src="../../../../assets/images/comida.png" alt="">
                                 <p>Ejecutivo</p>
@@ -104,31 +136,179 @@
                         <div style="margin-bottom: 2vh;">
                             <span class="header">Entrada</span>
                             <div class="flex-div" style="margin-top: 1vh;">
-                                <div class="box"></div>
+                                <div class="box" *ngFor="let plate of entry" (click)="selectedDish(plate)">
+                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                    <img src="../../../../assets/images/almuerzo.png" alt="">
+                                    <p>{{plate['name']}}</p>
+                                </div>
                             </div>
                         </div>
-                        <div  style="margin-bottom: 2vh;">
+                        <div style="margin-bottom: 2vh;">
                             <span class="header">Sopa</span>
                             <div class="flex-div" style="margin-top: 1vh;">
-                                <div class="box"></div>
-                                <div class="box"></div>
+                                <div class="box" *ngFor="let plate of soup" (click)="selectedDish(plate)">
+                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                    <img src="../../../../assets/images/almuerzo.png" alt="">
+                                    <p>{{plate['name']}}</p>
+                                </div>
                             </div>
                         </div>
-                        <div  style="margin-bottom: 2vh;">
+                        <div style="margin-bottom: 2vh;">
                             <span class="header">Postres</span>
                             <div class="flex-div" style="margin-top: 1vh;">
-                                <div class="box"></div>
-                                <div class="box"></div>
+                                <div class="box" *ngFor="let plate of dessert" (click)="selectedDish(plate)">
+                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                    <img src="../../../../assets/images/almuerzo.png" alt="">
+                                    <p>{{plate['name']}}</p>
+                                </div>
                             </div>
                         </div>
-                        <div  style="margin-bottom: 2vh;">
+                        <div style="margin-bottom: 2vh;">
                             <span class="header">Segundos</span>
                             <div class="flex-div" style="margin-top: 1vh;">
-                                <div class="box"></div>
-                                <div class="box"></div>
-                                <div class="box"></div>
+                                <div class="box" *ngFor="let plate of second" (click)="selectedDish(plate)">
+                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                    <img src="../../../../assets/images/almuerzo.png" alt="">
+                                    <p>{{plate['name']}}</p>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <div class="flex-div" style="justify-content: space-around;">
+                        <button mat-raised-button style="background-color: #B70705; color:white;">Cancelar</button>
+                        <button mat-raised-button style="background-color: #C8C8C8;"
+                            (click)="MenuList=false; categoriesList=true">Categorías</button>
+                        <button mat-raised-button style="background: #EE8434; color: white"
+                            (click)="MenuList=false; generateSale=true">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="generateSale" class="sale">
+                <span class="header">Generar Venta</span>
+                <div class="container-box">
+                    <span class="title-box">Comprobante</span>
+                    <div class="flex-div" style="margin-top: 3vh; align-items: center;">
+                        <div [className]="billView ? 'box selected' : 'box'"
+                            (click)="billView = true; ticketView = false; checketView = false">
+                            <mat-icon>library_books</mat-icon>
+                            <p>Factura</p>
+                        </div>
+                        <div [className]="ticketView ? 'box selected' : 'box'"
+                            (click)="billView = false; ticketView = true; checketView = false">
+                            <mat-icon>library_books</mat-icon>
+                            <p>Boleta</p>
+                        </div>
+                        <div [className]="checketView ? 'box selected' : 'box'"
+                            (click)="billView = false; ticketView = false; checketView = true">
+                            <mat-icon>receipt</mat-icon>
+                            <p>Ticket</p>
+                        </div>
+                        <div class="w3-margin-left" style="width: 10vw;">
+                            <span>Nro de Serie</span>
+                            <div class="input-disabled">FE001</div>
+                        </div>
+                        <div class="w3-margin-left" style="width: 14vw;">
+                            <span>Correlativo</span>
+                            <div class="input-disabled">00000089</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-div">
+                    <div class="container-box">
+                        <span class="title-box">Datos del Cliente</span>
+                        <div style="width: 26vw; margin-top: 3vh;">
+                            <form *ngIf="billView">
+                                <mat-form-field appearance="outline" class="w3-block">
+                                    <mat-label>RUC</mat-label>
+                                    <input matInput placeholder="RUC">
+                                    <mat-hint>Requerido*</mat-hint>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" class="w3-block">
+                                    <mat-label>Razón Social</mat-label>
+                                    <input matInput placeholder="Razón Social">
+                                    <mat-hint>Requerido*</mat-hint>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" class="w3-block">
+                                    <mat-label>Dirección</mat-label>
+                                    <input matInput placeholder="Dirección">
+                                    <mat-hint>Requerido*</mat-hint>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" class="w3-block">
+                                    <mat-label>Teléfono</mat-label>
+                                    <input matInput placeholder="Teléfono">
+                                    <mat-hint>Requerido*</mat-hint>
+                                </mat-form-field>
+                            </form>
+                            <form *ngIf="ticketView">
+                                <mat-form-field appearance="outline" class="w3-block">
+                                    <mat-label>RUC</mat-label>
+                                    <input matInput placeholder="RUC">
+                                    <mat-hint>Requerido*</mat-hint>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" class="w3-block">
+                                    <mat-label>Nombre / Apellido</mat-label>
+                                    <input matInput placeholder="N">
+                                    <mat-hint>Requerido*</mat-hint>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" class="w3-block">
+                                    <mat-label>Teléfono</mat-label>
+                                    <input matInput placeholder="Teléfono">
+                                    <mat-hint>Requerido*</mat-hint>
+                                </mat-form-field>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="container-box" style="margin-left: 2vw;">
+                        <span class="title-box">Tipo de pago</span>
+                        <div class="flex-div" style="margin-top: 3vh;">
+                            <div [className]="cashView ? 'box selected' : 'box'"
+                                (click)="cashView = true; visaView = false; masterCardView = false">
+                                <mat-icon>money</mat-icon>
+                                <p>Efectivo</p>
+                            </div>
+                            <div [className]="visaView ? 'box selected' : 'box'"
+                                (click)="cashView = false; visaView = true; masterCardView = false">
+                                <mat-icon>credit_card</mat-icon>
+                                <p>Visa</p>
+                            </div>
+                            <div [className]="masterCardView ? 'box selected' : 'box'"
+                                (click)="cashView = false; visaView = false; masterCardView = true">
+                                <mat-icon>credit_card</mat-icon>
+                                <p>Mastercard</p>
+                            </div>
+                        </div>
+                        <div class="container-box">
+                            <span class="title-box">Pagado</span>
+                            <div class="flex-div" style="margin-top: 3vh; justify-content: space-between;">
+                                <div class="pay">
+                                    <div>Entrego</div>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="20.00">
+                                        <span matPrefix style="vertical-align: super;">S/. </span>
+                                    </mat-form-field>
+                                </div>
+                                <div class="pay" *ngIf="cashView">
+                                    <div>Vuelto</div>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput value="2.00" disabled>
+                                        <span matPrefix style="vertical-align: super;">S/. </span>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="buttons" style="margin-top: 2vh;">
+                    <div class="flex-div" style="justify-content: space-around;">
+                        <button mat-raised-button style="background-color: #B70705; color:white;"
+                            (click)="generateSale=false; categoriesList=true">Cancelar</button>
+                        <button mat-raised-button style="background-color: #C8C8C8;"
+                            (click)="generateSale=false; categoriesList=true">Categorías</button>
+                        <button mat-raised-button style="background: #EE8434; color: white"
+                            (click)="printVoucher()">Grabar</button>
                     </div>
                 </div>
             </div>

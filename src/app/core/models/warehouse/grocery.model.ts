@@ -1,4 +1,4 @@
-import { User } from '../../general/user.model';
+import { User } from '../general/user.model';
 
 export interface Grocery {
   id: string;

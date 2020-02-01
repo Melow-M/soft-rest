@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { Provider } from 'src/app/core/models/third-parties/provider.model';
-import { kitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model';
+import { Input } from 'src/app/core/models/warehouse/input.model';
 import { CreateProviderDialogComponent } from 'src/app/main/third-parties/providers/create-provider-dialog/create-provider-dialog.component'
 
 @Component({
@@ -16,7 +16,7 @@ export class RegisterDocumentsComponent implements OnInit {
 
   //Templates
   providers: Provider[];
-  items: kitchenInput[];
+  items: Input[];
   documentType: String[] = [
     'BOLETA', 'FACTURA', 'TICKET'
   ]
@@ -54,7 +54,7 @@ export class RegisterDocumentsComponent implements OnInit {
       }),
     });
     this.itemsListForm = this.fb.group({
-      kitchenInputId: null,
+      inputId: null,
       item: [null, Validators.required],
       quantity: [null, Validators.required],
       cost: [null, Validators.required]    //Have to check, if we need to disable

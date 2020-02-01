@@ -33,8 +33,16 @@ const routes: Routes = [
         loadChildren: () => import('./kitchen/kitchen.module').then(mod => mod.KitchenModule)
       },
       {
-        path: 'administrador',
-        loadChildren: () => import('./admin/admin.module').then(mod => mod.AdminModule)
+        path: 'administrativo/cuentas-por-pagar',
+        loadChildren: () => import('./admin/accounts-payable/accounts-payable.module').then(mod => mod.AccountsPayableModule)
+      },
+      {
+        path: 'administrativo/cuentas-por-cobrar',
+        loadChildren: () => import('./admin/accounts-receivable/accounts-receivable.module').then(mod => mod.AccountsReceivableModule)
+      },
+      {
+        path: 'administrativo/admin-cajas',
+        loadChildren: () => import('./admin/manage-cash/manage-cash.module').then(mod => mod.ManageCashModule)
       },
       {
         path: 'terceros/clientes',

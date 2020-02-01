@@ -20,7 +20,7 @@ export interface CashOpening {
     EFECTIVO: number;
   };
   totalDeparturesByPaymentType: {
-    'TRANSFERENCIA': number;
-    'EFECTIVO': number;
+    TRANSFERENCIA: number;
+    EFECTIVO: number;
   }
 }

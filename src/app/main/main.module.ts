@@ -17,8 +17,10 @@ import {  MatNativeDateModule,
           MatProgressBarModule, 
           MatDividerModule,
           MatDialogModule,
-          MatButtonModule} from '@angular/material';
+          MatButtonModule,
+          MAT_DATE_LOCALE} from '@angular/material';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MAT_DATE_LOCALE as MAT_DATE_LOCALESAT }  from 'saturn-datepicker';
 
 @NgModule({
   declarations: [
@@ -44,5 +46,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatButtonModule,
     
   ],
+  providers:[
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+    { provide: MAT_DATE_LOCALESAT, useValue: 'en-GB' }
+  ]
 })
 export class MainModule { }

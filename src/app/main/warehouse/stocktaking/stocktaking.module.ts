@@ -3,15 +3,30 @@ import { CommonModule } from '@angular/common';
 
 import { StocktakingComponent } from './stocktaking.component';
 import { StocktakingRoutingModule } from './stocktaking-routing.module';
+import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
+import { MatFormFieldModule, MatAutocompleteModule, MatIconModule, MatButtonModule, MatInputModule, MatSelectModule, MatSnackBarModule } from '@angular/material';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
   declarations: [
-    StocktakingComponent
+    StocktakingComponent,
+    CreateInputDialogComponent
   ],
   imports: [
     CommonModule,
-    StocktakingRoutingModule
+    StocktakingRoutingModule,
+    MatFormFieldModule,
+    MatAutocompleteModule,
+    MatIconModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSnackBarModule
+  ],
+  entryComponents: [
+    CreateInputDialogComponent
   ]
 })
 export class StocktakingModule { }

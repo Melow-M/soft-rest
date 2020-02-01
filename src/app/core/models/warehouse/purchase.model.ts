@@ -3,8 +3,8 @@ import { Input } from './input.model';
 import { Provider } from '../third-parties/provider.model';
 
 export interface Purchase {
+    id: string;
     documentDetails: {
-        id: string;
         documentDate: number;
         documentType: string;           //Factura, boelta y ticket
         documentSerial: number;

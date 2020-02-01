@@ -1,6 +1,6 @@
 import { User } from '../general/user.model';
 
-export interface Grocery {
+export interface Tool {
   id: string;
   name: string; // Chocman Doble
   sku: string; //AP909001

@@ -33,7 +33,7 @@ export class PurchasesComponent implements OnInit {
   onRegistering(){
     this.dialog.open(RegisterDocumentsComponent, {
       width: '100vw',
-      height: '90vh'
+
     });
   }
 }

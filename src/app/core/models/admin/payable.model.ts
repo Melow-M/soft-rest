@@ -5,6 +5,7 @@ import { Grocery } from '../warehouse/grocery.model';
 import { Dessert } from '../warehouse/desserts.model';
 import { User } from '../general/user.model';
 import { Cash } from '../sales/cash/cash.model';
+import { KitchenInput } from '../warehouse/kitchenInput.model';
 
 export interface Payable {
   id: string;
@@ -23,7 +24,8 @@ export interface Payable {
     name: string;
     sku: string;
     quantity: number;
-    amount: number;regDate
+    amount: number;
+    item: KitchenInput;
   }>;
   payments: Array<{
     type: string;

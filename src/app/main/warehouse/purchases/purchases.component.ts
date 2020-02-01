@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { RegisterDocumentsComponent } from './register-documents/register-documents.component';
 import { DatabaseService } from 'src/app/core/database.service';
-import { ThirdPartiesComponent } from '../../third-parties/third-parties.component';
 
 @Component({
   selector: 'app-purchases',

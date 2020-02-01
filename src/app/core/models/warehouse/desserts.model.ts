@@ -1,6 +1,6 @@
 import { User } from '../general/user.model';
 
-export interface Desert {
+export interface Dessert {
   id: string;
   name: string; // Chocman Doble
   sku: string; //AP909001

@@ -30,15 +30,15 @@ export class DatabaseService {
    * THIRD PARTIES VARIBLES
    */
 
-   customersCollection: AngularFirestoreCollection<Customer>;
-   customers$: Observable<Customer[]>;
+  customersCollection: AngularFirestoreCollection<Customer>;
+  customers$: Observable<Customer[]>;
 
-   providersCollection: AngularFirestoreCollection<Provider>;
-   providers$: Observable<Provider[]>;
+  providersCollection: AngularFirestoreCollection<Provider>;
+  providers$: Observable<Provider[]>;
 
-   /**
-    * ADMINISTRATIVE VARIABLES
-    */
+  /**
+   * ADMINISTRATIVE VARIABLES
+   */
 
   payablesCollection: AngularFirestoreCollection<Payable>;
   payables$: Observable<Payable[]>;
@@ -51,8 +51,8 @@ export class DatabaseService {
     private auth: AuthService
   ) { }
   /********** GENERAL METHODS *********************** */
-  
-  getUsers(): Observable<User[]>{
+
+  getUsers(): Observable<User[]> {
     this.usersCollection = this.af.collection('users', ref => ref.orderBy('displayName', 'desc'));
     this.users$ = this.usersCollection.valueChanges().pipe(shareReplay(1));
     return this.users$;
@@ -99,21 +99,21 @@ export class DatabaseService {
   }
 
   //To get available elements
-  onGetElements(types : string): Observable<KitchenInput[]>{
+  onGetElements(types: string): Observable<KitchenInput[]> {
     let typ: string;
 
     switch (types) {
       case 'Insumos':
-        typ= 'warehouseInputs';
+        typ = 'warehouseInputs';
         break;
       case 'Otros':
-        typ= 'warehouseGrocery';
+        typ = 'warehouseGrocery';
         break;
       case 'Postres':
-        typ= 'warehouseDesserts';
+        typ = 'warehouseDesserts';
         break;
       case 'Menajes':
-        typ= 'warehouseHousehold';
+        typ = 'warehouseHousehold';
         break;
     }
 
@@ -128,16 +128,16 @@ export class DatabaseService {
 
     switch (types) {
       case 'Insumos':
-        typ= 'warehouseInputs';
+        typ = 'warehouseInputs';
         break;
       case 'Otros':
-        typ= 'warehouseGrocery';
+        typ = 'warehouseGrocery';
         break;
       case 'Postres':
-        typ= 'warehouseDesserts';
+        typ = 'warehouseDesserts';
         break;
       case 'Menajes':
-        typ= 'warehouseHousehold';
+        typ = 'warehouseHousehold';
         break;
     }
 
@@ -194,11 +194,13 @@ export class DatabaseService {
     )
   }
 
-  onAddPurchase(purchase: Purchase, itemsList: Array<{kitchenInputId: string; item: KitchenInput; quantity: number; cost: number;}>): 
+  onAddPurchase(purchase: Purchase, itemsList: Array<{ kitchenInputId: string; item: KitchenInput; quantity: number; cost: number; }>):
     Observable<firebase.firestore.WriteBatch> {
-    let purchaseRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/warehousePurchases/`).doc();
+    let purchaseRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/accountsPayable`).doc();
     let purchaseData: Purchase = purchase;
     let batch = this.af.firestore.batch()
+
+    let payableData: Payable;
 
     let costTrendRef: DocumentReference;
     let costTrendData: CostTrend
@@ -224,68 +226,133 @@ export class DatabaseService {
 
         purchaseData.status = 'GRABADO';
 
-        batch.set(purchaseRef, purchaseData);
+        //Se cambio el purchase model por el payable model. Se procede a combertir que cambiar aca
+        //batch.set(purchaseRef, purchaseData);
+
+        let temp = [];
+        purchaseData.itemsList.forEach(el => {
+          temp.push({
+            id: el.item.id,
+            type: el.item.type, //INSUMO, MENAJE, POSTRE, OTROS
+            name: el.item.name,
+            sku: el.item.sku,
+            quantity: el.quantity,
+            amount: el.cost,
+            item: el.item
+          });
+        })
+
+        payableData = {
+          id: purchaseRef.id,
+          documentDate: purchaseData.documentDetails.documentDate,          
+          documentType: purchaseData.documentDetails.documentType, // FACTURA, BOLETA, TICKET
+          documentSerial: purchaseData.documentDetails.documentSerial,
+          documentCorrelative: purchaseData.documentDetails.documentCorrelative,
+          provider: {
+            id: purchaseData.documentDetails.provider.id,
+            name: purchaseData.documentDetails.provider.name,
+            ruc: purchaseData.documentDetails.provider.ruc,
+          },
+          
+          payments: purchaseData.documentDetails.paymentType == 'CREDITO' ? [{//SOLO CREDITO
+            type: 'PARCIAL',
+            paymentType: purchaseData.documentDetails.paymentType,
+            amount: purchaseData.imports.paidImport,
+            cashReference: null,
+            paidAt: date,
+            paidBy: user,
+          }]:[{
+            type: 'TOTAL',
+            paymentType: purchaseData.documentDetails.paymentType,
+            amount: purchaseData.imports.totalImport,
+            cashReference: null,
+            paidAt: date,
+            paidBy: user,
+          }],
+
+          itemsList: temp,
+          
+          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null:purchaseData.documentDetails.creditExpirationDate,
+          paymentDate: null,
+          totalAmount: purchaseData.imports.totalImport,
+          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null: purchaseData.imports.subtotalImport,
+          igvAmount: purchaseData.imports.igvImport == undefined ? null: purchaseData.imports.igvImport,
+          paymentType: purchaseData.documentDetails.paymentType, // CREDITO, EFECTIVO, TARJETA
+          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ?  purchaseData.imports.paidImport : purchaseData.imports.totalImport,
+          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport: null, //no existe por credito
+          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE': 'PAGADO', // PENDIENTE, PAGADO, ANULADO
+          createdAt: date,
+          createdBy: user,
+          editedAt: null,
+          editedBy: null,
+          approvedAt: null,
+          approvedBy: null,
+        }
+
+        batch.set(purchaseRef, payableData);
+
+        //
 
         //Cost trends
         itemsList.forEach(item => {
-          if(item.cost != item.item.cost){
+          if (item.cost != item.item.cost) {
             switch (item.item.type) {
               case 'Insumos':
-                typ= 'warehouseInputs';
+                typ = 'warehouseInputs';
                 break;
               case 'Otros':
-                typ= 'warehouseGrocery';
+                typ = 'warehouseGrocery';
                 break;
               case 'Postres':
-                typ= 'warehouseDesserts';
+                typ = 'warehouseDesserts';
                 break;
               case 'Menajes':
-                typ= 'warehouseTools';
+                typ = 'warehouseTools';
                 break;
             }
 
-          itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.kitchenInputId);
-          
-          costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.kitchenInputId}/costTrend`).doc();
-          costTrendData = {
-            cost: Math.round(item.cost * 100.0 / item.quantity*100.0) / 100.0,
-            id: costTrendRef.id,
-            createdAt: date
-          };
+            itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.kitchenInputId);
 
-          batch.update(itemRef, {cost: costTrendData.cost});
-          batch.set(costTrendRef, costTrendData);
+            costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.kitchenInputId}/costTrend`).doc();
+            costTrendData = {
+              cost: Math.round(item.cost * 100.0 / item.quantity * 100.0) / 100.0,
+              id: costTrendRef.id,
+              createdAt: date
+            };
+
+            batch.update(itemRef, { cost: costTrendData.cost });
+            batch.set(costTrendRef, costTrendData);
           }
         })
 
         return batch;
-    }))
+      }))
   }
 
-  repPurchaseValidator(docType: string, serie: number, corr: number, provider: Provider){
-    return this.af.collection<Purchase>(`/db/deliciasTete/warehousePurchases/`, ref => ref.where('documentDetails.provider.id', "==" , provider.id)).valueChanges()
-      .pipe(map((purchase)=>{
-        if(!purchase.length){
+  repPurchaseValidator(docType: string, serie: string, corr: number, provider: Provider) {
+    return this.af.collection<Payable>(`/db/deliciasTete/accountsPayable`, ref => ref.where('documentDetails.provider.id', "==", provider.id)).valueChanges()
+      .pipe(map((purchase) => {
+        if (!purchase.length) {
           return null
         }
-        else{
-          if(purchase.find(el => (el.documentDetails.documentCorrelative == Number(corr) && el.documentDetails.documentSerial == Number(serie) && el.documentDetails.documentType == docType))
-              == undefined){
-                return null
-              }
-          else{
-            return {repeatedPurchase: true}
+        else {
+          if (purchase.find(el => (el.documentCorrelative == Number(corr) && el.documentSerial == serie && el.documentType == docType))
+            == undefined) {
+            return null
+          }
+          else {
+            return { repeatedPurchase: true }
           }
         }
-        
+
       }))
   }
 
   //Warehouse purchases
-  onGetPurchases(startDate: Date, endDate: Date): Observable<Purchase[]>{
-    let formattedendDate: number = Math.ceil(endDate.valueOf()/1000.0)
-    return this.af.collection<Purchase>(`/db/deliciasTete/warehousePurchases/`, ref => ref.where('documentDetails.documentDate', '>=', startDate))
-      .valueChanges().pipe(map(purchase => purchase.filter(el => el.documentDetails.documentDate['seconds']<=formattedendDate)),tap(console.log))
+  onGetPurchases(startDate: Date, endDate: Date): Observable<Payable[]> {
+    let formattedendDate: number = Math.ceil(endDate.valueOf() / 1000.0)
+    return this.af.collection<Payable>(`/db/deliciasTete/accountsPayable/`, ref => ref.where('documentDate', '>=', startDate))
+      .valueChanges().pipe(tap(console.log),map(purchase => purchase.filter(el => el.documentDate['seconds'] <= formattedendDate)), tap(console.log))
   }
 
 }

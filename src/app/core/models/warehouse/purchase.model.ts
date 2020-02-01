@@ -1,13 +1,14 @@
 import { User } from '../general/user.model';
 import { Input } from './input.model';
 import { Provider } from '../third-parties/provider.model';
+import { KitchenInput } from './kitchenInput.model';
 
 export interface Purchase {
     id: string;
     documentDetails: {
         documentDate: Date;
         documentType: string;           //Factura, boelta y ticket
-        documentSerial: number;
+        documentSerial: string;
         documentCorrelative: number;            
         //socialReason?: string;          //Depends on RUC todo de proveedor//Estara disabled solo mostrar
         provider: Provider;
@@ -25,7 +26,7 @@ export interface Purchase {
 
     itemsList: Array<{
         kitchenInputId: string;
-        item: Input;
+        item: KitchenInput;
         quantity: number;
         cost: number;
     }>;

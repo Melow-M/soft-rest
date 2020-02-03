@@ -3,11 +3,11 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors }
 import { MatDialog, MatTableDataSource, MatPaginator, MatSnackBar, MatDialogRef } from '@angular/material';
 import { Provider } from 'src/app/core/models/third-parties/provider.model';
 import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model';
-import { CreateProviderDialogComponent } from 'src/app/main/third-parties/providers/create-provider-dialog/create-provider-dialog.component'
 import { CreateInputDialogComponent } from '../../stocktaking/create-input-dialog/create-input-dialog.component';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { tap, map, debounceTime, take } from 'rxjs/operators';
+import { PurchasesCreateProviderDialogComponent } from '../purchases-create-provider-dialog/purchases-create-provider-dialog.component';
 
 @Component({
   selector: 'app-register-documents',
@@ -18,6 +18,9 @@ export class RegisterDocumentsComponent implements OnInit {
   //Table
   inputsTableDataSource = new MatTableDataSource([]);
   inputsTableDisplayedColumns = ['N°', 'Tipo', 'Producto', 'Medida', 'Cantidad', 'Costo', 'Acciones'];
+  footerSubtotalDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter', 'descriptionSub', 'subtotal', 'emptyFooter'];
+  footerIGVDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter', 'descriptionIGV', 'IGV', 'emptyFooter'];
+  footerTotalDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter', 'descriptionTotal', 'total', 'emptyFooter'];
 
   //Paginators
   @ViewChild('inputsTablePaginator', {static: false}) inputsTablePaginator: MatPaginator;
@@ -129,17 +132,11 @@ export class RegisterDocumentsComponent implements OnInit {
   }
 
   onAddProvider(){
-    this.dialog.open(CreateProviderDialogComponent, {
-      width: '100vw',
-      height: '90vh'
-    });
+    this.dialog.open(PurchasesCreateProviderDialogComponent);
   }
 
   onCreateInput(){
-    this.dialog.open(CreateInputDialogComponent, {
-      width: '450px',
-      height: '90vh'
-    });
+    this.dialog.open(CreateInputDialogComponent);
   }
 
   onAddInput(){
@@ -156,18 +153,21 @@ export class RegisterDocumentsComponent implements OnInit {
 
   }
 
-  getSubTotal() {
-    return Math.round(this.getTotalCost() * 100.0 / 1.18) / 100.0;
+  getSubtotal() {
+    return this.getTotalCost() / 1.18;
   }
 
   getIGV() {
-    return Math.round((this.getTotalCost() - this.getSubTotal())*100.0) /100.0;
+    return this.getTotalCost() - this.getSubtotal();
   }
 
   getTotalCost(){
     let aux = this.inputsTableDataSource.data;
+    // return aux.reduce((accumulator, currentValue) => {
+    //   return (accumulator*100.0 + Math.round(currentValue['cost']*100.0))/100.0;
+    // }, 0)
     return aux.reduce((accumulator, currentValue) => {
-      return (accumulator*100.0 + Math.round(currentValue['cost']*100.0))/100.0;
+      return (accumulator + currentValue['cost']*currentValue['quantity']);
     }, 0)
   }
 
@@ -180,7 +180,7 @@ export class RegisterDocumentsComponent implements OnInit {
       this.documentForm.get('imports.totalImport').enable();
       this.documentForm.get('imports.indebtImport').enable();
 
-      this.documentForm.get('imports.subtotalImport').setValue(this.getSubTotal());
+      this.documentForm.get('imports.subtotalImport').setValue(this.getSubtotal());
       this.documentForm.get('imports.igvImport').setValue(this.getIGV());
       this.documentForm.get('imports.totalImport').setValue(this.getTotalCost());
     }

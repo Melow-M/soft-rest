@@ -1,20 +1,19 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Cash } from 'src/app/core/models/sales/cash/cash.model';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
 import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
-import { startWith, debounceTime, distinctUntilChanged, map, filter, tap } from 'rxjs/operators';
+import { startWith, debounceTime, distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { ManageCashCreateDialogComponent } from './manage-cash-create-dialog/manage-cash-create-dialog.component';
 import { ManageCashEditDialogComponent } from './manage-cash-edit-dialog/manage-cash-edit-dialog.component';
-import { Customer } from 'src/app/core/models/third-parties/customer.model';
 import { ManageCashDeleteConfirmComponent } from './manage-cash-delete-confirm/manage-cash-delete-confirm.component';
 
 @Component({
   selector: 'app-manage-cash',
   templateUrl: './manage-cash.component.html',
-  styles: []
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ManageCashComponent implements OnInit {
 

@@ -46,16 +46,43 @@ export class DatabaseService {
   cashesCollection: AngularFirestoreCollection<Cash>;
   cashes$: Observable<Cash[]>;
 
+  /**
+   * WAREHOUSE VARIABLES
+   */
+
+   purchasesCollection: AngularFirestoreCollection<Payable>;
+   purchases$: Observable<Payable[]>;
+
   constructor(
     public af: AngularFirestore,
     private auth: AuthService
   ) { }
+
   /********** GENERAL METHODS *********************** */
 
   getUsers(): Observable<User[]> {
     this.usersCollection = this.af.collection('users', ref => ref.orderBy('displayName', 'desc'));
     this.users$ = this.usersCollection.valueChanges().pipe(shareReplay(1));
     return this.users$;
+  }
+
+  getCurrentMonthOfViewDate(): { from: Date, to: Date } {
+    const date = new Date();
+    const fromMonth = date.getMonth();
+    const fromYear = date.getFullYear();
+
+    const actualFromDate = new Date(fromYear, fromMonth, 1);
+
+    const toMonth = (fromMonth + 1) % 12;
+    let toYear = fromYear;
+
+    if (fromMonth + 1 >= 12) {
+      toYear++;
+    }
+
+    const toDate = new Date(toYear, toMonth, 1);
+
+    return { from: actualFromDate, to: toDate };
   }
 
   /********* THIRD PARTIES METHODS ****************** */
@@ -73,11 +100,17 @@ export class DatabaseService {
   }
 
 
-  /**********ADMINISTRATIVE METHODS ***************** */
+  /********** ADMINISTRATIVE METHODS ***************** */
 
   getPayables(): Observable<Payable[]> {
-    this.payablesCollection = this.af.collection('db/deliciasTete/accountsPayable', ref => ref.orderBy('createdAt', 'desc'));
-    this.payables$ = this.payablesCollection.valueChanges().pipe(shareReplay(1));
+    this.payablesCollection = this.af.collection('db/deliciasTete/accountsPayable', ref => ref.where('status', '==', 'PENDIENTE'));
+    this.payables$ =
+      this.payablesCollection.valueChanges()
+        .pipe(
+          map(res => {
+            return res.sort((a, b) => b.documentDate.valueOf() - a.documentDate.valueOf());
+          }),
+          shareReplay(1));
     return this.payables$;
   }
 
@@ -87,7 +120,7 @@ export class DatabaseService {
     return this.cashes$;
   }
 
-  //Warehouse
+  /************ WAREHOUSE METHODS ********* */
 
   //Warehouse-Stocktaking
   onGetUnits(): Observable<{ id: string, unit: string }[]> {
@@ -350,9 +383,9 @@ export class DatabaseService {
 
   //Warehouse purchases
   onGetPurchases(startDate: Date, endDate: Date): Observable<Payable[]> {
-    let formattedendDate: number = Math.ceil(endDate.valueOf() / 1000.0)
-    return this.af.collection<Payable>(`/db/deliciasTete/accountsPayable/`, ref => ref.where('documentDate', '>=', startDate))
-      .valueChanges().pipe(tap(console.log),map(purchase => purchase.filter(el => el.documentDate['seconds'] <= formattedendDate)), tap(console.log))
+    this.purchasesCollection = this.af.collection<Payable>(`/db/deliciasTete/accountsPayable`, ref => ref.where('documentDate', '>=', startDate).where('documentDate', '<=', endDate))
+    this.purchases$ = this.purchasesCollection.valueChanges().pipe(shareReplay(1));
+    return this.purchases$
   }
 
 }

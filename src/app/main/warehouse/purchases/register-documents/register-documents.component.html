@@ -25,12 +25,12 @@
 
                     <!-- documentDate -->
                     <mat-form-field appearance="outline" class="w3-margin-bottom">
-                        <input formControlName="documentDate"
-                            matInput [matDatepicker]="dp3" placeholder="Fecha de Emisión">
+                        <input formControlName="documentDate" matInput [matDatepicker]="dp3"
+                            placeholder="Fecha de Emisión">
                         <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
                         <mat-datepicker #dp3 disabled="false"></mat-datepicker>
                     </mat-form-field>
-                    
+
                     <!-- documentType -->
                     <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Tipo de Comprobante</mat-label>
@@ -64,7 +64,7 @@
                                 <mat-icon>add</mat-icon>Añadir Proveedor
                             </mat-option>
                             <mat-option *ngFor=" let provider of providersList$ | async" [value]="provider">
-                                {{provider.ruc}}
+                                {{provider.name}} | <span class="w3-small">{{provider.ruc}}</span>
                             </mat-option>
                         </mat-select>
                         <mat-hint>*Requerido</mat-hint>
@@ -90,11 +90,13 @@
                     </mat-form-field>
 
                     <!-- creditExpirationDate -->
-                    <mat-form-field appearance="outline" class="w3-margin-bottom"
+                    <mat-form-field appearance="outline" class="w3-margin-bottom animated fadeInRight"
                         *ngIf="!documentForm.get('documentDetails.creditExpirationDate').disabled">
                         <mat-label>Fecha de Expiración de Crédito</mat-label>
                         <input formControlName="creditExpirationDate" matInput
-                            placeholder="Fecha de Expiración de Crédito">
+                            placeholder="Fecha de Expiración de Crédito" [matDatepicker]="dpCredit">
+                        <mat-datepicker-toggle matSuffix [for]="dpCredit"></mat-datepicker-toggle>
+                        <mat-datepicker #dpCredit disabled="false"></mat-datepicker>
                         <mat-hint>*Requerido</mat-hint>
                     </mat-form-field>
                 </div>
@@ -112,26 +114,29 @@
                     <div style="display: flex; flex-direction: row; justify-content: space-between;"
                         *ngIf="documentForm.get('documentDetails.documentType').value == 'FACTURA'">
                         <!-- subtotalImport -->
-                        <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
+                        <!-- <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
                             <mat-label>Sub Total</mat-label>
-                            <input formControlName="subtotalImport" matInput placeholder="Sub Total" [value]="getSubTotal()">
+                            <input formControlName="subtotalImport" matInput placeholder="Sub Total"
+                                [value]="getSubTotal()">
                             <mat-hint>*Requerido</mat-hint>
-                        </mat-form-field>
+                        </mat-form-field> -->
 
                         <!-- igvImport -->
-                        <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
+                        <!-- <mat-form-field appearance="outline" style="width: 45%" class="w3-margin-bottom">
                             <mat-label>IGV</mat-label>
-                            <input formControlName="igvImport" matInput placeholder="IGV" type="number" [value]="getIGV()">
+                            <input formControlName="igvImport" matInput placeholder="IGV" type="number"
+                                [value]="getIGV()">
                             <mat-hint>*Requerido</mat-hint>
-                        </mat-form-field>
+                        </mat-form-field> -->
                     </div>
 
                     <!-- totalImport -->
-                    <mat-form-field appearance="outline" class="w3-margin-bottom">
+                    <!-- <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Total</mat-label>
-                        <input formControlName="totalImport" matInput placeholder="Total" type="number" [value]="getTotalCost()">
+                        <input formControlName="totalImport" matInput placeholder="Total" type="number"
+                            [value]="getTotalCost()">
                         <mat-hint>*Requerido</mat-hint>
-                    </mat-form-field>
+                    </mat-form-field> -->
 
                     <div style="display: flex; flex-direction: row; justify-content: space-between;">
                         <!-- paidImport -->
@@ -242,21 +247,25 @@
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Cantidad</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
                         {{element.quantity}}</td>
-                    <td mat-footer-cell *matFooterCellDef> Total </td>
+                    <td mat-footer-cell *matFooterCellDef>
+                        <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
+                            style="margin: 0px 0px" class="animated fadeInRight w3-margin-top">Subtotal</p>
+                        <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
+                            style="margin: 0px 0px" class="animated fadeInRight">IGV</p>
+                        <p class="w3-margin-bottom" style="margin: 0px 0px">TOTAL</p>
+                    </td>
                 </ng-container>
                 <ng-container matColumnDef="Costo">
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Costo (S/.)</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
-                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                            <span>S/.</span>
-                            <span>{{element.cost}}</span>
-                        </div>
+                        <span>{{element.cost | currency: 'S/.'}}</span>
                     </td>
                     <td mat-footer-cell *matFooterCellDef>
-                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                            <span>S/.</span>
-                            <span>{{getTotalCost()}}</span>
-                        </div>
+                        <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
+                            class="animated fadeInRight" style="margin: 0px 0px" class="animated fadeInRight w3-margin-top">{{getSubtotal() | currency: 'S/.'}}</p>
+                        <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
+                            class="animated fadeInRight" style="margin: 0px 0px" class="animated fadeInRight">{{getIGV() | currency: 'S/.'}}</p>
+                        <p class="animated fadeInRight" style="margin: 0px 0px" class="animated fadeInRight w3-margin-bottom">{{getTotalCost() | currency: 'S/.'}}</p>
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="Acciones">

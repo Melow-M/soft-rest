@@ -34,7 +34,7 @@ export class ProvidersDeleteConfirmComponent implements OnInit {
 
     const batch = this.af.firestore.batch();
 
-    const providerRef = this.af.firestore.doc(this.dbs.customersCollection.ref.path + `/${this.data.provider.id}`);
+    const providerRef = this.af.firestore.doc(this.dbs.providersCollection.ref.path + `/${this.data.provider.id}`);
 
     batch.delete(providerRef);
 

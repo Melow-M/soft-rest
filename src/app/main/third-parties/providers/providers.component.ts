@@ -49,8 +49,6 @@ export class ProvidersComponent implements OnInit {
         this.filterFormControl.valueChanges.pipe(startWith<any>(''), debounceTime(300), distinctUntilChanged())
       ).pipe(
         map(([providers, filterKey]) => {
-          console.log(providers);
-          console.log(filterKey);
           const list = providers.filter(option => option.ruc.toString().includes(filterKey));
 
           const filteredList = list;

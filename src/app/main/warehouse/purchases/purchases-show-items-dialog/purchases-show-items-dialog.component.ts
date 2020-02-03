@@ -3,11 +3,11 @@ import { MatTableDataSource, MatPaginator, MAT_DIALOG_DATA } from '@angular/mate
 import { Payable } from 'src/app/core/models/admin/payable.model';
 
 @Component({
-  selector: 'app-accounts-payable-show-items-dialog',
-  templateUrl: './accounts-payable-show-items-dialog.component.html',
+  selector: 'app-purchases-show-items-dialog',
+  templateUrl: './purchases-show-items-dialog.component.html',
   styles: []
 })
-export class AccountsPayableShowItemsDialogComponent implements OnInit {
+export class PurchasesShowItemsDialogComponent implements OnInit {
 
   displayedColumns: string[] = ['index', 'sku', 'name', 'quantity', 'amount'];
 
@@ -16,11 +16,11 @@ export class AccountsPayableShowItemsDialogComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: {debt: Payable}
+    @Inject(MAT_DIALOG_DATA) public data: {purchase: Payable}
   ) { }
 
   ngOnInit() {
-    this.dataSource.data = this.data.debt.itemsList;
+    this.dataSource.data = this.data.purchase.itemsList;
     this.dataSource.paginator = this.paginator;
   }
 

@@ -5,7 +5,7 @@
         <span class="w3-margin-left">Agregar dinero</span>
     </h2>
     <mat-dialog-content>
-        <form>
+        <form *ngIf="!confirm">
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Importe ingresado</mat-label>
                 <input matInput type="text" placeholder="Importe ingresado S/." autocomplete="off" required>
@@ -58,13 +58,18 @@
                 </mat-hint>
             </mat-form-field>
         </form>
-
+        <div *ngIf="confirm">
+            <p>¿Estás seguro de agregar el importe: S/. 0.00?</p>
+            <p>Decripción: ****************</p>
+        </div>
     </mat-dialog-content>
     <mat-dialog-actions style="margin-bottom: -16px;" align="end">
         <button mat-stroked-button class="w3-margin-right" mat-dialog-close
             style="background: #B70705; color: white; font-family: Raleway;">Cancelar</button>
-        <button mat-stroked-button class="w3-margin-right" mat-dialog-close
+        <button *ngIf="!confirm" mat-stroked-button class="w3-margin-right" (click)="confirm = true"
             style="background: #EE8434; color: white; font-family: Raleway;">Aceptar</button>
+        <button *ngIf="confirm" mat-stroked-button class="w3-margin-right" mat-dialog-close
+            style="background: #EE8434; color: white; font-family: Raleway;">Sí, agregar</button>
 
     </mat-dialog-actions>
 </div>

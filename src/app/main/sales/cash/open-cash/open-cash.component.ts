@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'app-open-cash',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class OpenCashComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private dialog: MatDialogRef<OpenCashComponent>,
+    @Inject(MAT_DIALOG_DATA) public data
+  ) { }
 
   ngOnInit() {
   }
 
+  open(){
+    this.dialog.close({
+      open: true
+    })
+  }
 }

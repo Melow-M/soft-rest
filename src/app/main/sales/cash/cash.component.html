@@ -27,8 +27,8 @@
                         </mat-form-field>
                         <mat-form-field class="w3-block" appearance="outline">
                             <mat-label>Contraseña</mat-label>
-                            <input matInput [type]="hidePass ? 'password' : 'text'" 
-                                placeholder="***" autocomplete="off">
+                            <input matInput [type]="hidePass ? 'password' : 'text'" placeholder="***"
+                                autocomplete="off">
                             <button mat-icon-button matSuffix (click)="hidePass = !hidePass"
                                 [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePass">
                                 <mat-icon>{{hidePass ? 'visibility_off' : 'visibility'}}</mat-icon>
@@ -42,7 +42,7 @@
                     </form>
 
                     <div style="text-align: center;">
-                        <button mat-raised-button style="background: #EE8434; color: white" (click)="opening = false">
+                        <button mat-raised-button style="background: #EE8434; color: white" (click)="openCash()">
                             <mat-icon style="vertical-align: middle;">vpn_key</mat-icon>
                             Abrir Caja
                         </button>
@@ -84,9 +84,9 @@
                         <div style="display: flex; align-items: center; flex-wrap: wrap;">
                             <mat-form-field appearance="outline">
                                 <mat-label>Filtrar</mat-label>
-                                <input matInput placeholder="Placeholder">
+                                <input matInput placeholder="Filtrar">
                                 <span matPrefix>
-                                    <mat-icon>filter_list</mat-icon>
+                                    <mat-icon class="w3-margin-right">filter_list</mat-icon>
                                 </span>
 
                             </mat-form-field>
@@ -122,7 +122,9 @@
                                         Fecha </th>
                                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b; padding-left:0.5em"
                                         class="w3-center w3-border-left">
-                                        {{element.date.getTime() | date: 'dd/MM/yyyy, h:mm a'}} </td>
+                                        <span>{{element.date.getTime() | date: 'dd/MM/yyyy'}} </span><br>
+                                        <span>{{element.date.getTime() | date: 'hh:mm a'}} </span>
+                                    </td>
                                 </ng-container>
 
                                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
+import { Component, OnInit, Inject } from '@angular/core';
+import { MatTableDataSource, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'app-close-cash',
@@ -62,10 +62,19 @@ export class CloseCashComponent implements OnInit {
   displayedColumns: string[] = ['name', 'quantity', 'total'];
   dataSource = new MatTableDataSource();
 
-  constructor() { }
+  constructor(
+    private dialog: MatDialogRef<CloseCashComponent>,
+    @Inject(MAT_DIALOG_DATA) public data
+  ) { }
 
   ngOnInit() {
     this.dataSource.data = this.bills
+  }
+
+  close(){
+    this.dialog.close({
+      close: true
+    })
   }
 
 }

@@ -1,3 +1,4 @@
+import { OpenCashComponent } from './open-cash/open-cash.component';
 import { RecordComponent } from './record/record.component';
 import { TotalsComponent } from './totals/totals.component';
 import { AddComponent } from './add/add.component';
@@ -76,23 +77,35 @@ export class CashComponent implements OnInit {
     this.dataSource.data = this.cashInfo
   }
 
-  closeCash(){
-    this.dialog.open(CloseCashComponent)
+  openCash() {
+    this.dialog.open(OpenCashComponent).afterClosed().subscribe(res => {
+      if (res) {
+        this.opening = false
+      }
+    })
   }
 
-  removeMoney(){
+  closeCash() {
+    this.dialog.open(CloseCashComponent).afterClosed().subscribe(res => {
+      if (res) {
+        this.opening = true
+      }
+    })
+  }
+
+  removeMoney() {
     this.dialog.open(RemoveComponent)
   }
 
-  addMoney(){
+  addMoney() {
     this.dialog.open(AddComponent)
   }
 
-  totals(){
+  totals() {
     this.dialog.open(TotalsComponent)
   }
 
-  record(){
+  record() {
     this.dialog.open(RecordComponent)
   }
 

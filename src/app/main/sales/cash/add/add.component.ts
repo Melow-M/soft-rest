@@ -8,6 +8,8 @@ import { Component, OnInit } from '@angular/core';
 export class AddComponent implements OnInit {
   typesIncome = ['tipo1', 'tipo2']
   users = ['user1', 'user2']
+
+  confirm:boolean = false
   constructor() { }
 
   ngOnInit() {

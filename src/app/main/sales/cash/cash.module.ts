@@ -14,7 +14,8 @@ import {
   MatPaginatorModule,
   MatMenuModule,
   MatDialogModule,
-  MatCheckboxModule
+  MatCheckboxModule,
+  MatDatepickerModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OpenCashComponent } from './open-cash/open-cash.component';
@@ -49,7 +50,8 @@ import { RecordComponent } from './record/record.component';
     MatDialogModule,
     MatCheckboxModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatDatepickerModule
   ],
   entryComponents: [
     CloseCashComponent,

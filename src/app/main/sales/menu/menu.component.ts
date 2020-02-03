@@ -1,3 +1,6 @@
+import { map, tap, startWith } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { VoucherComponent } from './voucher/voucher.component';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
@@ -27,7 +30,7 @@ export class MenuComponent implements OnInit {
   other = [
     {
       name: 'Coca Cola Personal 300ml',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 25,
       sold: 50,
@@ -35,7 +38,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Coca Cola Personal 475ml',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 15,
       sold: 50,
@@ -43,7 +46,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Trika Donofrio',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 10,
       sold: 50,
@@ -51,7 +54,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Inka Cola 475ml',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 12,
       sold: 50,
@@ -59,7 +62,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Casino Menta',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 9,
       sold: 50,
@@ -67,7 +70,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Fanta 475ml',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 10,
       sold: 5,
@@ -76,7 +79,7 @@ export class MenuComponent implements OnInit {
 
     {
       name: 'Sprite 475ml',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 5,
       sold: 5,
@@ -84,7 +87,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Coca Cola 1lt',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 12,
       sold: 5,
@@ -92,7 +95,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Inka Cola 1lt',
-      type: 'entry',
+      type: 'Otro',
       initialStock: 50,
       stock: 12,
       sold: 5,
@@ -100,7 +103,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Sprite 1lt',
-      type: 'entry',
+      type: 'other',
       initialStock: 50,
       stock: 12,
       sold: 5,
@@ -108,7 +111,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Fanta 475ml',
-      type: 'entry',
+      type: 'other',
       initialStock: 50,
       stock: 10,
       sold: 5,
@@ -117,7 +120,7 @@ export class MenuComponent implements OnInit {
 
     {
       name: 'Sprite 475ml',
-      type: 'entry',
+      type: 'other',
       initialStock: 50,
       stock: 5,
       sold: 5,
@@ -125,7 +128,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Coca Cola 1lt',
-      type: 'entry',
+      type: 'other',
       initialStock: 50,
       stock: 12,
       sold: 5,
@@ -133,7 +136,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Inka Cola 1lt',
-      type: 'entry',
+      type: 'other',
       initialStock: 50,
       stock: 12,
       sold: 5,
@@ -141,7 +144,7 @@ export class MenuComponent implements OnInit {
     },
     {
       name: 'Sprite 1lt',
-      type: 'entry',
+      type: 'other',
       initialStock: 50,
       stock: 12,
       sold: 5,
@@ -216,40 +219,60 @@ export class MenuComponent implements OnInit {
   favorites = this.other.sort((a, b) => b['sold'] - a['sold']).slice(0, 5)
   others = this.other.filter(el => !this.favorites.includes(el))
 
-  order = [
-    {
-      type: 'executive',
-      price: 10,
-      name: 'Menú Ejecutivo',
-      plate: {
-        entry: 'Tequeños',
-        second: 'Lomo Saltado',
-        dessert: 'Fruta'
-      },
-      amount: 1,
-      index: 0
-    },
-    {
-      type: 'simple',
-      price: 8,
-      name: 'Menú Básico',
-      plate: {
-        entry: 'Caldo Blanco',
-        second: 'Ají de gallina',
-        dessert: ''
-      },
-      amount: 1,
-      index: 1
-    }
-  ]
+  order: Array<any> = []
 
   total: number = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
+  total$: Observable<number>
+
+  pay = new FormControl('')
+  change: number = 0
+  change$: Observable<number>
+
+  ticketForm: FormGroup
+  billForm: FormGroup
 
   constructor(
+    private fb: FormBuilder,
     private dialog: MatDialog
   ) { }
 
   ngOnInit() {
+    this.createForm()
+    this.change$ = this.pay.valueChanges.pipe(
+      startWith(0),
+      map(pay => {
+        return pay - this.total
+      }),
+      tap(res => {
+        if (res > 0) {
+          this.change = Number(new Intl.NumberFormat('en', {
+            maximumFractionDigits: 2,
+            useGrouping: false
+          }).format(res))
+        } else {
+          this.change = 0
+        }
+      })
+    )
+
+  }
+
+  createForm() {
+    this.ticketForm = this.fb.group({
+      ruc: [''],
+      name: [''],
+      phone: ['']
+    })
+    this.billForm = this.fb.group({
+      ruc: [''],
+      businessName: [''],
+      address: [''],
+      phone: ['']
+    })
+  }
+  cancelOrder() {
+    this.order = []
+    this.total = 0
   }
 
   firstOrder(type, price, name) {
@@ -276,6 +299,8 @@ export class MenuComponent implements OnInit {
   }
 
   printVoucher() {
+    console.log(this.order);
+
     this.dialog.open(VoucherComponent)
   }
 

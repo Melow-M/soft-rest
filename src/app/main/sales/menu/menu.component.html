@@ -21,8 +21,11 @@
                             <div class="flex-div"
                                 style="justify-content: space-between; width: 100%; font-weight: bold; font-size: medium;">
                                 <span>{{plate['amount']}} {{plate['name']}}</span>
-                                <span>S/. {{plate['price'] * plate['amount'] | number : '.2'}}</span>
-                                <mat-icon style="cursor: pointer;" (click)="deleteDish(i)">delete</mat-icon>
+                                <span>
+                                    <span>S/. {{plate['price'] * plate['amount'] | number : '.2'}}</span>
+                                    <mat-icon style="cursor: pointer;margin-left: 10px; vertical-align: middle;"
+                                        (click)="deleteDish(i)">delete</mat-icon>
+                                </span>
                             </div>
                             <div *ngIf="plate['type'] == 'executive' || plate['type'] == 'simple'">
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
@@ -118,8 +121,7 @@
                                 <p>Ejecutivo</p>
                             </div>
                         </div>
-                        <div class="category"
-                            style="margin-left: 2vw; margin-right: 2vw;background: rgba(237, 172, 47, 0.4);"
+                        <div class="category" style="margin-right: 2vw;background: rgba(237, 172, 47, 0.4);"
                             (click)="firstOrder('simple',8,'Menú Básico')">
                             <div class="w3-center">
                                 <mat-icon class="icon">restaurant</mat-icon>
@@ -181,7 +183,8 @@
 
                 <div class="buttons">
                     <div class="flex-div" style="justify-content: space-around;">
-                        <button mat-raised-button style="background-color: #B70705; color:white;">Cancelar</button>
+                        <button mat-raised-button style="background-color: #B70705; color:white;"
+                            (click)="MenuList=false; categoriesList= true; cancelOrder()">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
                             (click)="MenuList=false; categoriesList=true; selectablePlate = null">Categorías</button>
                         <button mat-raised-button style="background: #EE8434; color: white"
@@ -207,7 +210,7 @@
                 </div>
                 <div style="margin-top: 3vh;">
                     <span class="header">Todos</span>
-                    <div class="flex-div" style="height: 24vw; overflow: auto;">
+                    <div class="flex-div" style="height: 26vh; overflow: auto;">
                         <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
                             <span class="stock">{{plate['stock'] | number: '2.0'}}</span>
                             <p>{{plate['name']}}</p>
@@ -217,7 +220,8 @@
                 </div>
                 <div class="buttons" style="margin-top: 3vh;">
                     <div class="flex-div" style="justify-content: space-around;">
-                        <button mat-raised-button style="background-color: #B70705; color:white;">Cancelar</button>
+                        <button mat-raised-button style="background-color: #B70705; color:white;"
+                            (click)="otherList=false; categoriesList=true; cancelOrder()">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
                             (click)="otherList=false; categoriesList=true; selectablePlate = null">Categorías</button>
                         <button mat-raised-button style="background: #EE8434; color: white"
@@ -225,82 +229,93 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="generateSale" class="sale">
+            <div *ngIf="generateSale" class="sale categories">
                 <span class="header">Generar Venta</span>
-                <div class="container-box">
+                <div class="container-box" style="width: 100%;">
                     <span class="title-box">Comprobante</span>
-                    <div class="flex-div" style="margin-top: 3vh; align-items: center;">
-                        <div [className]="billView ? 'box selected' : 'box'"
-                            (click)="billView = true; ticketView = false; checketView = false">
-                            <mat-icon>library_books</mat-icon>
-                            <p>Factura</p>
+                    <div class="flex-div"
+                        style="margin-top: 3vh; align-items: center;width: 100%; justify-content: space-between;">
+                        <div class="flex-div">
+                            <div [className]="billView ? 'box selected' : 'box'"
+                                (click)="billView = true; ticketView = false; checketView = false">
+                                <mat-icon>library_books</mat-icon>
+                                <p>Factura</p>
+                            </div>
+                            <div [className]="ticketView ? 'box selected' : 'box'"
+                                (click)="billView = false; ticketView = true; checketView = false">
+                                <mat-icon>library_books</mat-icon>
+                                <p>Boleta</p>
+                            </div>
+                            <div [className]="checketView ? 'box selected' : 'box'"
+                                (click)="billView = false; ticketView = false; checketView = true">
+                                <mat-icon>receipt</mat-icon>
+                                <p>Ticket</p>
+                            </div>
                         </div>
-                        <div [className]="ticketView ? 'box selected' : 'box'"
-                            (click)="billView = false; ticketView = true; checketView = false">
-                            <mat-icon>library_books</mat-icon>
-                            <p>Boleta</p>
+                        <div class="flex-div w3-margin-top">
+                            <div class="w3-margin-left" style="width: 17vh;">
+                                <span>Nro de Serie</span>
+                                <div class="input-disabled">FE001</div>
+                            </div>
+                            <div class="w3-margin-left" style="width: 24vh;">
+                                <span>Correlativo</span>
+                                <div class="input-disabled">00000089</div>
+                            </div>
                         </div>
-                        <div [className]="checketView ? 'box selected' : 'box'"
-                            (click)="billView = false; ticketView = false; checketView = true">
-                            <mat-icon>receipt</mat-icon>
-                            <p>Ticket</p>
-                        </div>
-                        <div class="w3-margin-left" style="width: 10vw;">
-                            <span>Nro de Serie</span>
-                            <div class="input-disabled">FE001</div>
-                        </div>
-                        <div class="w3-margin-left" style="width: 14vw;">
-                            <span>Correlativo</span>
-                            <div class="input-disabled">00000089</div>
-                        </div>
+
                     </div>
                 </div>
-                <div class="flex-div">
-                    <div class="container-box">
+                <div class="flex-div" style="width: 100%; justify-content: space-between;">
+                    <div class="container-box" style="margin-right: 2vw;">
                         <span class="title-box">Datos del Cliente</span>
-                        <div style="width: 26vw; margin-top: 3vh;">
-                            <form *ngIf="billView">
-                                <mat-form-field appearance="outline" class="w3-block">
-                                    <mat-label>RUC</mat-label>
-                                    <input matInput placeholder="RUC">
-                                    <mat-hint>Requerido*</mat-hint>
-                                </mat-form-field>
-                                <mat-form-field appearance="outline" class="w3-block">
-                                    <mat-label>Razón Social</mat-label>
-                                    <input matInput placeholder="Razón Social">
-                                    <mat-hint>Requerido*</mat-hint>
-                                </mat-form-field>
-                                <mat-form-field appearance="outline" class="w3-block">
-                                    <mat-label>Dirección</mat-label>
-                                    <input matInput placeholder="Dirección">
-                                    <mat-hint>Requerido*</mat-hint>
-                                </mat-form-field>
-                                <mat-form-field appearance="outline" class="w3-block">
-                                    <mat-label>Teléfono</mat-label>
-                                    <input matInput placeholder="Teléfono">
-                                    <mat-hint>Requerido*</mat-hint>
-                                </mat-form-field>
-                            </form>
-                            <form *ngIf="ticketView">
-                                <mat-form-field appearance="outline" class="w3-block">
-                                    <mat-label>RUC</mat-label>
-                                    <input matInput placeholder="RUC">
-                                    <mat-hint>Requerido*</mat-hint>
-                                </mat-form-field>
-                                <mat-form-field appearance="outline" class="w3-block">
-                                    <mat-label>Nombre / Apellido</mat-label>
-                                    <input matInput placeholder="N">
-                                    <mat-hint>Requerido*</mat-hint>
-                                </mat-form-field>
-                                <mat-form-field appearance="outline" class="w3-block">
-                                    <mat-label>Teléfono</mat-label>
-                                    <input matInput placeholder="Teléfono">
-                                    <mat-hint>Requerido*</mat-hint>
-                                </mat-form-field>
-                            </form>
+                        <div style="width: 100%; max-width: 420px; margin-top: 3vh;">
+                            <div *ngIf="billView">
+                                <form [formGroup]="billForm">
+                                    <mat-form-field appearance="outline" class="w3-block">
+                                        <mat-label>RUC</mat-label>
+                                        <input matInput placeholder="RUC" formControlName="ruc">
+                                        <mat-hint>Requerido*</mat-hint>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" class="w3-block">
+                                        <mat-label>Razón Social</mat-label>
+                                        <input matInput placeholder="Razón Social" formControlName="businessName">
+                                        <mat-hint>Requerido*</mat-hint>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" class="w3-block">
+                                        <mat-label>Dirección</mat-label>
+                                        <input matInput placeholder="Dirección" formControlName="address">
+                                        <mat-hint>Requerido*</mat-hint>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" class="w3-block">
+                                        <mat-label>Teléfono</mat-label>
+                                        <input matInput placeholder="Teléfono" formControlName="phone">
+                                        <mat-hint>Requerido*</mat-hint>
+                                    </mat-form-field>
+                                </form>
+                            </div>
+                            <div *ngIf="ticketView">
+                                <form [formGroup]="ticketForm">
+                                    <mat-form-field appearance="outline" class="w3-block">
+                                        <mat-label>RUC</mat-label>
+                                        <input matInput placeholder="RUC" formControlName="ruc">
+                                        <mat-hint>Requerido*</mat-hint>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" class="w3-block">
+                                        <mat-label>Nombre / Apellido</mat-label>
+                                        <input matInput placeholder="Nombre" formControlName="name">
+                                        <mat-hint>Requerido*</mat-hint>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" class="w3-block">
+                                        <mat-label>Teléfono</mat-label>
+                                        <input matInput placeholder="Teléfono" formControlName="phone">
+                                        <mat-hint>Requerido*</mat-hint>
+                                    </mat-form-field>
+                                </form>
+                            </div>
+
                         </div>
                     </div>
-                    <div class="container-box" style="margin-left: 2vw;">
+                    <div class="container-box">
                         <span class="title-box">Tipo de pago</span>
                         <div class="flex-div" style="margin-top: 3vh;">
                             <div [className]="cashView ? 'box selected' : 'box'"
@@ -325,14 +340,14 @@
                                 <div class="pay">
                                     <div>Entrego</div>
                                     <mat-form-field appearance="outline">
-                                        <input matInput placeholder="20.00">
+                                        <input matInput placeholder="20.00" [formControl]="pay">
                                         <span matPrefix style="vertical-align: super;">S/. </span>
                                     </mat-form-field>
                                 </div>
                                 <div class="pay" *ngIf="cashView">
-                                    <div>Vuelto</div>
+                                    <div *ngIf="change$ | async">Vuelto</div>
                                     <mat-form-field appearance="outline">
-                                        <input matInput value="2.00" disabled>
+                                        <input matInput disabled [(ngModel)]="change">
                                         <span matPrefix style="vertical-align: super;">S/. </span>
                                     </mat-form-field>
                                 </div>
@@ -343,7 +358,7 @@
                 <div class="buttons" style="margin-top: 2vh;">
                     <div class="flex-div" style="justify-content: space-around;">
                         <button mat-raised-button style="background-color: #B70705; color:white;"
-                            (click)="generateSale=false; categoriesList=true">Cancelar</button>
+                            (click)="generateSale=false; categoriesList=true; cancelOrder()">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
                             (click)="generateSale=false; categoriesList=true">Categorías</button>
                         <button mat-raised-button style="background: #EE8434; color: white"

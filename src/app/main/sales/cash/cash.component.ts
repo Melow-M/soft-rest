@@ -1,5 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
+import { RecordComponent } from './record/record.component';
+import { TotalsComponent } from './totals/totals.component';
+import { AddComponent } from './add/add.component';
+import { RemoveComponent } from './remove/remove.component';
+import { CloseCashComponent } from './close-cash/close-cash.component';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-cash',
@@ -8,7 +13,6 @@ import { MatTableDataSource } from '@angular/material';
 })
 export class CashComponent implements OnInit {
   opening: boolean = true
-
 
   cashRegisters: Array<string> = ['Caja 1', 'Caja 2', 'Caja 3']
   hidePass: boolean = true;
@@ -60,10 +64,36 @@ export class CashComponent implements OnInit {
   displayedColumns: string[] = ['index', 'date', 'type', 'description', 'amount', 'user', 'payment', 'actions'];
   dataSource = new MatTableDataSource();
 
-  constructor() { }
+  @ViewChild("firstView", { static: false }) set content(paginator: MatPaginator) {
+    this.dataSource.paginator = paginator;
+  }
+
+  constructor(
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit() {
     this.dataSource.data = this.cashInfo
+  }
+
+  closeCash(){
+    this.dialog.open(CloseCashComponent)
+  }
+
+  removeMoney(){
+    this.dialog.open(RemoveComponent)
+  }
+
+  addMoney(){
+    this.dialog.open(AddComponent)
+  }
+
+  totals(){
+    this.dialog.open(TotalsComponent)
+  }
+
+  record(){
+    this.dialog.open(RecordComponent)
   }
 
 }

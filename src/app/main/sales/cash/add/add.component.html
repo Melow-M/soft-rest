@@ -1,0 +1,70 @@
+<div style="font-family: Raleway; max-width: 350px;">
+    <h2 style="font-size:1.2em; font-family: Raleway; font-weight: bolder; border-bottom: 1px solid black; padding-bottom: 10px;"
+        mat-dialog-title>
+        <mat-icon style="vertical-align: middle;">add_circle</mat-icon>
+        <span class="w3-margin-left">Agregar dinero</span>
+    </h2>
+    <mat-dialog-content>
+        <form>
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                <mat-label>Importe ingresado</mat-label>
+                <input matInput type="text" placeholder="Importe ingresado S/." autocomplete="off" required>
+                <mat-hint>
+                    Requerido*
+                </mat-hint>
+            </mat-form-field>
+            <br>
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                <mat-label>Tipo de Ingreso</mat-label>
+                <mat-select>
+                    <mat-option *ngFor="let type of typesIncome" [value]="type">
+                        {{type}}
+                    </mat-option>
+                </mat-select>
+                <mat-hint>
+                    Requerido*
+                </mat-hint>
+            </mat-form-field>
+
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                <mat-label>Tipo de pago</mat-label>
+                <mat-select>
+                    <mat-option *ngFor="let type of typesIncome" [value]="type">
+                        {{type}}
+                    </mat-option>
+                </mat-select>
+                <mat-hint>
+                    Requerido*
+                </mat-hint>
+            </mat-form-field>
+
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                <mat-label>Descripción</mat-label>
+                <textarea matInput placeholder="Descripción"></textarea>
+                <mat-hint>
+                    Opcional*
+                </mat-hint>
+            </mat-form-field>
+
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                <mat-label>Responsable</mat-label>
+                <mat-select>
+                    <mat-option *ngFor="let user of users" [value]="user">
+                        {{user}}
+                    </mat-option>
+                </mat-select>
+                <mat-hint>
+                    Requerido*
+                </mat-hint>
+            </mat-form-field>
+        </form>
+
+    </mat-dialog-content>
+    <mat-dialog-actions style="margin-bottom: -16px;" align="end">
+        <button mat-stroked-button class="w3-margin-right" mat-dialog-close
+            style="background: #B70705; color: white; font-family: Raleway;">Cancelar</button>
+        <button mat-stroked-button class="w3-margin-right" mat-dialog-close
+            style="background: #EE8434; color: white; font-family: Raleway;">Aceptar</button>
+
+    </mat-dialog-actions>
+</div>

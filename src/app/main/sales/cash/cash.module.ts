@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { CashRoutingModule } from './cash-routing.module';
-import { 
+import {
   MatIconModule,
   MatDividerModule,
   MatFormFieldModule,
@@ -12,16 +12,27 @@ import {
   MatButtonModule,
   MatTableModule,
   MatPaginatorModule,
-  MatMenuModule
+  MatMenuModule,
+  MatDialogModule,
+  MatCheckboxModule
 } from '@angular/material';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OpenCashComponent } from './open-cash/open-cash.component';
 import { CloseCashComponent } from './close-cash/close-cash.component';
+import { AddComponent } from './add/add.component';
+import { RemoveComponent } from './remove/remove.component';
+import { TotalsComponent } from './totals/totals.component';
+import { RecordComponent } from './record/record.component';
 
 @NgModule({
   declarations: [
     CashComponent,
     OpenCashComponent,
-    CloseCashComponent
+    CloseCashComponent,
+    AddComponent,
+    RemoveComponent,
+    TotalsComponent,
+    RecordComponent
   ],
   imports: [
     CommonModule,
@@ -34,7 +45,19 @@ import { CloseCashComponent } from './close-cash/close-cash.component';
     MatButtonModule,
     MatTableModule,
     MatPaginatorModule,
-    MatMenuModule
+    MatMenuModule,
+    MatDialogModule,
+    MatCheckboxModule,
+    FormsModule,
+    ReactiveFormsModule
+  ],
+  entryComponents: [
+    CloseCashComponent,
+    OpenCashComponent,
+    RecordComponent,
+    AddComponent,
+    RemoveComponent,
+    TotalsComponent
   ]
 })
 export class CashModule { }

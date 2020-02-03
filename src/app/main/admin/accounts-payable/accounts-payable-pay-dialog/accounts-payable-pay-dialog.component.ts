@@ -64,7 +64,7 @@ export class AccountsPayablePayDialogComponent implements OnInit {
         map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase()))
     ).pipe(
       map(([cashes, name]) => {
-        return name ? cashes.filter(option => option['displayName'].toLowerCase().includes(name)) : cashes;
+        return name ? cashes.filter(option => option['name'].toLowerCase().includes(name)) : cashes;
       })
     );
   }

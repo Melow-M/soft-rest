@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
@@ -14,7 +14,7 @@ import { AccountsPayablePartialPayDialogComponent } from './accounts-payable-par
 @Component({
   selector: 'app-accounts-payable',
   templateUrl: './accounts-payable.component.html',
-  styles: []
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountsPayableComponent implements OnInit {
 

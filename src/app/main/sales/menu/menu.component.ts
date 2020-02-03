@@ -1,5 +1,7 @@
+import { Grocery } from './../../../core/models/warehouse/grocery.model';
+import { DatabaseService } from 'src/app/core/database.service';
 import { map, tap, startWith } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { VoucherComponent } from './voucher/voucher.component';
 import { Component, OnInit } from '@angular/core';
@@ -27,130 +29,8 @@ export class MenuComponent implements OnInit {
 
   selectablePlate: any = null
 
-  other = [
-    {
-      name: 'Coca Cola Personal 300ml',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 25,
-      sold: 50,
-      price: 1.5
-    },
-    {
-      name: 'Coca Cola Personal 475ml',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 15,
-      sold: 50,
-      price: 3
-    },
-    {
-      name: 'Trika Donofrio',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 10,
-      sold: 50,
-      price: 1.5
-    },
-    {
-      name: 'Inka Cola 475ml',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 12,
-      sold: 50,
-      price: 3
-    },
-    {
-      name: 'Casino Menta',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 9,
-      sold: 50,
-      price: 0.8
-    },
-    {
-      name: 'Fanta 475ml',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 10,
-      sold: 5,
-      price: 3
-    },
-
-    {
-      name: 'Sprite 475ml',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 5,
-      sold: 5,
-      price: 3
-    },
-    {
-      name: 'Coca Cola 1lt',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 12,
-      sold: 5,
-      price: 3
-    },
-    {
-      name: 'Inka Cola 1lt',
-      type: 'Otro',
-      initialStock: 50,
-      stock: 12,
-      sold: 5,
-      price: 3
-    },
-    {
-      name: 'Sprite 1lt',
-      type: 'other',
-      initialStock: 50,
-      stock: 12,
-      sold: 5,
-      price: 3
-    },
-    {
-      name: 'Fanta 475ml',
-      type: 'other',
-      initialStock: 50,
-      stock: 10,
-      sold: 5,
-      price: 3
-    },
-
-    {
-      name: 'Sprite 475ml',
-      type: 'other',
-      initialStock: 50,
-      stock: 5,
-      sold: 5,
-      price: 3
-    },
-    {
-      name: 'Coca Cola 1lt',
-      type: 'other',
-      initialStock: 50,
-      stock: 12,
-      sold: 5,
-      price: 3
-    },
-    {
-      name: 'Inka Cola 1lt',
-      type: 'other',
-      initialStock: 50,
-      stock: 12,
-      sold: 5,
-      price: 3
-    },
-    {
-      name: 'Sprite 1lt',
-      type: 'other',
-      initialStock: 50,
-      stock: 12,
-      sold: 5,
-      price: 3
-    }
-  ]
+  others$: Observable<any>
+  other: Array<any> = []
 
   plates = [
     {
@@ -216,8 +96,9 @@ export class MenuComponent implements OnInit {
   second = this.plates.filter(el => el['type'] == 'second')
   dessert = this.plates.filter(el => el['type'] == 'dessert')
 
-  favorites = this.other.sort((a, b) => b['sold'] - a['sold']).slice(0, 5)
-  others = this.other.filter(el => !this.favorites.includes(el))
+  favorites: Array<any> = []
+  //favorites = this.other.sort((a, b) => b['sold'] - a['sold']).slice(0, 5)
+  //others = this.other.filter(el => !this.favorites.includes(el))
 
   order: Array<any> = []
 
@@ -225,6 +106,7 @@ export class MenuComponent implements OnInit {
   total$: Observable<number>
 
   pay = new FormControl('')
+  searchProduct = new FormControl('')
   change: number = 0
   change$: Observable<number>
 
@@ -233,11 +115,13 @@ export class MenuComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public dbs: DatabaseService
   ) { }
 
   ngOnInit() {
     this.createForm()
+
     this.change$ = this.pay.valueChanges.pipe(
       startWith(0),
       map(pay => {
@@ -254,6 +138,20 @@ export class MenuComponent implements OnInit {
         }
       })
     )
+
+    this.others$ =
+      combineLatest(
+        this.dbs.onGetOthers(),
+        this.searchProduct.valueChanges.pipe(
+          startWith('')
+        )
+      )
+        .pipe(
+          map(([product, search]) => {
+            return product.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true)
+          })
+        )
+
 
   }
 

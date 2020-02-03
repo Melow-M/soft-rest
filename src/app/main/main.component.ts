@@ -18,7 +18,7 @@ export class MainComponent implements OnInit {
   loadingRouteConfig: boolean;
   
   constructor(
-    private auth: AuthService,
+    public auth: AuthService,
     public router: Router
   ) { }
 

@@ -1,9 +1,260 @@
 .ticket {
     border-right: 1px solid black;
-    width: 25%;
-    height: 80vh;
+    width: 50%;
+    max-width: 450px;
+    min-width: 150px;
+    min-height: 83vh;
+    padding: 20px 16px 5px;
+    font-family: Raleway;
 }
 
-.ticket .header {
+.flex-div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.header {
     color: #B70705;
+    font-weight: 600;
+    font-size: 1.8vh;
+    font-family: Raleway;
+}
+
+.categories {
+    padding: 20px 3vw;
+    overflow: auto;
+    min-height: 83vh;
+}
+
+.type {
+    padding: 20px 3vw;
+}
+
+.categories .flex-div {
+    justify-content: space-between;
+}
+
+.category {
+    width: 12.5vw;
+    min-width: 100px;
+    margin-top: 2vw;
+    margin-right: 1vw;
+    height: 13vw;
+    min-height: 120px;
+    background: #EFEFEF;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.category div {
+    margin-top: 2vw;
+    font-size: 1vw;
+    color: #828282;
+    font-family: Raleway;
+}
+
+.category .icon {
+    width: 6vw;
+    font-size: 6vw;
+    color: #828282;
+}
+
+.type .category {
+    width: 10vw;
+    height: 11.5vw;
+    margin-top: 0.5vw;
+}
+
+.type .category .icon {
+    width: 5vw;
+    font-size: 5vw;
+}
+
+.type .category div {
+    margin-top: 1.8vw;
+    font-size: 1vw;
+}
+
+.plates {
+    border-top: 1px solid black;
+    width: 100%;
+    padding: 20px 3vw;
+}
+
+.box {
+    background: #EFEFEF;
+    border-radius: 5px;
+    width: 8vw;
+    height: 8vw;
+    text-align: center;
+    margin-right: 1vw;
+    padding-top: 2vw;
+    font-family: Raleway;
+    color: #6C6C6C;
+    position: relative;
+    cursor: pointer;
+}
+
+.box img, .box .mat-icon {
+    width: 3vw;
+    font-size: 3vw;
+}
+
+.box p {
+    margin: 0.5vw 0;
+}
+
+.box .stock {
+    position: absolute;
+    top: 0.2vw;
+    right: 0.5vw;
+    font-size: smaller;
+}
+
+.buttons {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.buttons button {
+    font-size: large;
+    font-family: Raleway;
+}
+
+.order {
+    padding: 15px 25px;
+    font-family: Raleway;
+    cursor: pointer;
+}
+
+.order .flex-div {
+    margin: 5px 0;
+}
+
+.order-list {
+    height: 72vh;
+    overflow: auto;
+}
+
+.total {
+    font-size: 2.2vh;
+    font-weight: bolder;
+    border-top: 1px solid;
+    padding: 10px 20px;
+}
+
+.order-list ol {
+    list-style-position: inside;
+    padding-inline-start: 0;
+    list-style-type: none;
+}
+
+.order-list li:hover {
+    border: 1px solid black;
+}
+
+.sale {
+    padding-top: 20px;
+    padding-left: 3vw;
+    font-family: Raleway;
+}
+
+.sale .box {
+    padding-top: 1vw;
+    height: 6vw;
+}
+
+.sale .box .mat-icon {
+    width: 2.5vw;
+    font-size: 2.5vw;
+}
+
+.sale .box p {
+    margin: 0;
+}
+
+.sale .container-box {
+    padding: 16px 0;
+}
+
+.sale .container-box .title-box {
+    font-weight: bolder;
+    font-size: 2.2vh;
+}
+
+.input-disabled {
+    background: #E0E0E0;
+    color: #2B2B2B;
+    font-weight: bold;
+    border: 1px solid #828282;
+    box-sizing: border-box;
+    border-radius: 5px;
+    padding: 16px;
+    padding: 9px 14px;
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+.pay .mat-form-field {
+    width: 11vw;
+    text-align: right;
+    font-family: Roboto;
+    font-weight: bold;
+    font-size: 2vh;
+}
+
+::ng-deep .pay .mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 1em 0 0.8em 0;
+}
+
+::ng-deep .pay .mat-form-field-infix {
+    border-top: none;
+}
+
+::ng-deep .pay .mat-form-field-appearance-outline.mat-form-field-disabled .mat-form-field-outline {
+    background: #E0E0E0;
+    color: #2B2B2B;
+}
+
+::ng-deep .pay .mat-input-element:disabled {
+    color: #2B2B2B;
+}
+
+.selected {
+    background-color: white !important;
+    color: #B70705 !important;
+    border: 1px solid #A5A6AA;
+    box-shadow: 3px 4px 4px rgba(0, 0, 0, 0.4);
+}
+
+.selected .mat-icon, .selected p {
+    color: #B70705 !important;
+}
+
+.others .box {
+    width: 10vw;
+    height: 10vw;
+    margin-top: 1vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.others .box .stock {
+    font-size: medium;
+}
+
+.others .box .price {
+    font-family: 'Roboto';
+    position: absolute;
+    right: 0.5vw;
+    bottom: 0.4vw;
+    font-size: small;
+}
+
+.others .box p {
+    font-weight: bold;
+    font-size: 1.2vw;
+    position: relative;
+    top: -15%;
 }

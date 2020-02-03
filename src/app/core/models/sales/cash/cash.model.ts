@@ -2,13 +2,13 @@ import { User } from '../../general/user.model';
 
 export interface Cash {
   id: string;
-  currentOwner: string;
+  currentOwnerName: string;
+  currentOwnerId: string;
   currentOpeningId: string;
   name: string;
   open: boolean;
   password: string;
-  supervisorName: string;
-  supervisorId: string;
+  supervisor: User;
   lastOpening: Date;
   lastClosure: Date;
   createdAt: Date;
@@ -16,3 +16,4 @@ export interface Cash {
   editedAt: Date;
   editedBy: User;
 }
+

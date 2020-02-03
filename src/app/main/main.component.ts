@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouteConfigLoadStart, RouteConfigLoadEnd } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 
 @Component({
@@ -14,6 +14,8 @@ export class MainComponent implements OnInit {
   kitchenOpenedFlag: boolean = false;
   adminOpenedFlag: boolean = false;
   thirdOpenedFlag: boolean = false;
+
+  loadingRouteConfig: boolean;
   
   constructor(
     public auth: AuthService,
@@ -22,7 +24,14 @@ export class MainComponent implements OnInit {
 
 
   ngOnInit() {
-    
+    this.router.events
+      .subscribe(event => {
+        if (event instanceof RouteConfigLoadStart) {
+          this.loadingRouteConfig = true;
+        } else if (event instanceof RouteConfigLoadEnd) {
+          this.loadingRouteConfig = false;
+        }
+      });
   }
   
   toggleSideMenu(): void {

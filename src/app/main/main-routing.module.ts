@@ -29,8 +29,24 @@ const routes: Routes = [
         loadChildren: () => import('./warehouse/stocktaking/stocktaking.module').then(mod => mod.StocktakingModule)
       },
       {
-        path: 'cocina',
-        loadChildren: () => import('./kitchen/kitchen.module').then(mod => mod.KitchenModule)
+        path: 'cocina/recetas',
+        loadChildren: () => import('./kitchen/recipes/recipes.module').then(mod => mod.RecipesModule)
+      },
+      {
+        path: 'cocina/platos',
+        loadChildren: () => import('./kitchen/dishes/dishes.module').then(mod => mod.DishesModule)
+      },
+      {
+        path: 'cocina/pedidos',
+        loadChildren: () => import('./kitchen/orders/orders.module').then(mod => mod.OrdersModule)
+      },
+      {
+        path: 'cocina/promociones',
+        loadChildren: () => import('./kitchen/promos/promos.module').then(mod => mod.PromosModule)
+      },
+      {
+        path: 'cocina/combos',
+        loadChildren: () => import('./kitchen/combos/combos.module').then(mod => mod.CombosModule)
       },
       {
         path: 'administrativo/cuentas-por-pagar',

@@ -100,6 +100,47 @@
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink='cocina/recetas' style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            list_alt
+                        </mat-icon> Recetas
+                    </button>
+
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink='cocina/platos' style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            restaurant
+                        </mat-icon> Platos/Varios
+                    </button>
+                    
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink='cocina/pedidos' style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            description
+                        </mat-icon> Pedidos
+                    </button>
+
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink='cocina/promociones' style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            %
+                        </mat-icon> Promociones
+                    </button>
+
+                    <button mat-button class="w3-block ms-expansion-panel-menu redText w3-padding"
+                        routerLink='cocina/combos' style="text-align:left;border-radius:0px 0px 0px 0px"
+                        (click)="toggleSideMenu()">
+                        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">
+                            fastfood
+                        </mat-icon> Combos
+                    </button>
+
+
                     <p class="w3-margin-bottom"></p>
 
                 </mat-expansion-panel>

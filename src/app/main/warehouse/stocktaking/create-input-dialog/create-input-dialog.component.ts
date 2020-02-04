@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl, ValidationErrors, AbstractControl } from '@angular/forms';
-import { tap, startWith, map, debounceTime, filter, take } from 'rxjs/operators';
+import { tap, startWith, map, debounceTime, filter, take, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { MatSnackBar } from '@angular/material';
@@ -44,10 +44,11 @@ export class CreateInputDialogComponent implements OnInit {
       cost: [null, Validators.required],
     });
 
-    this.inputFormGroup.get('name').valueChanges.pipe(
+    this.inputFormGroup.get('name').valueChanges
+    .pipe(
+      startWith<any>(''),
       debounceTime(500),
-      startWith(''), 
-      filter((name: string )=> name != this.formatInput(name)),
+      distinctUntilChanged(),
       tap((name: string) => {
       console.log('now');
       this.inputFormGroup.get('name').setValue(this.formatInput(name))

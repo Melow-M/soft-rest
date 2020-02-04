@@ -1,1 +1,69 @@
-<p>recipes works!</p>
+<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2">
+    <div class="w3-row">
+        <div class="w3-col s0 m1 l1">
+            <p></p>
+        </div>
+        <div class="w3-col s12 m10 l10" style="min-height:86vh; font-family: Raleway;">
+            <h1 style="font-size:1.8em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
+                <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">list_alt
+                </mat-icon> Recetas
+            </h1>
+            <mat-divider></mat-divider>
+
+            <form [formGroup] = "searchForm" (ngSubmit)="onSearchProducto()">
+
+                <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; flex-wrap: wrap ;">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Categoría de Producto</mat-label>
+                        <mat-select placeholder="Categoría de Producto" formControlName="productCategory">
+                            <mat-option *ngFor="let category of productCategory" [value]="category">
+                                {{category}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+    
+                    <mat-form-field appearance="outline">
+                        <mat-label>Búsqueda por nombre</mat-label>
+                        <input type="text" placeholder="Búsqueda por nombre" matInput formControlName="productName" [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete">
+                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                            {{option}}
+                        </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                    <div>
+                        <button mat-raised-button color="secondary" type="submit" [disabled]="searchForm.status != 'VALID'">
+                            <mat-icon>search</mat-icon>
+                            Buscar
+                        </button>
+                    </div>
+
+                    <div>
+                        <button mat-raised-button color="secondary" type="button" (click)="onCreateProduct()">
+                            <mat-icon>add_circle</mat-icon>
+                            Crear Nuevo
+                        </button>
+                    </div>
+
+                    <div>
+                        <button mat-raised-button color="secondary" type="button">
+                            <mat-icon>cloud_download</mat-icon>
+                            Descargar
+                        </button>
+                    </div>
+
+                </div>
+                
+
+            </form>
+
+
+
+
+
+        </div>
+        <div class="w3-col s0 m1 l1">
+            <p></p>
+        </div>
+    </div>
+</div>

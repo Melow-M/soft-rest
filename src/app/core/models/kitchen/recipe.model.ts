@@ -5,7 +5,7 @@ export interface Recipe {
   name: string;
   sku: string;
   description: string | null;
-  picture: string | null;
+  picture?: string | null;
   inputs: Array<{
     name: string;
     sku: string;

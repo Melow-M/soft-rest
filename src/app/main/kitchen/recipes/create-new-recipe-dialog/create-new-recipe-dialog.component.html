@@ -1,0 +1,81 @@
+<div mat-dialog-title>
+    <div
+        style="font-size: x-large; margin-bottom: 8px; display: flex; flex-direction: row; justify-content: space-between;">
+        <span>
+            <mat-icon style="vertical-align: middle; margin-right: 4px;">add_circle</mat-icon>
+            Crear nueva receta
+        </span>
+        <button mat-button mat-dialog-close>
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <mat-divider></mat-divider>
+</div>
+
+<div mat-dialog-content>
+    <p><b>Asignación de Receta</b></p>
+    <form [formGroup]="productForm">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+            <mat-form-field appearance="outline">
+                <mat-label>Categoría de Producto</mat-label>
+                <mat-select placeholder="Categoría de Producto" formControlName="productCategory">
+                    <mat-option *ngFor="let category of productCategory" [value]="category">
+                        {{category}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Nombre de Plato/Bebida</mat-label>
+                <input type="text" placeholder="Nombre de Plato/Bebida" matInput formControlName="productName">
+            </mat-form-field>
+        </div>
+
+    </form>
+
+    
+    <p><b>Ingredientes</b></p>
+    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <form [formGroup]="itemForm" style="display: flex; flex-direction: column; width: 100%;">
+
+            <div style="display: flex; flex-direction: row; width: 100%; justify-content: space-between;">
+                <!-- item -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Seleccione Insumo</mat-label>
+                    <input 
+                        type="text" placeholder="Seleccione Insumo" aria-label="Number" matInput formControlName="item" [matAutocomplete]="auto">
+                    <mat-autocomplete [displayWith]="displayFn.bind(this)" #auto="matAutocomplete">
+                    <mat-option *ngFor="let input of inputList | async" [value]="input">
+                        {{input.name | titlecase }}
+                    </mat-option>
+                    </mat-autocomplete>
+                    <mat-hint>*Requerido</mat-hint>
+                </mat-form-field>
+
+                
+                <div>
+                    <!-- quantity -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Cantidad</mat-label>
+                        <input formControlName="quantity" matInput placeholder="Cantidad" type="number">
+                        <mat-hint>*Requerido</mat-hint>
+                    </mat-form-field>
+    
+                    <!-- Add -->
+                    <button (click)="onAddItem()" mat-raised-button color="secondary" type="button">
+                        <mat-icon>add_circle</mat-icon>
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+    
+
+</div>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
+    <button mat-raised-button class="w3-margin-right" color="primary">Crear</button>
+</mat-dialog-actions>

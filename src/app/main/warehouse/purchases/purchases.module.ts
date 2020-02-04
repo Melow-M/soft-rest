@@ -17,7 +17,6 @@ import { PurchasesCancelDialogComponent } from './purchases-cancel-dialog/purcha
   declarations: [
     PurchasesComponent,
     RegisterDocumentsComponent,
-    CreateInputDialogComponent,
     PurchasesCreateProviderDialogComponent,
     PurchasesShowItemsDialogComponent,
     PurchasesShowPaymentsDialogComponent,
@@ -47,7 +46,6 @@ import { PurchasesCancelDialogComponent } from './purchases-cancel-dialog/purcha
   ],
   entryComponents: [
     RegisterDocumentsComponent,
-    CreateInputDialogComponent,
     PurchasesCreateProviderDialogComponent,
     PurchasesShowItemsDialogComponent,
     PurchasesShowPaymentsDialogComponent,

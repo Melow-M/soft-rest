@@ -13,6 +13,10 @@ import { AuthService } from './auth.service';
 import { take, map } from 'rxjs/operators';
 import { CostTrend } from './models/warehouse/costTrend.model';
 import { Purchase } from './models/warehouse/purchase.model';
+import { Input } from './models/warehouse/input.model';
+import { Household } from './models/warehouse/household.model';
+import { Grocery } from './models/warehouse/grocery.model';
+import { Dessert } from './models/warehouse/desserts.model';
 
 @Injectable({
   providedIn: 'root'
@@ -50,8 +54,22 @@ export class DatabaseService {
    * WAREHOUSE VARIABLES
    */
 
-   purchasesCollection: AngularFirestoreCollection<Payable>;
-   purchases$: Observable<Payable[]>;
+  purchasesCollection: AngularFirestoreCollection<Payable>;
+  purchases$: Observable<Payable[]>;
+
+  inputsCollection: AngularFirestoreCollection<Input>;
+  inputs$: Observable<Input[]>;
+
+  householdsCollection: AngularFirestoreCollection<Household>;
+  households$: Observable<Household[]>;
+
+  groceriesCollection: AngularFirestoreCollection<Grocery>;
+  groceries$: Observable<Grocery[]>;
+
+  dessertsCollection: AngularFirestoreCollection<Dessert>;
+  desserts$: Observable<Dessert[]>;
+
+  items$: Observable<(any)[]>;
 
   constructor(
     public af: AngularFirestore,
@@ -277,7 +295,7 @@ export class DatabaseService {
 
         payableData = {
           id: purchaseRef.id,
-          documentDate: purchaseData.documentDetails.documentDate,          
+          documentDate: purchaseData.documentDetails.documentDate,
           documentType: purchaseData.documentDetails.documentType, // FACTURA, BOLETA, TICKET
           documentSerial: purchaseData.documentDetails.documentSerial,
           documentCorrelative: purchaseData.documentDetails.documentCorrelative,
@@ -286,7 +304,7 @@ export class DatabaseService {
             name: purchaseData.documentDetails.provider.name,
             ruc: purchaseData.documentDetails.provider.ruc,
           },
-          
+
           payments: purchaseData.documentDetails.paymentType == 'CREDITO' ? [{//SOLO CREDITO
             type: 'PARCIAL',
             paymentType: purchaseData.documentDetails.paymentType,
@@ -294,7 +312,7 @@ export class DatabaseService {
             cashReference: null,
             paidAt: date,
             paidBy: user,
-          }]:[{
+          }] : [{
             type: 'TOTAL',
             paymentType: purchaseData.documentDetails.paymentType,
             amount: purchaseData.imports.totalImport,
@@ -304,16 +322,16 @@ export class DatabaseService {
           }],
 
           itemsList: temp,
-          
-          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null:purchaseData.documentDetails.creditExpirationDate,
+
+          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null : purchaseData.documentDetails.creditExpirationDate,
           paymentDate: null,
           totalAmount: purchaseData.imports.totalImport,
-          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null: purchaseData.imports.subtotalImport,
-          igvAmount: purchaseData.imports.igvImport == undefined ? null: purchaseData.imports.igvImport,
+          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null : purchaseData.imports.subtotalImport,
+          igvAmount: purchaseData.imports.igvImport == undefined ? null : purchaseData.imports.igvImport,
           paymentType: purchaseData.documentDetails.paymentType, // CREDITO, EFECTIVO, TARJETA
-          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ?  purchaseData.imports.paidImport : purchaseData.imports.totalImport,
-          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport: null, //no existe por credito
-          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE': 'PAGADO', // PENDIENTE, PAGADO, ANULADO
+          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.paidImport : purchaseData.imports.totalImport,
+          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport : null, //no existe por credito
+          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE' : 'PAGADO', // PENDIENTE, PAGADO, ANULADO
           createdAt: date,
           createdBy: user,
           editedAt: null,
@@ -386,6 +404,38 @@ export class DatabaseService {
     this.purchasesCollection = this.af.collection<Payable>(`/db/deliciasTete/accountsPayable`, ref => ref.where('documentDate', '>=', startDate).where('documentDate', '<=', endDate))
     this.purchases$ = this.purchasesCollection.valueChanges().pipe(shareReplay(1));
     return this.purchases$
+  }
+
+  getItems(type: string): Observable<(any)[]> {
+    switch (type) {
+      case 'INSUMO':
+        this.inputsCollection = this.af.collection(`db/deliciasTete/warehouseInputs`, ref => ref.orderBy('createdAt', 'desc'));
+        this.items$ = this.inputsCollection.valueChanges().pipe(shareReplay(1));
+        return this.items$;
+        break;
+
+      case 'MENAJE':
+        this.householdsCollection = this.af.collection(`db/deliciasTete/warehouseHousehold`, ref => ref.orderBy('createdAt', 'desc'));
+        this.items$ = this.householdsCollection.valueChanges().pipe(shareReplay(1));
+        return this.items$;
+        break;
+
+      case 'POSTRES':
+        this.dessertsCollection = this.af.collection(`db/deliciasTete/warehouseDesserts`, ref => ref.orderBy('createdAt', 'desc'));
+        this.items$ = this.dessertsCollection.valueChanges().pipe(shareReplay(1));
+        return this.items$;
+        break;
+
+      case 'OTROS':
+        this.groceriesCollection = this.af.collection(`db/deliciasTete/warehouseGrocery`, ref => ref.orderBy('createdAt', 'desc'));
+        this.items$ = this.groceriesCollection.valueChanges().pipe(shareReplay(1));
+        return this.items$;
+        break;
+
+      default:
+        console.log('Sin resultados');
+        break;
+    }
   }
 
 }

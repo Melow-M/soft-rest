@@ -7,7 +7,6 @@ import { MatDividerModule, MatIconModule, MatDatepickerModule, MatFormFieldModul
 import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RegisterDocumentsComponent } from './register-documents/register-documents.component';
-import { CreateInputDialogComponent } from '../stocktaking/create-input-dialog/create-input-dialog.component';
 import { PurchasesCreateProviderDialogComponent } from './purchases-create-provider-dialog/purchases-create-provider-dialog.component';
 import { PurchasesShowItemsDialogComponent } from './purchases-show-items-dialog/purchases-show-items-dialog.component';
 import { PurchasesShowPaymentsDialogComponent } from './purchases-show-payments-dialog/purchases-show-payments-dialog.component';
@@ -17,7 +16,6 @@ import { PurchasesCancelDialogComponent } from './purchases-cancel-dialog/purcha
   declarations: [
     PurchasesComponent,
     RegisterDocumentsComponent,
-    CreateInputDialogComponent,
     PurchasesCreateProviderDialogComponent,
     PurchasesShowItemsDialogComponent,
     PurchasesShowPaymentsDialogComponent,
@@ -47,7 +45,6 @@ import { PurchasesCancelDialogComponent } from './purchases-cancel-dialog/purcha
   ],
   entryComponents: [
     RegisterDocumentsComponent,
-    CreateInputDialogComponent,
     PurchasesCreateProviderDialogComponent,
     PurchasesShowItemsDialogComponent,
     PurchasesShowPaymentsDialogComponent,

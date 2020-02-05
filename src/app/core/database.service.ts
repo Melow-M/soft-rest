@@ -1,3 +1,5 @@
+import { Order } from './models/sales/menu/order.model';
+import { Meal } from './models/sales/menu/meal.model';
 import { Grocery } from './models/warehouse/grocery.model';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -51,15 +53,20 @@ export class DatabaseService {
    * WAREHOUSE VARIABLES
    */
 
-   purchasesCollection: AngularFirestoreCollection<Payable>;
-   purchases$: Observable<Payable[]>;
+  purchasesCollection: AngularFirestoreCollection<Payable>;
+  purchases$: Observable<Payable[]>;
 
-   /**
-   * SALES VARIABLES
-   */
+  /**
+  * SALES VARIABLES
+  */
   othersCollection: AngularFirestoreCollection<Grocery>;
-   others$: Observable<Grocery[]>;
-   
+  others$: Observable<Grocery[]>;
+
+  dishesCollection: AngularFirestoreCollection<Meal>;
+  dishes$: Observable<Meal[]>;
+
+  ordersCollection: AngularFirestoreCollection<Order>;
+  orders$: Observable<Order[]>;
 
   constructor(
     public af: AngularFirestore,
@@ -236,7 +243,7 @@ export class DatabaseService {
     )
   }
 
-  addOthers(product){
+  addOthers(product) {
     let batch = this.af.firestore.batch();
     let date = new Date()
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc();
@@ -260,11 +267,11 @@ export class DatabaseService {
           name: product.name,
           description: '',
           sku: '',
-          picture:'',
-          unit:  product.unit,
+          picture: '',
+          unit: product.unit,
           stock: product.stock,
           cost: product.cost,
-          emergencyStock:0,
+          emergencyStock: 0,
           status: 'DISPONIBLE',
           createdAt: new Date(),
           createdBy: user,
@@ -275,12 +282,12 @@ export class DatabaseService {
 
         batch.set(inputRef, inputData);
 
-        batch.commit().then(()=>{
+        batch.commit().then(() => {
           console.log('otros guardado');
-          
+
         })
       })
-    
+
   }
 
   onAddPurchase(purchase: Purchase, itemsList: Array<{ kitchenInputId: string; item: KitchenInput; quantity: number; cost: number; }>):
@@ -333,7 +340,7 @@ export class DatabaseService {
 
         payableData = {
           id: purchaseRef.id,
-          documentDate: purchaseData.documentDetails.documentDate,          
+          documentDate: purchaseData.documentDetails.documentDate,
           documentType: purchaseData.documentDetails.documentType, // FACTURA, BOLETA, TICKET
           documentSerial: purchaseData.documentDetails.documentSerial,
           documentCorrelative: purchaseData.documentDetails.documentCorrelative,
@@ -342,7 +349,7 @@ export class DatabaseService {
             name: purchaseData.documentDetails.provider.name,
             ruc: purchaseData.documentDetails.provider.ruc,
           },
-          
+
           payments: purchaseData.documentDetails.paymentType == 'CREDITO' ? [{//SOLO CREDITO
             type: 'PARCIAL',
             paymentType: purchaseData.documentDetails.paymentType,
@@ -350,7 +357,7 @@ export class DatabaseService {
             cashReference: null,
             paidAt: date,
             paidBy: user,
-          }]:[{
+          }] : [{
             type: 'TOTAL',
             paymentType: purchaseData.documentDetails.paymentType,
             amount: purchaseData.imports.totalImport,
@@ -360,16 +367,16 @@ export class DatabaseService {
           }],
 
           itemsList: temp,
-          
-          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null:purchaseData.documentDetails.creditExpirationDate,
+
+          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null : purchaseData.documentDetails.creditExpirationDate,
           paymentDate: null,
           totalAmount: purchaseData.imports.totalImport,
-          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null: purchaseData.imports.subtotalImport,
-          igvAmount: purchaseData.imports.igvImport == undefined ? null: purchaseData.imports.igvImport,
+          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null : purchaseData.imports.subtotalImport,
+          igvAmount: purchaseData.imports.igvImport == undefined ? null : purchaseData.imports.igvImport,
           paymentType: purchaseData.documentDetails.paymentType, // CREDITO, EFECTIVO, TARJETA
-          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ?  purchaseData.imports.paidImport : purchaseData.imports.totalImport,
-          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport: null, //no existe por credito
-          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE': 'PAGADO', // PENDIENTE, PAGADO, ANULADO
+          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.paidImport : purchaseData.imports.totalImport,
+          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport : null, //no existe por credito
+          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE' : 'PAGADO', // PENDIENTE, PAGADO, ANULADO
           createdAt: date,
           createdBy: user,
           editedAt: null,
@@ -446,9 +453,71 @@ export class DatabaseService {
 
   /************ SALES METHODS ********* */
 
-  onGetOthers():Observable<Grocery[]>{
+  onGetOthers(): Observable<Grocery[]> {
     this.othersCollection = this.af.collection('db/deliciasTete/warehouseGrocery', ref => ref.orderBy('createdAt', 'desc'));
     this.others$ = this.othersCollection.valueChanges().pipe(shareReplay(1));
     return this.others$;
+  }
+
+  onGetDishes(){
+    this.dishesCollection = this.af.collection('db/deliciasTete/kitchenDishes', ref => ref.orderBy('createdAt', 'desc'));
+    this.dishes$ = this.dishesCollection.valueChanges().pipe(shareReplay(1));
+    return this.dishes$;
+  }
+  
+  addDishes(product) {
+    let batch = this.af.firestore.batch();
+    let date = new Date()
+    let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc();
+    let inputData: Meal;
+
+    let costTrendRef: DocumentReference = this.af.firestore
+      .collection(`/db/deliciasTete/kitchenDishes/${inputRef.id}/costTrend`).doc();
+    let costTrendData = {
+      cost: product.cost,
+      createdAt: date,
+      id: costTrendRef.id,
+      kitchenOrder: 1,
+      price: product.price
+    }
+
+    batch.set(costTrendRef, costTrendData);
+
+    this.auth.user$.pipe(
+      take(1))
+      .subscribe(user => {
+        inputData = {
+          id: inputRef.id,
+          name: product.name,
+          description: '',
+          sku: '',
+          picture: '',
+          unit: product.unit,
+          stock: product.stock,
+          type: product.type,
+          recipeId: '',
+          emergencyStock: 0,
+          status: 'DISPONIBLE',
+          createdAt: new Date(),
+          createdBy: user,
+          editedAt: new Date(),
+          editedBy: user,
+          price: product.price
+        }
+
+        batch.set(inputRef, inputData);
+
+        batch.commit().then(() => {
+          console.log('plato guardado');
+
+        })
+      })
+
+  }
+
+  getOrders(){
+    this.ordersCollection = this.af.collection('db/deliciasTete/orders', ref => ref.orderBy('createdAt', 'desc'));
+    this.orders$ = this.ordersCollection.valueChanges().pipe(shareReplay(1));
+    return this.orders$;
   }
 }

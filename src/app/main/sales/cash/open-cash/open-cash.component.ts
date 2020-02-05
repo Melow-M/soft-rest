@@ -18,7 +18,7 @@ export class OpenCashComponent implements OnInit {
 
   open(){
     this.dialog.close({
-      open: true
+      open: !this.data.open
     })
   }
 }

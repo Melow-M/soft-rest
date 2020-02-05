@@ -8,10 +8,10 @@
         </h1>
         <div style="display: flex; border-top: 1px solid;">
             <div class="ticket">
-                <div class="header flex-div">
+                <div class="header flex-div" *ngIf="numberOrder$ | async as number">
                     <span>Pedido</span>
                     <span style="flex: 1 1 auto;"></span>
-                    <span>#00001</span>
+                    <span>#{{("0000"+number).slice(-5)}}</span>
                 </div>
                 <div class="order-list">
                     <ol>
@@ -27,22 +27,22 @@
                                         (click)="deleteDish(i)">delete</mat-icon>
                                 </span>
                             </div>
-                            <div *ngIf="plate['type'] == 'executive' || plate['type'] == 'simple'">
+                            <div *ngIf="plate['mainDish']">
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                    *ngIf="plate['plate']['entry']">
-                                    <span>{{plate['plate']['entry']}}</span>
-                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'entry')">delete
+                                    *ngIf="plate['appetizer']">
+                                    <span>{{plate['appetizer']['name']}}</span>
+                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'appetizer')">delete
                                     </mat-icon>
                                 </div>
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                    *ngIf="plate['plate']">
-                                    <span>{{plate['plate']['second']}}</span>
-                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'second')">delete
+                                    *ngIf="plate['mainDish']">
+                                    <span>{{plate['mainDish']['name']}}</span>
+                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'mainDish')">delete
                                     </mat-icon>
                                 </div>
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
                                     *ngIf="plate['type']=='executive'">
-                                    <span>{{plate['plate']['dessert']}}</span>
+                                    <span>{{plate['dessert']['name']}}</span>
                                     <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'dessert')">delete
                                     </mat-icon>
                                 </div>
@@ -110,7 +110,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="MenuList">
+            <div *ngIf="MenuList" style="width:100%; height: 80vh;">
                 <div class="type">
                     <span class="header">Tipo</span>
                     <div class="flex-div">
@@ -121,14 +121,14 @@
                                 <p>Ejecutivo</p>
                             </div>
                         </div>
-                        <div class="category" style="margin-right: 2vw;background: rgba(237, 172, 47, 0.4);"
+                        <div class="category" style="background: rgba(237, 172, 47, 0.4);"
                             (click)="firstOrder('simple',8,'Menú Básico')">
                             <div class="w3-center">
                                 <mat-icon class="icon">restaurant</mat-icon>
                                 <p>Básico</p>
                             </div>
                         </div>
-                        <div class="category">
+                        <div class="category" (click)="firstOrder('second',6,'Segundo')">
                             <div class="w3-center">
                                 <img class="icon" src="../../../../assets/images/almuerzo.png" alt="">
                                 <p>Segundo</p>
@@ -136,13 +136,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="plates">
-                    <div class="flex-div" style="justify-content: space-between;">
+                <div class="plates" *ngIf="plate$ | async">
+                    <div class="flex-div" style="justify-content: space-between; overflow: auto;  height: 43.5vh;">
                         <div style="margin-bottom: 2vh;">
                             <span class="header">Entrada</span>
-                            <div class="flex-div" style="margin-top: 1vh;">
+                            <div class="flex-div">
                                 <div class="box" *ngFor="let plate of entry" (click)="selectedDish(plate)">
-                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                    <span class="stock">{{plate['stock']}} / 80</span>
                                     <img src="../../../../assets/images/almuerzo.png" alt="">
                                     <p>{{plate['name']}}</p>
                                 </div>
@@ -150,9 +150,9 @@
                         </div>
                         <div style="margin-bottom: 2vh;">
                             <span class="header">Sopa</span>
-                            <div class="flex-div" style="margin-top: 1vh;">
+                            <div class="flex-div">
                                 <div class="box" *ngFor="let plate of soup" (click)="selectedDish(plate)">
-                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                    <span class="stock">{{plate['stock']}} / 80</span>
                                     <img src="../../../../assets/images/almuerzo.png" alt="">
                                     <p>{{plate['name']}}</p>
                                 </div>
@@ -160,9 +160,9 @@
                         </div>
                         <div style="margin-bottom: 2vh;">
                             <span class="header">Postres</span>
-                            <div class="flex-div" style="margin-top: 1vh;">
+                            <div class="flex-div">
                                 <div class="box" *ngFor="let plate of dessert" (click)="selectedDish(plate)">
-                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                    <span class="stock">{{plate['stock']}} / 80</span>
                                     <img src="../../../../assets/images/almuerzo.png" alt="">
                                     <p>{{plate['name']}}</p>
                                 </div>
@@ -170,9 +170,9 @@
                         </div>
                         <div style="margin-bottom: 2vh;">
                             <span class="header">Segundos</span>
-                            <div class="flex-div" style="margin-top: 1vh;">
+                            <div class="flex-div">
                                 <div class="box" *ngFor="let plate of second" (click)="selectedDish(plate)">
-                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                    <span class="stock">{{plate['stock']}} / 80</span>
                                     <img src="../../../../assets/images/almuerzo.png" alt="">
                                     <p>{{plate['name']}}</p>
                                 </div>
@@ -184,15 +184,16 @@
                 <div class="buttons">
                     <div class="flex-div" style="justify-content: space-around;">
                         <button mat-raised-button style="background-color: #B70705; color:white;"
-                            (click)="MenuList=false; categoriesList= true; cancelOrder()">Cancelar</button>
+                            (click)=" cancelOrder()">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
                             (click)="MenuList=false; categoriesList=true; selectablePlate = null">Categorías</button>
                         <button mat-raised-button style="background: #EE8434; color: white"
-                            (click)="MenuList=false; generateSale=true">Siguiente</button>
+                            (click)="MenuList=false; generateSale=true; this.selectablePlate=''"
+                            [disabled]="!order.length">Siguiente</button>
                     </div>
                 </div>
             </div>
-            <div class="categories others" *ngIf="otherList">
+            <div class="categories others" style="padding-right: 0;" *ngIf="otherList">
                 <span class="header">{{otherTitle}}</span>
                 <mat-form-field class="w3-block" appearance="outline">
                     <input type="text" placeholder="Búsqueda por producto" matInput [formControl]="searchProduct">
@@ -223,11 +224,11 @@
                 <div class="buttons" style="margin-top: 3vh;">
                     <div class="flex-div" style="justify-content: space-around;">
                         <button mat-raised-button style="background-color: #B70705; color:white;"
-                            (click)="otherList=false; categoriesList=true; cancelOrder()">Cancelar</button>
+                            (click)="cancelOrder(); searchProduct.setValue('') ">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
-                            (click)="otherList=false; categoriesList=true; selectablePlate = null">Categorías</button>
+                            (click)="otherList=false; categoriesList=true; selectablePlate = null; searchProduct.setValue('') ">Categorías</button>
                         <button mat-raised-button style="background: #EE8434; color: white"
-                            (click)="otherList=false; generateSale=true">Siguiente</button>
+                            (click)="otherList=false; generateSale=true; searchProduct.setValue('') ">Siguiente</button>
                     </div>
                 </div>
             </div>
@@ -235,33 +236,38 @@
                 <span class="header">Generar Venta</span>
                 <div class="container-box" style="width: 100%;">
                     <span class="title-box">Comprobante</span>
-                    <div class="flex-div"
-                        style="margin-top: 3vh; align-items: center;width: 100%; justify-content: space-between;">
+                    <div class="flex-div" style=" align-items: center;width: 100%; justify-content: space-between;">
                         <div class="flex-div">
+                            <div [className]="checketView ? 'box selected' : 'box'"
+                                (click)="billView = false; ticketView = false; checketView = true;selectedPay='checket'">
+                                <mat-icon>receipt</mat-icon>
+                                <p>Ticket</p>
+                            </div>
                             <div [className]="billView ? 'box selected' : 'box'"
-                                (click)="billView = true; ticketView = false; checketView = false">
+                                (click)="billView = true; ticketView = false; checketView = false; selectedPay = 'bill'">
                                 <mat-icon>library_books</mat-icon>
                                 <p>Factura</p>
                             </div>
                             <div [className]="ticketView ? 'box selected' : 'box'"
-                                (click)="billView = false; ticketView = true; checketView = false">
+                                (click)="billView = false; ticketView = true; checketView = false; selectedPay = 'ticket'">
                                 <mat-icon>library_books</mat-icon>
                                 <p>Boleta</p>
                             </div>
-                            <div [className]="checketView ? 'box selected' : 'box'"
-                                (click)="billView = false; ticketView = false; checketView = true">
-                                <mat-icon>receipt</mat-icon>
-                                <p>Ticket</p>
-                            </div>
+
                         </div>
                         <div class="flex-div w3-margin-top">
                             <div class="w3-margin-left" style="width: 17vh;">
                                 <span>Nro de Serie</span>
-                                <div class="input-disabled">FE001</div>
+                                <div class="input-disabled" *ngIf="billView">FE001</div>
+                                <div class="input-disabled" *ngIf="ticketView">BE001</div>
+                                <div class="input-disabled" *ngIf="checketView">T0001</div>
                             </div>
-                            <div class="w3-margin-left" style="width: 24vh;">
+                            <div class="w3-margin-left" style="width: 24vh;"
+                                *ngIf="documentCorrelative$ | async as doc">
                                 <span>Correlativo</span>
-                                <div class="input-disabled">00000089</div>
+                                <div class="input-disabled" *ngIf="billView">{{doc.bill}}</div>
+                                <div class="input-disabled" *ngIf="ticketView">{{doc.ticket}}</div>
+                                <div class="input-disabled" *ngIf="checketView">{{doc.checket}}</div>
                             </div>
                         </div>
 
@@ -275,7 +281,7 @@
                                 <form [formGroup]="billForm">
                                     <mat-form-field appearance="outline" class="w3-block">
                                         <mat-label>RUC</mat-label>
-                                        <input matInput placeholder="RUC" formControlName="ruc">
+                                        <input matInput placeholder="RUC" formControlName="ruc" autocomplete="off">
                                         <mat-hint>Requerido*</mat-hint>
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" class="w3-block">
@@ -295,22 +301,22 @@
                                     </mat-form-field>
                                 </form>
                             </div>
-                            <div *ngIf="ticketView">
+                            <div *ngIf="ticketView || checketView">
                                 <form [formGroup]="ticketForm">
                                     <mat-form-field appearance="outline" class="w3-block">
-                                        <mat-label>RUC</mat-label>
-                                        <input matInput placeholder="RUC" formControlName="ruc">
-                                        <mat-hint>Requerido*</mat-hint>
+                                        <mat-label>DNI</mat-label>
+                                        <input matInput placeholder="DNI" formControlName="ruc">
+                                        <mat-hint>Opcional*</mat-hint>
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" class="w3-block">
                                         <mat-label>Nombre / Apellido</mat-label>
                                         <input matInput placeholder="Nombre" formControlName="name">
-                                        <mat-hint>Requerido*</mat-hint>
+                                        <mat-hint>Opcional*</mat-hint>
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" class="w3-block">
                                         <mat-label>Teléfono</mat-label>
                                         <input matInput placeholder="Teléfono" formControlName="phone">
-                                        <mat-hint>Requerido*</mat-hint>
+                                        <mat-hint>Opcional*</mat-hint>
                                     </mat-form-field>
                                 </form>
                             </div>
@@ -319,7 +325,7 @@
                     </div>
                     <div class="container-box">
                         <span class="title-box">Tipo de pago</span>
-                        <div class="flex-div" style="margin-top: 3vh;">
+                        <div class="flex-div" style="margin-bottom: 1vh;">
                             <div [className]="cashView ? 'box selected' : 'box'"
                                 (click)="cashView = true; visaView = false; masterCardView = false">
                                 <mat-icon>money</mat-icon>
@@ -342,7 +348,7 @@
                                 <div class="pay">
                                     <div>Entrego</div>
                                     <mat-form-field appearance="outline">
-                                        <input matInput placeholder="20.00" [formControl]="pay">
+                                        <input matInput placeholder="0.00" autocomplete="off" [formControl]="pay">
                                         <span matPrefix style="vertical-align: super;">S/. </span>
                                     </mat-form-field>
                                 </div>
@@ -360,11 +366,11 @@
                 <div class="buttons" style="margin-top: 2vh;">
                     <div class="flex-div" style="justify-content: space-around;">
                         <button mat-raised-button style="background-color: #B70705; color:white;"
-                            (click)="generateSale=false; categoriesList=true; cancelOrder()">Cancelar</button>
+                            (click)="cancelOrder()">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
-                            (click)="generateSale=false; categoriesList=true">Categorías</button>
+                            (click)="generateSale=false; categoriesList=true; this.pay.setValue('')">Categorías</button>
                         <button mat-raised-button style="background: #EE8434; color: white"
-                            (click)="printVoucher()">Grabar</button>
+                            [disabled]="!(pay.value > total)" (click)="printVoucher()">Grabar</button>
                     </div>
                 </div>
             </div>

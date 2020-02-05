@@ -29,10 +29,6 @@ const routes: Routes = [
         loadChildren: () => import('./warehouse/stocktaking/stocktaking.module').then(mod => mod.StocktakingModule)
       },
       {
-        path: 'cocina',
-        loadChildren: () => import('./kitchen/kitchen.module').then(mod => mod.KitchenModule)
-      },
-      {
         path: 'administrativo/cuentas-por-pagar',
         loadChildren: () => import('./admin/accounts-payable/accounts-payable.module').then(mod => mod.AccountsPayableModule)
       },

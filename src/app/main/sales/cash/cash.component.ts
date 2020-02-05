@@ -1,3 +1,4 @@
+import { take } from 'rxjs/operators';
 import { OpenCashComponent } from './open-cash/open-cash.component';
 import { RecordComponent } from './record/record.component';
 import { TotalsComponent } from './totals/totals.component';
@@ -78,11 +79,13 @@ export class CashComponent implements OnInit {
   }
 
   openCash() {
-    this.dialog.open(OpenCashComponent).afterClosed().subscribe(res => {
-      if (res) {
-        this.opening = false
+    this.dialog.open(OpenCashComponent,{
+      data: {
+        open: this.opening
       }
-    })
+    }).afterClosed().pipe(
+      take(1)
+    )
   }
 
   closeCash() {

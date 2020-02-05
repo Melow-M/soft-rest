@@ -25,7 +25,7 @@
       <p></p>
     </div>
     <div class="w3-col s12 m10 l10">
-      <mat-progress-bar mode="indeterminate" *ngIf="loadingCustomers$ | async"></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate" ></mat-progress-bar>
       <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
         <ng-container *ngIf="customers$ | async as customers">
           <div>
@@ -136,10 +136,10 @@
                     <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
                     <td mat-cell class="w3-center" style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
-                        <button mat-menu-item (click)="editCustomer(raw)" [disabled]="thirdPartiesEditAction">
+                        <button mat-menu-item (click)="editCustomer(raw)" >
                           <mat-icon class="ms-icons-color">edit</mat-icon> Editar
                         </button>
-                        <button mat-menu-item (click)="deleteCustomer(raw)" [disabled]="thirdPartiesDeleteAction">
+                        <button mat-menu-item (click)="deleteCustomer(raw)">
                           <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
                       </mat-menu>
@@ -170,7 +170,7 @@
 
       </ng-container>
 
-      <ng-template>
+      <ng-template #defaultUser>
         <p class="mat-h2" style="font-family: Raleway; color: #2b2b2b">Cargando credenciales ...</p>
       </ng-template>
     </div>

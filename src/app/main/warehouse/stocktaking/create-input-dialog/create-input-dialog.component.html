@@ -3,7 +3,7 @@
         style="font-size: x-large; margin-bottom: 8px; display: flex; flex-direction: row; justify-content: space-between;">
         <span>
             <mat-icon style="vertical-align: middle; margin-right: 4px;">add_circle</mat-icon>
-            Crear Nuevo Insumo
+            Crear {{inputFormGroup.get('type').value}}
         </span>
         <button mat-button mat-dialog-close>
             <mat-icon>close</mat-icon>
@@ -15,64 +15,64 @@
 <div mat-dialog-content>
     <form [formGroup]="inputFormGroup">
         <!-- Select -->
-        <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+        <mat-form-field class="w3-block w3-margin-bottom" style="max-width:350px" appearance="outline">
             <mat-label>Tipo</mat-label>
             <mat-select formControlName="type" placeholder="Tipo" matInput type="text">
                 <mat-option *ngFor="let el of typesList" [value]="el">{{el}}</mat-option>
             </mat-select>
             <mat-hint>*Requerido</mat-hint>
-        </mat-form-field>
+        </mat-form-field><br>
         <!-- name -->
-        <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+        <mat-form-field class="w3-block w3-margin-bottom" style="max-width:350px" appearance="outline">
             <mat-label>Nombre</mat-label>
-            <input formControlName="name" placeholder="Nombre" matInput type="text">
+            <input formControlName="name" placeholder="Nombre" matInput type="text" autocomplete="off">
             <mat-error>
                 <span *ngIf="!inputFormGroup.errors?.repeatedName">Este nombre ya existe</span>
             </mat-error>
             <mat-hint>*Requerido</mat-hint>
-        </mat-form-field>
+        </mat-form-field><br>
         <!-- sku -->
-        <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+        <mat-form-field class="w3-block w3-margin-bottom" style="max-width:350px" appearance="outline">
             <mat-label>Código</mat-label>
-            <input formControlName="sku" placeholder="Código" matInput type="text">
+            <input formControlName="sku" placeholder="Código" matInput type="text" autocomplete="off">
             <mat-error>
                 <span *ngIf="!inputFormGroup.errors?.repeatedCode">Este sku ya existe</span>
             </mat-error>
             <mat-hint>*Requerido</mat-hint>
-        </mat-form-field>
+        </mat-form-field><br>
 
         <!-- unit -->
-        <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+        <mat-form-field class="w3-block w3-margin-bottom" style="max-width:350px" appearance="outline">
             <mat-label>Unidad</mat-label>
             <input formControlName="unit" placeholder="Unidad" matInput type="text"
-                [matAutocomplete]="auto">
+                [matAutocomplete]="auto" autocomplete="off">
             <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let unit of filteredUnitList" [value]="unit.unit">
+                <mat-option *ngFor="let unit of units$ | async" [value]="unit.unit">
                     {{unit.unit}}
                 </mat-option>
             </mat-autocomplete>
             <mat-hint>*Requerido</mat-hint>
-        </mat-form-field>
+        </mat-form-field><br>
         
         <!-- description -->
-        <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+        <mat-form-field class="w3-block w3-margin-bottom" style="max-width:350px" appearance="outline">
             <mat-label>Descripción</mat-label>
             <textarea formControlName="description" placeholder="Descripción" matInput type="text">
             </textarea>
             <mat-hint>*Requerido</mat-hint>
-        </mat-form-field>
+        </mat-form-field><br>
 
-        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; max-width: 350px;">
             <!-- stock -->
-            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline" style="width:45%;">
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline" style="width:47%">
                 <mat-label>Stock Inicial</mat-label>
-                <input formControlName="stock" placeholder="Stock Inicial" matInput type="number">
+                <input formControlName="stock" placeholder="Stock Inicial" matInput type="number" autocomplete="off">
                 <mat-hint>*Requerido</mat-hint>
             </mat-form-field>
             <!-- cost -->
-            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline" style="width:45%;">
+            <mat-form-field class="w3-block w3-margin-bottom" appearance="outline" style="width:47%">
                 <mat-label>Costo Inicial</mat-label>
-                <input formControlName="cost" placeholder="Costo Inicial" matInput type="number">
+                <input formControlName="cost" placeholder="Costo Inicial" matInput type="number" autocomplete="off">
                 <mat-hint>*Requerido</mat-hint>
             </mat-form-field>
         </div>

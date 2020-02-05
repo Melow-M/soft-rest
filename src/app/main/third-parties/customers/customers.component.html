@@ -134,7 +134,7 @@
 
                   <ng-container matColumnDef="actions" stickyEnd>
                     <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
-                    <td mat-cell class="w3-center" style="padding:0px 15px" *matCellDef="let raw">
+                    <td mat-cell class="w3-center mat-elevation-z4" style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
                         <button mat-menu-item (click)="editCustomer(raw)" [disabled]="thirdPartiesEditAction">
                           <mat-icon class="ms-icons-color">edit</mat-icon> Editar

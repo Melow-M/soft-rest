@@ -15,6 +15,7 @@
         <ng-container *ngIf="items$ | async as items">
 
           <div style="display: flex; flex-wrap: wrap; align-items: baseline; margin: 12px 0px;">
+
             <!-- Select item's type -->
             <mat-form-field class="w3-margin-right" appereance="outline">
               <mat-label>Categoría</mat-label>
@@ -35,10 +36,22 @@
               <mat-hint>Filtro de existencias</mat-hint>
             </mat-form-field>
 
-            <button type="button" (click)="onRegistering()" style="margin-right: 16px" color="secondary"
-              mat-raised-button>
-              <mat-icon style="margin-right: 8px; vertical-align: middle;">more_vert</mat-icon>
-              <span style="vertical-align: middle;">Más acciones</span>
+            <mat-menu #rawMenu="matMenu">
+              <button mat-menu-item (click)="createItem(raw)" *ngIf="user.role.warehouseStocktakingCreateAction">
+                <mat-icon class="ms-icons-color">add_circle</mat-icon> Crear nuevo
+              </button>
+              <button mat-menu-item (click)="withdrawHousehold(raw)"
+                *ngIf="user.role.warehouseStocktakingWithdrawHouseholdAction"
+                [disabled]="itemsTypeFormControl.value !== 'MENAJE'">
+                <mat-icon class="ms-icons-color">remove_circle</mat-icon> Retirar Menaje
+              </button>
+              <button mat-menu-item (click)="addHousehold(raw)" *ngIf="user.role.warehouseStocktakingAddHouseholdAction"
+                [disabled]="itemsTypeFormControl.value !== 'MENAJE'">
+                <mat-icon class="ms-icons-color">add_circle</mat-icon> Agregar Menaje
+              </button>
+            </mat-menu>
+            <button mat-raised-button style="margin-right: 16px" color="secondary" [matMenuTriggerFor]="rawMenu">
+              <mat-icon>more_vert</mat-icon> Más acciones
             </button>
 
             <span style="flex: auto 1 1"></span>
@@ -51,7 +64,7 @@
           </div>
 
           <ng-container *ngIf="items.length; else default">
-            <div class="mat-elevation-z8" style="border-radius: 10px 10px 10px 10px">
+            <div class="mat-elevation-z8 w3-margin-top" style="border-radius: 10px 10px 10px 10px">
               <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
                 <table mat-table [dataSource]="dataSource" matSort style="width:100%">
 
@@ -62,159 +75,76 @@
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="createdAt">
-                    <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>
-                      Fecha de
-                      registro</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="documentDate">
-                    <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>
-                      Fecha de
-                      emisión</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.documentDate.seconds * 1000 | date : 'dd/MM/yyyy'}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="itemsList">
+                  <ng-container matColumnDef="name">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>
-                      Lista de items</th>
+                      Nombre </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <button mat-raised-button color="primary" (click)="showItemsList(raw)">
-                        <mat-icon>list</mat-icon> Lista
-                      </button>
+                      {{raw.name}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="documentType">
+                  <ng-container matColumnDef="sku">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef
-                      matTooltip="Ordenar tabla por tipo de documento" matTooltipPosition="above" mat-sort-header>Tipo
-                      de documento</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <b>{{raw.documentType}}</b>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="documentSerial">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Doc. Serie</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.documentSerial}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="documentCorrelative">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Doc. Correlativo
+                      matTooltip="Ordenar tabla por tipo de documento" matTooltipPosition="above" mat-sort-header>SKU
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.documentCorrelative}}
+                      {{raw.sku}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="provider">
-                    <th mat-header-cell style="padding:0px 8px; min-width:170px" *matHeaderCellDef>
-                      Proveedor
+                  <ng-container matColumnDef="unit">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Medida</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      {{raw.unit}}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="stock">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Stock
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <span>{{raw.provider.name}}</span><br>
-                      <span>{{raw.provider.ruc}}</span><br>
+                      {{raw.stock | number : '.2'}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="totalAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>TOTAL</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.totalAmount | currency : 'S/.'}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="subtotalAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>SUBTOTAL</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.subtotalAmount ? (raw.subtotalAmount | currency : 'S/.') : '---'}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="igvAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>IGV</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.igvAmount ? (raw.igvAmount | currency : 'S/.') : '---'}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="paymentType">
-                    <th mat-header-cell style="padding:0px 8px; min-width:75px" *matHeaderCellDef
-                      matTooltip="Ordenar tabla por tipo de pago" matTooltipPosition="above" mat-sort-header>Tipo de
-                      pago</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <b>{{raw.paymentType}}</b>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="status">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef matTooltip="Ordenar tabla por estado"
-                      matTooltipPosition="above" mat-sort-header>Estado
+                  <ng-container matColumnDef="averageCost">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>
+                      Costo promedio
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <span style="padding: 8px 8px; border-radius: 10px"
-                        [ngClass]="{'w3-green': raw.status === 'PAGADO',
-                                        'w3-amber': (raw.status === 'PENDIENTE' && (currentDate < raw.creditDate.seconds * 1000)),
-                                        'w3-black': raw.status === 'ANULADO',
-                                        'w3-red': (raw.status === 'PENDIENTE' && (currentDate >= raw.creditDate.seconds * 1000))}">{{raw.status}}</span>
-                    </td>
-                    <td mat-footer-cell *matFooterCellDef></td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="paidAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Importe pagado
-                    </th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.paidAmount ? (raw.paidAmount | currency : 'S/.') : '---'}}
+                      {{raw.averageCost | currency : 'S/.'}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="indebtAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Importe adeudado
-                    </th>
+                  <ng-container matColumnDef="totalValue">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Valor total</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.indebtAmount ? (raw.indebtAmount | currency : 'S/.') : '---'}}
+                      {{(raw.stock * raw.averageCost) | currency : 'S/.'}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="payments">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Pagos a cuenta
-                    </th>
+                  <ng-container matColumnDef="description">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Descripción</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <ng-container *ngIf="raw.payments; else notPayments">
-                        <button mat-raised-button color="primary" (click)="showPayments(raw)"
-                          [disabled]="!raw.payments.length">
-                          <mat-icon>list</mat-icon> Pagos
-                        </button>
-                      </ng-container>
-                      <ng-template #notPayments>
-                        ---
-                      </ng-template>
+                      {{raw.description ? raw.description : '---'}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="creditDate">
-                    <th mat-header-cell style="padding:0px 8px; min-width:80px" *matHeaderCellDef>
-                      Fecha de
-                      vencimiento<br> <small>(CREDITO)</small></th>
+                  <!-- otros, postres -->
+
+                  <ng-container matColumnDef="price"
+                    *ngIf="itemsTypeFormControl.value === 'OTROS' || itemsTypeFormControl.value === 'POSTRES'">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Precio venta</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.creditDate ? (raw.creditDate.seconds * 1000 | date : 'dd/MM/yyyy') : '---'}}
+                      {{raw.price ? (raw.price | currency : 'S/.') : '---'}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="paymentDate">
-                    <th mat-header-cell style="padding:0px 8px; min-width:80px" *matHeaderCellDef>
-                      Fecha de pago<br>
-                      <small>(CREDITO)</small></th>
+                  <ng-container matColumnDef="utility"
+                    *ngIf="itemsTypeFormControl.value === 'OTROS' || itemsTypeFormControl.value === 'POSTRES'">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Utilidad</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.paymentDate ? (raw.paymentDate.seconds * 1000 | date : 'dd/MM/yyyy') : '---'}}
+                      {{ ((raw.stock * raw.price) - (raw.stock * raw.averageCost)) | currency : 'S/.'}}
                     </td>
                   </ng-container>
 
@@ -222,10 +152,10 @@
                     <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
                       matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
                       Creado por</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                    <td mat-cell class="w3-small" style="padding:0px 8px" *matCellDef="let raw">
                       <span>{{raw.createdBy ? raw.createdBy.displayName : '---' }}</span><br>
                       <span *ngIf="raw.createdAt">{{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}</span><br>
-                      <span *ngIf="raw.createdAt" class="w3-small"><b>
+                      <span *ngIf="raw.createdAt"><b>
                           ({{raw.createdAt.seconds * 1000 | date : 'hh:mm a'}})</b></span>
                     </td>
                   </ng-container>
@@ -234,33 +164,26 @@
                     <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
                       matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
                       Editado por</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                    <td mat-cell class="w3-small" style="padding:0px 8px" *matCellDef="let raw">
                       <span>{{raw.editedBy ? raw.editedBy.displayName : '---' }}</span><br>
                       <span *ngIf="raw.editedAt">{{raw.editedAt.seconds * 1000 | date : 'dd/MM/yyyy'}}</span><br>
-                      <span *ngIf="raw.editedAt" class="w3-small"><b>
+                      <span *ngIf="raw.editedAt"><b>
                           ({{raw.editedAt.seconds * 1000 | date : 'hh:mm a'}})</b></span>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="approvedBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
-                      matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
-                      Aprobado por</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <span>{{raw.approvedBy ? raw.approvedBy.displayName : '---' }}</span><br>
-                      <span *ngIf="raw.approvedAt">{{raw.approvedAt.seconds * 1000 | date : 'dd/MM/yyyy'}}</span><br>
-                      <span *ngIf="raw.approvedAt" class="w3-small"><b>
-                          ({{raw.approvedAt.seconds * 1000 | date : 'hh:mm a'}})</b></span>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="actions" stickyEnd>
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Acciones</th>
-                    <td mat-cell style="padding:0px 24px" *matCellDef="let raw">
+                    <td mat-cell class="mat-elevation-z4" style="padding:0px 24px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
-                        <button mat-menu-item (click)="cancelPurchase(raw)"
-                          *ngIf="user.role.accountsPayableCancelAction">
-                          <mat-icon class="ms-icons-color">cancel</mat-icon> Anular
+                        <button mat-menu-item (click)="kardex(raw)" *ngIf="user.role.warehouseStocktakingKardexAction">
+                          <mat-icon class="ms-icons-color">ballot</mat-icon> Kardex
+                        </button>
+                        <button mat-menu-item (click)="edit(raw)" *ngIf="user.role.warehouseStocktakingEditAction">
+                          <mat-icon class="ms-icons-color">edit</mat-icon> Editar
+                        </button>
+                        <button mat-menu-item (click)="delete(raw)" *ngIf="user.role.warehouseStocktakingDeleteAction">
+                          <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
                       </mat-menu>
                       <button mat-icon-button [matMenuTriggerFor]="rawMenu">

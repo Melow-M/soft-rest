@@ -408,7 +408,7 @@ export class DatabaseService {
 
   getItems(type: string): Observable<(any)[]> {
     switch (type) {
-      case 'INSUMO':
+      case 'INSUMOS':
         this.inputsCollection = this.af.collection(`db/deliciasTete/warehouseInputs`, ref => ref.orderBy('createdAt', 'desc'));
         this.items$ = this.inputsCollection.valueChanges().pipe(shareReplay(1));
         return this.items$;

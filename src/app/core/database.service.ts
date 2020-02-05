@@ -17,6 +17,7 @@ import { Household } from './models/warehouse/household.model';
 import { Input } from './models/warehouse/input.model';
 import { Dessert } from './models/warehouse/desserts.model';
 import { Grocery } from './models/warehouse/grocery.model';
+import { Recipe } from './models/kitchen/recipe.model';
 
 @Injectable({
   providedIn: 'root'
@@ -390,6 +391,31 @@ export class DatabaseService {
 
   onGetInputs(): Observable<Input[]>{
     return this.af.collection<Input>(`/db/deliciasTete/warehouseInputs`, ref => ref.orderBy('name')).valueChanges();
+  }
+
+  //Kitchen
+  onGetRecipes(): Observable<Recipe[]> {
+    return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.orderBy('name')).valueChanges();
+  }
+
+  onGetRecipesType(type: string): Observable<Recipe[]>{
+    return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.where('type', '==', type)).valueChanges()
+  }
+
+  onUploadRecipe(recipe: Recipe): Observable<firebase.firestore.WriteBatch>{
+    let recipeRef = this.af.firestore.collection(`/db/deliciasTete/kitchenRecipes`).doc();
+    let recipeData = recipe;
+    let date = new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1), map((user)=> {
+      recipeData.createdAt = date;
+      recipeData.createdBy = user;
+      recipeData.id = recipeRef.id;
+      batch.set(recipeRef, recipeData);
+      return batch;
+    }));
+
   }
 
 }

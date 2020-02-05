@@ -29,9 +29,14 @@
             </div>
             <div class="w3-col s12 m6 l6 w3-padding">
             <!-- Nombre de plato o bebida -->
-                <mat-form-field appearance="outline" style="display: block">
+                <mat-form-field appearance="outline" style="display: block" >
                     <mat-label>Nombre de Plato/Bebida</mat-label>
                     <input type="text" placeholder="Nombre de Plato/Bebida" matInput formControlName="productName">
+                    <mat-hint *ngIf="this.productNameFormat$ | async">*Requerido</mat-hint>
+                    <mat-error>
+                        <span *ngIf="productForm.get('productName').errors?.repeatedName">Este nombre ya existe.</span>
+                    </mat-error>
+
                 </mat-form-field>
             </div>
 
@@ -147,6 +152,6 @@
 </div>
 
 <mat-dialog-actions align="end">
-    <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
-    <button mat-raised-button class="w3-margin-right" color="primary">Crear</button>
+    <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close type="button">Cancelar</button>
+    <button mat-raised-button class="w3-margin-right" color="primary" mat-dialog-close type="button" (click)="onUploadRecipe()">Crear</button>
 </mat-dialog-actions>

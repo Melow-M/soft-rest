@@ -26,8 +26,8 @@
                         <mat-label>Búsqueda por nombre</mat-label>
                         <input type="text" placeholder="Búsqueda por nombre" matInput formControlName="productName" [matAutocomplete]="auto">
                         <mat-autocomplete #auto="matAutocomplete">
-                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                            {{option}}
+                        <mat-option *ngFor="let option of availableOptions$ | async" [value]="option">
+                            {{option.name | titlecase}}
                         </mat-option>
                         </mat-autocomplete>
                     </mat-form-field>

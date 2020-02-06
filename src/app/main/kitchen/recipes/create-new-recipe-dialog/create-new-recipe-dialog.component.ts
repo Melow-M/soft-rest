@@ -131,6 +131,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
         sku: el['item']['sku'],
         quantity: el['quantity'],
         inputId: el['item']['id'],
+        unit: el['item']['unit']
       });
     });
 

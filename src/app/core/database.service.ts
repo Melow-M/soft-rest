@@ -398,8 +398,9 @@ export class DatabaseService {
     return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.orderBy('name')).valueChanges();
   }
 
-  onGetRecipesType(type: string): Observable<Recipe[]>{
-    return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.where('type', '==', type)).valueChanges()
+  onGetRecipesType(category: string): Observable<Recipe[]>{
+    console.log(category);
+    return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.where('category', '==', category)).valueChanges()
   }
 
   onUploadRecipe(recipe: Recipe): Observable<firebase.firestore.WriteBatch>{
@@ -415,7 +416,8 @@ export class DatabaseService {
       batch.set(recipeRef, recipeData);
       return batch;
     }));
-
   }
+
+  // onGetRecipe()
 
 }

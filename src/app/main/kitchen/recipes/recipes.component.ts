@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable, combineLatest } from 'rxjs';
 import { startWith, map, switchMap, tap, debounceTime } from 'rxjs/operators';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatTableDataSource, MatPaginator } from '@angular/material';
 import { CreateNewRecipeDialogComponent } from './create-new-recipe-dialog/create-new-recipe-dialog.component';
 import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 import { DatabaseService } from 'src/app/core/database.service';
+import { Input } from 'src/app/core/models/warehouse/input.model';
 
 @Component({
   selector: 'app-recipes',
@@ -16,6 +17,14 @@ export class RecipesComponent implements OnInit {
   productCategory: Array<string> = [
     'Platos', 'Piqueo', 'Extras', 'Bebidas'
   ]
+
+  //Table
+  inputTableDataSource = new MatTableDataSource();
+  inputTableDisplayedColumns: string[] = [
+    'index', 'inputsName', 'inputsUnit', 'inputsQuantity'
+  ]
+  @ViewChild('recipeTablePaginator', {static:false}) recipeTablePaginator: MatPaginator;
+  getRecipe$: Observable<Recipe[]>;
 
   searchForm: FormGroup;
   options: string[] = ['One', 'Two', 'Three'];
@@ -31,19 +40,37 @@ export class RecipesComponent implements OnInit {
   ngOnInit() {
     this.initForm();
     this.filteredOptions = this.searchForm.get('productName').valueChanges
-    .pipe(
-      startWith(''),
-      map(value => this._filter(value))
-    );
+      .pipe(
+        startWith(''),
+        map(value => this._filter(value))
+      );
 
-    this.availableOptions$ = combineLatest(this.searchForm.get('productName').valueChanges,
-                              this.dbs.onGetRecipesType(this.searchForm.get('productCategory').value)).pipe(
-      map(([productName, recipesList])=> {
-        console.log('retreiving');
-        return this.filterRecipe(recipesList, productName)
-      }), startWith('')
-    )
+    this.availableOptions$ = this.searchForm.get('productName').valueChanges.pipe(
+      switchMap((productName)=> {
+        return this.dbs.onGetRecipesType(this.searchForm.get('productCategory').value).pipe(debounceTime(500), map((recipesList: Recipe[])=> {
+          console.log(recipesList);
+          return this.filterRecipe(recipesList, this.searchForm.get('productName').value)
+        }))
+      }));
 
+    // this.getRecipe$ = this.searchForm.get('productName').valueChanges.pipe(
+    //   tap((productName: Recipe[] | string)=>{
+    //     if(typeof productName=='string'){
+    //       this.inputTableDataSource.data = [];
+    //     }
+    //     else{
+    //       this.inputTableDataSource.data = productName;
+    //     }
+
+    //   })
+  }
+
+  
+
+  
+  displayFn(input: Input) {
+    if (!input) return '';
+    return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }
 
   initForm(){

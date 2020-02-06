@@ -234,130 +234,169 @@
             </div>
             <div *ngIf="generateSale" class="sale categories">
                 <span class="header">Generar Venta</span>
-                <div class="container-box" style="width: 100%;">
-                    <span class="title-box">Comprobante</span>
-                    <div class="flex-div" style=" align-items: center;width: 100%; justify-content: space-between;">
-                        <div class="flex-div">
-                            <div [className]="checketView ? 'box selected' : 'box'"
-                                (click)="billView = false; ticketView = false; checketView = true;selectedPay='checket'">
-                                <mat-icon>receipt</mat-icon>
-                                <p>Ticket</p>
-                            </div>
-                            <div [className]="billView ? 'box selected' : 'box'"
-                                (click)="billView = true; ticketView = false; checketView = false; selectedPay = 'bill'">
-                                <mat-icon>library_books</mat-icon>
-                                <p>Factura</p>
-                            </div>
-                            <div [className]="ticketView ? 'box selected' : 'box'"
-                                (click)="billView = false; ticketView = true; checketView = false; selectedPay = 'ticket'">
-                                <mat-icon>library_books</mat-icon>
-                                <p>Boleta</p>
-                            </div>
+                <div style="height: 67vh; overflow: auto;">
+                    <div class="container-box" style="width: 100%;">
+                        <span class="title-box">Comprobante</span>
+                        <div class="flex-div" style=" align-items: center;width: 100%; justify-content: space-between;">
+                            <div class="flex-div">
+                                <div [className]="checketView ? 'box selected' : 'box'"
+                                    (click)="billView = false; ticketView = false; checketView = true;selectedPay='checket'">
+                                    <mat-icon>receipt</mat-icon>
+                                    <p>Ticket</p>
+                                </div>
+                                <div [className]="billView ? 'box selected' : 'box'"
+                                    (click)="billView = true; ticketView = false; checketView = false; selectedPay = 'bill'">
+                                    <mat-icon>library_books</mat-icon>
+                                    <p>Factura</p>
+                                </div>
+                                <div [className]="ticketView ? 'box selected' : 'box'"
+                                    (click)="billView = false; ticketView = true; checketView = false; selectedPay = 'ticket'">
+                                    <mat-icon>library_books</mat-icon>
+                                    <p>Boleta</p>
+                                </div>
 
-                        </div>
-                        <div class="flex-div w3-margin-top">
-                            <div class="w3-margin-left" style="width: 17vh;">
-                                <span>Nro de Serie</span>
-                                <div class="input-disabled" *ngIf="billView">FE001</div>
-                                <div class="input-disabled" *ngIf="ticketView">BE001</div>
-                                <div class="input-disabled" *ngIf="checketView">T0001</div>
                             </div>
-                            <div class="w3-margin-left" style="width: 24vh;"
-                                *ngIf="documentCorrelative$ | async as doc">
-                                <span>Correlativo</span>
-                                <div class="input-disabled" *ngIf="billView">{{doc.bill}}</div>
-                                <div class="input-disabled" *ngIf="ticketView">{{doc.ticket}}</div>
-                                <div class="input-disabled" *ngIf="checketView">{{doc.checket}}</div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <div class="flex-div" style="width: 100%; justify-content: space-between;">
-                    <div class="container-box" style="margin-right: 2vw;">
-                        <span class="title-box">Datos del Cliente</span>
-                        <div style="width: 100%; max-width: 420px; margin-top: 3vh;">
-                            <div *ngIf="billView">
-                                <form [formGroup]="billForm">
-                                    <mat-form-field appearance="outline" class="w3-block">
-                                        <mat-label>RUC</mat-label>
-                                        <input matInput placeholder="RUC" formControlName="ruc" autocomplete="off">
-                                        <mat-hint>Requerido*</mat-hint>
-                                    </mat-form-field>
-                                    <mat-form-field appearance="outline" class="w3-block">
-                                        <mat-label>Razón Social</mat-label>
-                                        <input matInput placeholder="Razón Social" formControlName="businessName">
-                                        <mat-hint>Requerido*</mat-hint>
-                                    </mat-form-field>
-                                    <mat-form-field appearance="outline" class="w3-block">
-                                        <mat-label>Dirección</mat-label>
-                                        <input matInput placeholder="Dirección" formControlName="address">
-                                        <mat-hint>Requerido*</mat-hint>
-                                    </mat-form-field>
-                                    <mat-form-field appearance="outline" class="w3-block">
-                                        <mat-label>Teléfono</mat-label>
-                                        <input matInput placeholder="Teléfono" formControlName="phone">
-                                        <mat-hint>Requerido*</mat-hint>
-                                    </mat-form-field>
-                                </form>
-                            </div>
-                            <div *ngIf="ticketView || checketView">
-                                <form [formGroup]="ticketForm">
-                                    <mat-form-field appearance="outline" class="w3-block">
-                                        <mat-label>DNI</mat-label>
-                                        <input matInput placeholder="DNI" formControlName="ruc">
-                                        <mat-hint>Opcional*</mat-hint>
-                                    </mat-form-field>
-                                    <mat-form-field appearance="outline" class="w3-block">
-                                        <mat-label>Nombre / Apellido</mat-label>
-                                        <input matInput placeholder="Nombre" formControlName="name">
-                                        <mat-hint>Opcional*</mat-hint>
-                                    </mat-form-field>
-                                    <mat-form-field appearance="outline" class="w3-block">
-                                        <mat-label>Teléfono</mat-label>
-                                        <input matInput placeholder="Teléfono" formControlName="phone">
-                                        <mat-hint>Opcional*</mat-hint>
-                                    </mat-form-field>
-                                </form>
+                            <div class="flex-div w3-margin-top">
+                                <div class="w3-margin-left" style="width: 17vh;">
+                                    <span>Nro de Serie</span>
+                                    <div class="input-disabled" *ngIf="billView">FE001</div>
+                                    <div class="input-disabled" *ngIf="ticketView">BE001</div>
+                                    <div class="input-disabled" *ngIf="checketView">T0001</div>
+                                </div>
+                                <div class="w3-margin-left" style="width: 24vh;"
+                                    *ngIf="documentCorrelative$ | async as doc">
+                                    <span>Correlativo</span>
+                                    <div class="input-disabled" *ngIf="billView">{{doc.bill}}</div>
+                                    <div class="input-disabled" *ngIf="ticketView">{{doc.ticket}}</div>
+                                    <div class="input-disabled" *ngIf="checketView">{{doc.checket}}</div>
+                                </div>
                             </div>
 
                         </div>
                     </div>
-                    <div class="container-box">
-                        <span class="title-box">Tipo de pago</span>
-                        <div class="flex-div" style="margin-bottom: 1vh;">
-                            <div [className]="cashView ? 'box selected' : 'box'"
-                                (click)="cashView = true; visaView = false; masterCardView = false">
-                                <mat-icon>money</mat-icon>
-                                <p>Efectivo</p>
-                            </div>
-                            <div [className]="visaView ? 'box selected' : 'box'"
-                                (click)="cashView = false; visaView = true; masterCardView = false">
-                                <mat-icon>credit_card</mat-icon>
-                                <p>Visa</p>
-                            </div>
-                            <div [className]="masterCardView ? 'box selected' : 'box'"
-                                (click)="cashView = false; visaView = false; masterCardView = true">
-                                <mat-icon>credit_card</mat-icon>
-                                <p>Mastercard</p>
+                    <div class="flex-div" style="width: 100%; justify-content: space-between;">
+                        <div class="container-box" style="margin-right: 2vw;">
+                            <span class="title-box">Datos del Cliente</span>
+                            <div style="width: 100%; max-width: 420px; margin-top: 3vh;"
+                                *ngIf="filteredCustomers$ | async as filter">
+                                <div *ngIf="billView">
+                                    <form [formGroup]="billForm">
+                                        <mat-form-field appearance="outline" class="w3-block">
+                                            <mat-label>RUC</mat-label>
+                                            <input matInput type="text" placeholder="RUC" formControlName="ruc"
+                                                [matAutocomplete]="autoCustomersRuc" autocomplete="off"
+                                                (keyup.enter)="chooseCustomer()">
+                                            <mat-autocomplete #autoCustomersRuc="matAutocomplete"
+                                                [displayWith]="showRucCustomer">
+                                                <mat-option *ngFor="let option of filter.ruc" [value]="option"
+                                                    (keyup.enter)="chooseCustomer()" (click)="chooseCustomer()">
+                                                    <strong>{{option['ruc']}}</strong>
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-hint>Requerido*</mat-hint>
+                                        </mat-form-field>
+                                        <mat-form-field appearance="outline" class="w3-block">
+                                            <mat-label>Razón Social</mat-label>
+                                            <input matInput type="text" placeholder="Razón Social"
+                                                formControlName="businessName" [matAutocomplete]="autoCustomers"
+                                                autocomplete="off" (keyup.enter)="chooseCustomer()">
+                                            <mat-autocomplete #autoCustomers="matAutocomplete"
+                                                [displayWith]="showBusinessNameCustomer">
+                                                <mat-option *ngFor="let option of filter.businessName" [value]="option"
+                                                    (keyup.enter)="chooseCustomer()" (click)="chooseCustomer()">
+                                                    <strong>{{option['businessName']}}</strong>
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-hint>Requerido*</mat-hint>
+                                        </mat-form-field>
+                                        <mat-form-field appearance="outline" class="w3-block">
+                                            <mat-label>Dirección</mat-label>
+                                            <input matInput placeholder="Dirección" formControlName="address">
+                                            <mat-hint>Requerido*</mat-hint>
+                                        </mat-form-field>
+                                        <mat-form-field appearance="outline" class="w3-block">
+                                            <mat-label>Teléfono</mat-label>
+                                            <input matInput placeholder="Teléfono" formControlName="phone">
+                                            <mat-hint>Requerido*</mat-hint>
+                                        </mat-form-field>
+                                    </form>
+                                </div>
+                                <div *ngIf="ticketView || checketView">
+                                    <form [formGroup]="ticketForm">
+                                        <mat-form-field appearance="outline" class="w3-block">
+                                            <mat-label>DNI</mat-label>
+                                            <input matInput type="text" placeholder="DNI" formControlName="dni"
+                                                [matAutocomplete]="autoCustomersDni" autocomplete="off"
+                                                (keyup.enter)="chooseCustomer()">
+                                            <mat-autocomplete #autoCustomersDni="matAutocomplete"
+                                                [displayWith]="showDniCustomer">
+                                                <mat-option *ngFor="let option of filter.dni" [value]="option"
+                                                    (keyup.enter)="chooseCustomer()" (click)="chooseCustomer()">
+                                                    <strong>{{option['dni']}}</strong>
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-hint>Opcional*</mat-hint>
+                                        </mat-form-field>
+                                        <mat-form-field appearance="outline" class="w3-block">
+                                            <mat-label>Nombre / Apellido</mat-label>
+                                            <input matInput type="text" placeholder="Nombre" formControlName="name"
+                                                [matAutocomplete]="autoCustomersName" autocomplete="off"
+                                                (keyup.enter)="chooseCustomer()">
+                                            <mat-autocomplete #autoCustomersName="matAutocomplete"
+                                                [displayWith]="showNameCustomer">
+                                                <mat-option *ngFor="let option of filter.name" [value]="option"
+                                                    (keyup.enter)="chooseCustomer()" (click)="chooseCustomer()">
+                                                    <strong>{{option['name']}}</strong>
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-hint>Opcional*</mat-hint>
+                                        </mat-form-field>
+                                        <mat-form-field appearance="outline" class="w3-block">
+                                            <mat-label>Teléfono</mat-label>
+                                            <input matInput placeholder="Teléfono" formControlName="phone">
+                                            <mat-hint>Opcional*</mat-hint>
+                                        </mat-form-field>
+                                    </form>
+                                </div>
+
                             </div>
                         </div>
                         <div class="container-box">
-                            <span class="title-box">Pagado</span>
-                            <div class="flex-div" style="margin-top: 3vh; justify-content: space-between;">
-                                <div class="pay">
-                                    <div>Entrego</div>
-                                    <mat-form-field appearance="outline">
-                                        <input matInput placeholder="0.00" autocomplete="off" [formControl]="pay">
-                                        <span matPrefix style="vertical-align: super;">S/. </span>
-                                    </mat-form-field>
+                            <span class="title-box">Tipo de pago</span>
+                            <div class="flex-div" style="margin-bottom: 1vh;">
+                                <div [className]="cashView ? 'box selected' : 'box'"
+                                    (click)="cashView = true; visaView = false; masterCardView = false">
+                                    <mat-icon>money</mat-icon>
+                                    <p>Efectivo</p>
                                 </div>
-                                <div class="pay" *ngIf="cashView">
-                                    <div *ngIf="change$ | async">Vuelto</div>
-                                    <mat-form-field appearance="outline">
-                                        <input matInput disabled [(ngModel)]="change">
-                                        <span matPrefix style="vertical-align: super;">S/. </span>
-                                    </mat-form-field>
+                                <div [className]="visaView ? 'box selected' : 'box'"
+                                    (click)="cashView = false; visaView = true; masterCardView = false">
+                                    <mat-icon>credit_card</mat-icon>
+                                    <p>Visa</p>
+                                </div>
+                                <div [className]="masterCardView ? 'box selected' : 'box'"
+                                    (click)="cashView = false; visaView = false; masterCardView = true">
+                                    <mat-icon>credit_card</mat-icon>
+                                    <p>Mastercard</p>
+                                </div>
+                            </div>
+                            <div class="container-box">
+                                <span class="title-box">Pagado</span>
+                                <div class="flex-div" style="margin-top: 3vh; justify-content: space-between;">
+                                    <div class="pay">
+                                        <div>Entrego</div>
+                                        <mat-form-field appearance="outline">
+                                            <input matInput placeholder="0.00" autocomplete="off" [formControl]="pay">
+                                            <span matPrefix style="vertical-align: super;">S/. </span>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="pay" *ngIf="cashView && change$ | async">
+                                        <div>Vuelto</div>
+                                        <mat-form-field appearance="outline">
+                                            <input matInput disabled [(ngModel)]="change">
+                                            <span matPrefix style="vertical-align: super;">S/. </span>
+                                        </mat-form-field>
+                                    </div>
                                 </div>
                             </div>
                         </div>

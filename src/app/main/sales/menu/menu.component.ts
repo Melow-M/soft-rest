@@ -1,13 +1,14 @@
 import { Order } from './../../../core/models/sales/menu/order.model';
 import { Grocery } from './../../../core/models/warehouse/grocery.model';
 import { DatabaseService } from 'src/app/core/database.service';
-import { map, tap, startWith, take, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import { map, tap, startWith, take, distinctUntilChanged, debounceTime, filter } from 'rxjs/operators';
 import { Observable, combineLatest, of } from 'rxjs';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { VoucherComponent } from './voucher/voucher.component';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Meal } from 'src/app/core/models/sales/menu/meal.model';
+import { Customer } from 'src/app/core/models/third-parties/customer.model';
 
 @Component({
   selector: 'app-menu',
@@ -64,6 +65,8 @@ export class MenuComponent implements OnInit {
   change: number = 0
   change$: Observable<number>
 
+  filteredCustomers$: Observable<any>
+
   selectedPay: any = 'checket'
 
   ticketForm: FormGroup
@@ -77,6 +80,38 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() {
     this.createForm()
+
+    this.filteredCustomers$ = combineLatest(
+      this.dbs.getCustomers(),
+      this.billForm.get('ruc').valueChanges.pipe(
+        filter(input => input !== null),
+        startWith<any>(''),
+        map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase())),
+      this.billForm.get('businessName').valueChanges.pipe(
+        filter(input => input !== null),
+        startWith<any>(''),
+        map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase())),
+      this.ticketForm.get('dni').valueChanges.pipe(
+        filter(input => input !== null),
+        startWith<any>(''),
+        map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase())),
+      this.ticketForm.get('name').valueChanges.pipe(
+        filter(input => input !== null),
+        startWith<any>(''),
+        map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase()))
+    ).pipe(
+      map(([users, ruc, businessName, dni, name]) => {
+
+        let userNatural = users.filter(el => el['type'] == 'NATURAL')
+        let business = users.filter(el => el['type'] == 'EMPRESA')
+        return {
+          ruc: ruc ? business.filter(option => option['ruc'].toString().includes(ruc)) : business,
+          dni: dni ? userNatural.filter(option => option['dni'].toString().includes(dni)) : userNatural,
+          name: name ? userNatural.filter(option => option['name'].toLowerCase().includes(name)) : userNatural,
+          businessName: businessName ? business.filter(option => option['businessName'].toLowerCase().includes(businessName)) : business,
+        }
+      })
+    );
 
     this.plate$ = this.dbs.onGetDishes().pipe(
       tap(plates => {
@@ -113,9 +148,14 @@ export class MenuComponent implements OnInit {
     )
 
     this.change$ = this.pay.valueChanges.pipe(
-      startWith(0),
+      startWith(1),
       map(pay => {
-        return pay - this.total
+        if (this.total) {
+          return pay - this.total
+        } else {
+          return 0
+        }
+
       }),
       tap(res => {
         if (res > 0) {
@@ -152,7 +192,7 @@ export class MenuComponent implements OnInit {
 
   createForm() {
     this.ticketForm = this.fb.group({
-      ruc: [''],
+      dni: [''],
       name: [''],
       phone: ['']
     })
@@ -163,10 +203,41 @@ export class MenuComponent implements OnInit {
       phone: ['']
     })
   }
+
+  showRucCustomer(user): string | undefined {
+    return user ? user['ruc'] : undefined;
+  }
+  showDniCustomer(user): string | undefined {
+    return user ? user['dni'] : undefined;
+  }
+  showNameCustomer(user): string | undefined {
+    return user ? user['name'] : undefined;
+  }
+  showBusinessNameCustomer(user): string | undefined {
+    return user ? user['businessName'] : undefined;
+  }
+
+  chooseCustomer(){
+    if(this.ticketForm.get('dni').value || this.ticketForm.get('name').value){
+      let customer = this.ticketForm.get('dni').value?this.ticketForm.get('dni').value:this.ticketForm.get('name').value
+      this.ticketForm.get('dni').setValue(customer)
+      this.ticketForm.get('name').setValue(customer)
+      this.ticketForm.get('phone').setValue(customer.phone)
+    }
+
+    if(this.billForm.get('ruc').value || this.billForm.get('businessName').value){
+      let customer = this.billForm.get('ruc').value?this.billForm.get('ruc').value:this.billForm.get('businessName').value
+      this.billForm.get('ruc').setValue(customer)
+      this.billForm.get('businessName').setValue(customer)
+      this.billForm.get('phone').setValue(customer.businessPhone)
+      this.billForm.get('address').setValue(customer.businessAddress)
+    }
+    
+  }
   cancelOrder() {
     this.MenuList = false;
     this.otherList = false
-    this.categoriesList = true;
+    this.categoriesList = true
     this.generateSale = false
     this.order = []
     this.total = 0

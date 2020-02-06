@@ -459,12 +459,12 @@ export class DatabaseService {
     return this.others$;
   }
 
-  onGetDishes(){
+  onGetDishes() {
     this.dishesCollection = this.af.collection('db/deliciasTete/kitchenDishes', ref => ref.orderBy('createdAt', 'desc'));
     this.dishes$ = this.dishesCollection.valueChanges().pipe(shareReplay(1));
     return this.dishes$;
   }
-  
+
   addDishes(product) {
     let batch = this.af.firestore.batch();
     let date = new Date()
@@ -515,9 +515,14 @@ export class DatabaseService {
 
   }
 
-  getOrders(){
+  getOrders() {
     this.ordersCollection = this.af.collection('db/deliciasTete/orders', ref => ref.orderBy('createdAt', 'desc'));
     this.orders$ = this.ordersCollection.valueChanges().pipe(shareReplay(1));
     return this.orders$;
+  }
+
+  getOpenCash(cash) {
+    let openingCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cash + '/openings', ref => ref.orderBy('openendAt', 'desc'));
+    return openingCollection.valueChanges().pipe(shareReplay(1));
   }
 }

@@ -92,8 +92,8 @@ export class SalesRecordComponent implements OnInit {
          return el['createdAt'].toMillis() <= to.setHours(23, 59, 59)
       }
     }
-
   }
+  
   showSelectedUser(user): string | undefined {
     return user ? user['displayName'] : undefined;
   }

@@ -117,7 +117,7 @@ export class CloseCashComponent implements OnInit {
         }
 
         const inputUpdate = {
-          open: true,
+          open: false,
           currentOwnerName: '',
           currentOwnerId: '',
           currentOpeningId: '',

@@ -21,7 +21,7 @@
                             <mat-label>Elija una caja</mat-label>
                             <mat-select formControlName='cash'>
                                 <mat-option *ngFor="let cash of cashRegisters$ | async" [value]="cash"
-                                    (click)="currentCash = cash">
+                                    (click)="currentCash = cash" [disabled]="cash.open">
                                     {{cash.name}}
                                 </mat-option>
                             </mat-select>
@@ -55,7 +55,7 @@
                 </div>
             </ng-template>
 
-            <div *ngIf="isOpening$ | async; else openView"  style="margin-top: 3vh;">
+            <div *ngIf="isOpening$ | async; else openView" style="margin-top: 3vh;">
                 <div style="display: flex; justify-content: space-around;">
                     <button mat-raised-button style="background: #EE8434; color: white" (click)="closeCash()">
                         <mat-icon style="vertical-align: middle;">vpn_key</mat-icon>

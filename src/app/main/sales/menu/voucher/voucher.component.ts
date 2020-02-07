@@ -1,4 +1,4 @@
-import { take } from 'rxjs/operators';
+import { take, filter, map } from 'rxjs/operators';
 import { Order } from './../../../../core/models/sales/menu/order.model';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { AuthService } from './../../../../core/auth.service';
@@ -22,7 +22,108 @@ export class VoucherComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log(this.data);
+    let dishes = this.data['orderList'].filter(el => el['type']).map(el => {
+      let array = []
+      switch (el['type']) {
+        case 'executive':
+          array.push({
+            name: el['appetizer']['name'],
+            id: el['appetizer']['id']
+          })
+          array.push({
+            name: el['mainDish']['name'],
+            id: el['mainDish']['id']
+          })
+          array.push({
+            name: el['dessert']['name'],
+            id: el['dessert']['id']
+          })
+          return array
+          break;
+        case 'simple':
+          array.push({
+            name: el['appetizer']['name'],
+            id: el['appetizer']['id']
+          })
+          array.push({
+            name: el['mainDish']['name'],
+            id: el['mainDish']['id']
+          })
+          return array
+          break;
+        case 'second':
+          return {
+            name: el['mainDish']['name'],
+            id: el['mainDish']['id'],
+            type: 'meal'
+          }
+          break;
+        default:
+          break;
+      }
+    })
+    let orders = this.data['orderList'].filter(el => el['id']).map(el => {
+      return {
+        name: el['name'],
+        id: el['id'],
+        amount: el['amount']
+      }
+    })
+
+
+  }
+
+  newCustomer(type) {
+    const batch = this.af.firestore.batch();
+
+    const customerRef = this.af.firestore.collection(this.dbs.customersCollection.ref.path).doc();
+
+    let data;
+
+    this.auth.user$
+      .pipe(
+        take(1)
+      )
+      .subscribe(user => {
+        if (type === 'NATURAL') {
+          data = {
+            id: customerRef.id,
+            type: type,
+            name: this.data['customerId']['name'],
+            dni: this.data['customerId']['dni'],
+            phone: this.data['customerId']['phone'] ? this.data['customerId']['phone'] : "",
+            mail: '',
+            createdAt: new Date(),
+            createdBy: user,
+            editedBy: null,
+            editedDate: null
+          }
+        } else {
+          data = {
+            id: customerRef.id,
+            type: type,
+            businessName: this.data['customerId']['businessName'],
+            businessAddress: this.data['customerId']['address'],
+            ruc: this.data['customerId']['ruc'],
+            businessPhone: this.data['customerId']['phone'],
+            contacts: null,
+            createdAt: new Date(),
+            createdBy: user,
+            editedBy: null,
+            editedDate: null
+          }
+        }
+
+        batch.set(customerRef, data);
+
+        this.data['customerId'] = customerRef.id
+        batch.commit()
+          .then(() => {
+            console.log('cliente guardado');
+
+          })
+      })
+
 
   }
 
@@ -30,6 +131,14 @@ export class VoucherComponent implements OnInit {
     let batch = this.af.firestore.batch();
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/orders/`).doc();
     let inputData: Order;
+
+    if (typeof this.data['customerId'] == 'object') {
+      if (this.data['customerId']['dni']) {
+        this.newCustomer('NATURAL')
+      } else {
+        this.newCustomer('EMPRESA')
+      }
+    }
 
     this.auth.user$.pipe(
       take(1))
@@ -49,7 +158,9 @@ export class VoucherComponent implements OnInit {
           documentType: this.data['documentType'],
           documentSerial: this.data['documentSerial'], // FE001 ...
           documentCorrelative: this.data['documentCorrelative'], // 0000124 ...
-          customerId: '',
+          customerId: this.data['customerId'],
+          cashId: this.data['cashId'],
+          openingId: this.data['openingId'],
           canceledAt: null,
           canceledBy: null,
           createdAt: new Date(),
@@ -65,7 +176,6 @@ export class VoucherComponent implements OnInit {
           this.dialog.close()
         })
       })
-
 
   }
 

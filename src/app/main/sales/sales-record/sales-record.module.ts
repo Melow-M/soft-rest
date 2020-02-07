@@ -19,12 +19,14 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SalesRecordRoutingModule } from './sales-record-routing.module';
 import { ListProductsComponent } from './list-products/list-products.component';
+import { CancelComponent } from './cancel/cancel.component';
 
 
 @NgModule({
   declarations: [
     SalesRecordComponent,
-    ListProductsComponent
+    ListProductsComponent,
+    CancelComponent
   ],
   imports: [
     CommonModule,
@@ -46,7 +48,8 @@ import { ListProductsComponent } from './list-products/list-products.component';
     MatAutocompleteModule
   ],
   entryComponents: [
-    ListProductsComponent
+    ListProductsComponent,
+    CancelComponent
   ]
 })
 export class SalesRecordModule { }

@@ -86,7 +86,8 @@ export class CloseCashComponent implements OnInit {
   createForm() {
     this.closingForm = this.fb.group({
       password: ['', [Validators.required], [this.matchPassword()]],
-      amount: ['', Validators.required]
+      amount: ['', Validators.required],
+      checked: [false]
     })
   }
   matchPassword(): AsyncValidatorFn {
@@ -112,7 +113,7 @@ export class CloseCashComponent implements OnInit {
         const openUpdate = {
           closedAt: new Date(),
           closedBy: user,
-          closureBalance: this.data['amount']
+          closureBalance: this.closingForm.get('amount').value
         }
 
         const inputUpdate = {

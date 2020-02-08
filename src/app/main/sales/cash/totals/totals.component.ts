@@ -1,6 +1,6 @@
 import { map, tap } from 'rxjs/operators';
 import { CashOpening } from './../../../../core/models/sales/cash/cashOpening.model';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
@@ -32,57 +32,65 @@ export class TotalsComponent implements OnInit {
 
   ngOnInit() {
 
-    this.openingCash$ = this.dbs.getOpenCash(this.data['id']).pipe(
-      map(cashes => {
-        return cashes.filter(el => el['id'] == this.data['currentOpeningId'])[0]
-      }),
-      tap(res => {
-        this.expenses = [
-          {
-            item: 'Transferencia',
-            amount: res['totalDeparturesByPaymentType']['TRANSFERENCIA']
-          },
-          {
-            item: 'Egresos',
-            amount: res['totalDeparturesByPaymentType']['EFECTIVO']
-          }
-        ]
-        this.income = [
-          {
-            item: 'Ventas',
-            amount: 100
-          },
-          {
-            item: 'Ingreso efectivo',
-            amount: res['totalTicketsByPaymentType']['EFECTIVO']
-          },
-          {
-            item: 'Tarjeta Visa',
-            amount: res['totalTicketsByPaymentType']['VISA']
-          },
-          {
-            item: 'Tarjeta Mastercard',
-            amount: res['totalTicketsByPaymentType']['MASTERCARD']
-          }
+    this.openingCash$ =
+      combineLatest(
+        this.dbs.getOpenCash(this.data['id']),
+        this.dbs.getOrders()
+      ).pipe(
+        map(([cashes, orders]) => {
+          let cash = cashes.filter(el => el['id'] == this.data['currentOpeningId'])[0]
+          let ordersPay = orders.filter(el => (el['openingId'] == this.data['currentOpeningId']) && (el['orderStatus'] == 'PAGADO'))
+          let efectivo = ordersPay.filter(el => el.paymentType == 'EFECTIVO').map(el => el['total'])
+          let visa = ordersPay.filter(el => el.paymentType == 'VISA').map(el => el['total'])
+          let mastercard = ordersPay.filter(el => el.paymentType == 'MASTERCARD').map(el => el['total'])
 
-        ]
-        this.cash = [
-          {
-            item: 'Importe Inicial',
-            amount: res['openingBalance']
-          },
-          {
-            item: 'Total ingresos',
-            amount: res['totalAmount']
-          },
-          {
-            item: 'Egresos',
-            amount: res['totalDepartures']
-          }
+          this.expenses = [
+            {
+              item: 'Transferencia',
+              amount: cash['totalDeparturesByPaymentType']['TRANSFERENCIA']
+            },
+            {
+              item: 'Egresos',
+              amount: cash['totalDeparturesByPaymentType']['EFECTIVO']
+            }
+          ]
+          this.income = [
+            {
+              item: 'Ventas',
+              amount: 100
+            },
+            {
+              item: 'Ingreso efectivo',
+              amount: efectivo.length ? efectivo.reduce((a, b) => a + b, 0) : 0
+            },
+            {
+              item: 'Tarjeta Visa',
+              amount: visa.length ? visa.reduce((a, b) => a + b, 0) : 0
+            },
+            {
+              item: 'Tarjeta Mastercard',
+              amount: mastercard ? mastercard.reduce((a, b) => a + b, 0) : 0
+            }
 
-        ]
-      })
-    )
+          ]
+          this.cash = [
+            {
+              item: 'Importe Inicial',
+              amount: cash['openingBalance']
+            },
+            {
+              item: 'Total ingresos',
+              amount: cash['totalAmount']
+            },
+            {
+              item: 'Egresos',
+              amount: cash['totalDepartures']
+            }
+
+          ]
+          return cash
+        })
+      )
 
   }
 

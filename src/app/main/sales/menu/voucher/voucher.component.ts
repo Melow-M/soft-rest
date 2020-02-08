@@ -55,7 +55,6 @@ export class VoucherComponent implements OnInit {
           return {
             name: el['mainDish']['name'],
             id: el['mainDish']['id'],
-            type: 'meal'
           }
           break;
         default:
@@ -69,9 +68,12 @@ export class VoucherComponent implements OnInit {
         amount: el['amount']
       }
     })
-
+    console.log(orders);
+    console.log(dishes);
+    
 
   }
+
 
   newCustomer(type) {
     const batch = this.af.firestore.batch();

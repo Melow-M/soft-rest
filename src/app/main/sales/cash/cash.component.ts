@@ -144,11 +144,15 @@ export class CashComponent implements OnInit {
   }
 
   removeMoney() {
-    this.dialog.open(RemoveComponent)
+    this.dialog.open(RemoveComponent, {
+      data: this.currentCash
+    })
   }
 
   addMoney() {
-    this.dialog.open(AddComponent)
+    this.dialog.open(AddComponent, {
+      data: this.currentCash
+    })
   }
 
   totals() {

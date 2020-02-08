@@ -6,7 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./remove.component.css']
 })
 export class RemoveComponent implements OnInit {
-  typesIncome = ['tipo1', 'tipo2']
+  typesExpenses = ['GASTO', 'DEVOLUCIONES', 'PAGO PERSONAL', 'OTROS']
+  typesPayment = ['EFECTIVO', 'TRANSFERENCIA']
   users = ['user1', 'user2']
 
   confirm:boolean = false

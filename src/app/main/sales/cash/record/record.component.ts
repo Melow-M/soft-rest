@@ -64,12 +64,12 @@ export class RecordComponent implements OnInit {
 
   filterTime(from, to, el) {
     if (from && to) {
-      return el['openendAt'].toMillis() >= from.getTime() && el['openendAt'].toMillis() <= to.setHours(23, 59, 59)
+      return el['openedAt'].toMillis() >= from.getTime() && el['openedAt'].toMillis() <= to.setHours(23, 59, 59)
     } else {
       if (from) {
-        return el['openendAt'].toMillis() >= from.getTime()
+        return el['openedAt'].toMillis() >= from.getTime()
       } else if (to) {
-         return el['openendAt'].toMillis() <= to.setHours(23, 59, 59)
+         return el['openedAt'].toMillis() <= to.setHours(23, 59, 59)
       }
     }
   }

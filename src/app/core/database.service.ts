@@ -522,7 +522,7 @@ export class DatabaseService {
   }
 
   getOpenCash(cash) {
-    let openingCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cash + '/openings', ref => ref.orderBy('openendAt', 'desc'));
+    let openingCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cash + '/openings', ref => ref.orderBy('openedAt', 'desc'));
     return openingCollection.valueChanges().pipe(shareReplay(1));
   }
 }

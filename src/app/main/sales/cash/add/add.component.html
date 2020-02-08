@@ -29,7 +29,7 @@
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Tipo de pago</mat-label>
                 <mat-select>
-                    <mat-option *ngFor="let type of typesIncome" [value]="type">
+                    <mat-option *ngFor="let type of typesPayment" [value]="type">
                         {{type}}
                     </mat-option>
                 </mat-select>
@@ -49,8 +49,8 @@
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Responsable</mat-label>
                 <mat-select>
-                    <mat-option *ngFor="let user of users" [value]="user">
-                        {{user}}
+                    <mat-option *ngFor="let user of dbs.users$ | async" [value]="user">
+                        {{user['displayName']}}
                     </mat-option>
                 </mat-select>
                 <mat-hint>

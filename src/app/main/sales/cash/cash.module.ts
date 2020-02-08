@@ -24,6 +24,7 @@ import { AddComponent } from './add/add.component';
 import { RemoveComponent } from './remove/remove.component';
 import { TotalsComponent } from './totals/totals.component';
 import { RecordComponent } from './record/record.component';
+import { DeleteTransactionComponent } from './delete-transaction/delete-transaction.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { RecordComponent } from './record/record.component';
     AddComponent,
     RemoveComponent,
     TotalsComponent,
-    RecordComponent
+    RecordComponent,
+    DeleteTransactionComponent
   ],
   imports: [
     CommonModule,

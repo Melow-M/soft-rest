@@ -21,15 +21,15 @@ export class RecipesComponent implements OnInit {
   //Table
   inputTableDataSource = new MatTableDataSource();
   inputTableDisplayedColumns: string[] = [
-    'index', 'inputsName', 'inputsUnit', 'inputsQuantity'
+    'index', 'name', 'unit', 'quantity'
   ]
   @ViewChild('recipeTablePaginator', {static:false}) recipeTablePaginator: MatPaginator;
-  getRecipe$: Observable<Recipe[]>;
 
   searchForm: FormGroup;
   options: string[] = ['One', 'Two', 'Three'];
   filteredOptions: Observable<string[]>;
   availableOptions$: Observable<string | Recipe[]>;
+  getRecipe$: Observable<Recipe | string>;
 
   constructor(
     private fb: FormBuilder,
@@ -39,30 +39,27 @@ export class RecipesComponent implements OnInit {
 
   ngOnInit() {
     this.initForm();
-    this.filteredOptions = this.searchForm.get('productName').valueChanges
-      .pipe(
-        startWith(''),
-        map(value => this._filter(value))
-      );
 
     this.availableOptions$ = this.searchForm.get('productName').valueChanges.pipe(
+      //First tap to initialize table data
+      tap((productName: Recipe | string)=>{
+        if(typeof productName=='string'){
+          this.inputTableDataSource.data = [];
+        }
+        else{
+          this.inputTableDataSource.data = productName.inputs;
+        }
+      }),
+      //switchMap to get filtered data of options available
       switchMap((productName)=> {
-        return this.dbs.onGetRecipesType(this.searchForm.get('productCategory').value).pipe(debounceTime(500), map((recipesList: Recipe[])=> {
-          console.log(recipesList);
-          return this.filterRecipe(recipesList, this.searchForm.get('productName').value)
-        }))
+        return this.dbs.onGetRecipesType(this.searchForm.get('productCategory').value).pipe(
+          debounceTime(500), 
+          map((recipesList: Recipe[])=> {
+            console.log(recipesList);
+            return this.filterRecipe(recipesList, this.searchForm.get('productName').value)
+          }))
       }));
 
-    // this.getRecipe$ = this.searchForm.get('productName').valueChanges.pipe(
-    //   tap((productName: Recipe[] | string)=>{
-    //     if(typeof productName=='string'){
-    //       this.inputTableDataSource.data = [];
-    //     }
-    //     else{
-    //       this.inputTableDataSource.data = productName;
-    //     }
-
-    //   })
   }
 
   
@@ -80,16 +77,20 @@ export class RecipesComponent implements OnInit {
     });
   }
 
-  onSearchProduct(){
-    console.log(this.searchForm.value);
-  }
-
   onCreateProduct(){
     this.dialog.open(CreateNewRecipeDialogComponent,
       {
         width: '550px'
       });
     console.log('creating');
+  }
+
+  onEditRecipe(){
+    console.log('editing');
+  }
+
+  onDeleteRecipe(){
+    console.log('deleting')
   }
 
   filterRecipe(recipeList: Recipe[], recipeName: Recipe | string){

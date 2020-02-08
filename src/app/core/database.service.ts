@@ -525,4 +525,10 @@ export class DatabaseService {
     let openingCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cash + '/openings', ref => ref.orderBy('openedAt', 'desc'));
     return openingCollection.valueChanges().pipe(shareReplay(1));
   }
+
+  getTransactions(cashId, openingId) {
+    let transactionsCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cashId + '/openings/'+ openingId + '/transactions', ref => ref.orderBy('createdAt', 'desc'));
+    return transactionsCollection.valueChanges().pipe(shareReplay(1));
+  }
+  
 }

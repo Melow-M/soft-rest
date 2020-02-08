@@ -1,3 +1,4 @@
+import { Transaction } from './../../../../core/models/sales/cash/transaction.model';
 import { take, filter, map } from 'rxjs/operators';
 import { Order } from './../../../../core/models/sales/menu/order.model';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
@@ -69,8 +70,8 @@ export class VoucherComponent implements OnInit {
       }
     })
     console.log(orders);
-    console.log(dishes);
-    
+    console.log(dishes.reduce((a, b) => a.concat(b)));
+
 
   }
 
@@ -132,7 +133,10 @@ export class VoucherComponent implements OnInit {
   save() {
     let batch = this.af.firestore.batch();
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/orders/`).doc();
+    let transactionRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/${this.data['cashId']}/openings/${this.data['openingId']}/transactions`).doc(inputRef.id);
+
     let inputData: Order;
+    let transactionData: Transaction;
 
     if (typeof this.data['customerId'] == 'object') {
       if (this.data['customerId']['dni']) {
@@ -171,7 +175,24 @@ export class VoucherComponent implements OnInit {
           editedBy: user
         }
 
+        transactionData = {
+          id: inputRef.id,
+          type: 'Ingreso',
+          description: 'Venta ' + this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
+          amount: this.data['total'],
+          status: 'PAGADO',
+          ticketType: this.data['documentType'],
+          paymentType: this.data['paymentType'].toUpperCase(),
+          editedBy: user,
+          editedAt: new Date(),
+          createdAt: new Date(),
+          createdBy: user,
+        }
+
+
         batch.set(inputRef, inputData);
+
+        batch.set(transactionRef, transactionData)
 
         batch.commit().then(() => {
           console.log('orden guardada');

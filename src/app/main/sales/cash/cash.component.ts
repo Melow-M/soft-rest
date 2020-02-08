@@ -10,8 +10,9 @@ import { CloseCashComponent } from './close-cash/close-cash.component';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, AsyncValidatorFn, AbstractControl } from '@angular/forms';
 import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
-import { map, tap, startWith, take, distinctUntilChanged, debounceTime, filter } from 'rxjs/operators';
+import { map, tap, startWith, take, distinctUntilChanged, debounceTime, filter, switchMap } from 'rxjs/operators';
 import { Observable, combineLatest, of } from 'rxjs';
+import { Transaction } from 'src/app/core/models/sales/cash/transaction.model';
 
 @Component({
   selector: 'app-cash',
@@ -21,59 +22,15 @@ import { Observable, combineLatest, of } from 'rxjs';
 export class CashComponent implements OnInit {
   hidePass: boolean = true;
 
-  cashRegisters: Array<string> = ['Caja 1', 'Caja 2', 'Caja 3']
-
-
-  cashInfo: Array<any> = [
-    {
-      date: new Date(),
-      type: 'Ingreso',
-      description: 'Saldo compras insumos',
-      amount: 30,
-      user: 'Juan Perez',
-      payment: 'Efectivo'
-    },
-    {
-      date: new Date(),
-      type: 'Egreso',
-      description: 'Retiro Efectivo MTP',
-      amount: 50,
-      user: 'Maritza Torres',
-      payment: 'Efectivo'
-    },
-    {
-      date: new Date(),
-      type: 'Ingreso',
-      description: 'Dio en efectivo',
-      amount: 100,
-      user: 'Maria Ponce',
-      payment: 'Efectivo'
-    },
-    {
-      date: new Date(),
-      type: 'Egreso',
-      description: 'Compras insumos',
-      amount: 230,
-      user: 'Juan Perez',
-      payment: 'Efectivo'
-    },
-    {
-      date: new Date(),
-      type: 'Ingreso',
-      description: 'Ventas del día',
-      amount: 980,
-      user: 'Caja 1',
-      payment: 'Efectivo'
-    }
-  ]
-
   isOpening$: Observable<boolean>
 
   openingForm: FormGroup
 
   cashRegisters$: Observable<any>
+  transactions$: Observable<any>
 
   currentCash: Cash = null
+  balance: number = 0
 
   displayedColumns: string[] = ['index', 'date', 'type', 'description', 'amount', 'user', 'payment', 'actions'];
   dataSource = new MatTableDataSource();
@@ -91,7 +48,7 @@ export class CashComponent implements OnInit {
 
   ngOnInit() {
     this.createForm()
-    this.dataSource.data = this.cashInfo
+
 
     this.isOpening$ = combineLatest(
       this.dbs.getCashes(),
@@ -101,6 +58,20 @@ export class CashComponent implements OnInit {
         this.currentCash = cashes.filter(el => el['open'])[0]
         let cashOpen = cashes.filter(el => el['open']).filter(el => el['currentOwnerId'] == user.uid)
         return cashOpen.length == 1
+      })
+    )
+
+    this.transactions$ = this.dbs.getCashes().pipe(
+      switchMap(cashes => {
+        let cash = cashes.filter(el => el['open'])[0]
+        return this.dbs.getTransactions(cash.id, cash.currentOpeningId)
+      }),
+      tap(res => {
+        let income = res.filter(el => el['type'] == 'Ingreso').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0)
+        let expenses = res.filter(el => el['type'] == 'Egreso').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0)
+
+        this.balance = income - expenses
+        this.dataSource.data = res
       })
     )
 

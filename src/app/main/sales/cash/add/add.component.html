@@ -5,10 +5,11 @@
         <span class="w3-margin-left">Agregar dinero</span>
     </h2>
     <mat-dialog-content>
-        <form *ngIf="!confirm">
+        <form *ngIf="!confirm" [formGroup]="addForm">
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Importe ingresado</mat-label>
-                <input matInput type="text" placeholder="Importe ingresado S/." autocomplete="off" required>
+                <input matInput type="text" placeholder="Importe ingresado S/." autocomplete="off"
+                    formControlName="income">
                 <mat-hint>
                     Requerido*
                 </mat-hint>
@@ -16,7 +17,7 @@
             <br>
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Tipo de Ingreso</mat-label>
-                <mat-select>
+                <mat-select formControlName="typeIncome">
                     <mat-option *ngFor="let type of typesIncome" [value]="type">
                         {{type}}
                     </mat-option>
@@ -28,7 +29,7 @@
 
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Tipo de pago</mat-label>
-                <mat-select>
+                <mat-select formControlName="typePayment">
                     <mat-option *ngFor="let type of typesPayment" [value]="type">
                         {{type}}
                     </mat-option>
@@ -40,7 +41,7 @@
 
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Descripción</mat-label>
-                <textarea matInput placeholder="Descripción"></textarea>
+                <textarea matInput placeholder="Descripción" formControlName="description"></textarea>
                 <mat-hint>
                     Opcional*
                 </mat-hint>
@@ -48,7 +49,7 @@
 
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Responsable</mat-label>
-                <mat-select>
+                <mat-select formControlName="user">
                     <mat-option *ngFor="let user of dbs.users$ | async" [value]="user">
                         {{user['displayName']}}
                     </mat-option>
@@ -59,7 +60,7 @@
             </mat-form-field>
         </form>
         <div *ngIf="confirm">
-            <p>¿Estás seguro de agregar el importe: S/. 0.00?</p>
+            <p>¿Estás seguro de agregar el importe: S/. {{addForm.get('income').value}}?</p>
             <p>Decripción: ****************</p>
         </div>
     </mat-dialog-content>
@@ -67,9 +68,10 @@
         <button mat-stroked-button class="w3-margin-right" mat-dialog-close
             style="background: #B70705; color: white; font-family: Raleway;">Cancelar</button>
         <button *ngIf="!confirm" mat-stroked-button class="w3-margin-right" (click)="confirm = true"
-            style="background: #EE8434; color: white; font-family: Raleway;">Aceptar</button>
+            style="background: #EE8434; color: white; font-family: Raleway;"
+            [disabled]="!addForm.valid">Aceptar</button>
         <button *ngIf="confirm" mat-stroked-button class="w3-margin-right" mat-dialog-close
-            style="background: #EE8434; color: white; font-family: Raleway;">Sí, agregar</button>
+            style="background: #EE8434; color: white; font-family: Raleway;" (click)="save()">Sí, agregar</button>
 
     </mat-dialog-actions>
 </div>

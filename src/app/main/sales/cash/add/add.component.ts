@@ -1,3 +1,4 @@
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Transaction } from './../../../../core/models/sales/cash/transaction.model';
 import { take } from 'rxjs/operators';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
@@ -18,17 +19,32 @@ export class AddComponent implements OnInit {
   typesPayment = ['EFECTIVO', 'TRANSFERENCIA']
 
   confirm: boolean = false
+
+  addForm: FormGroup
+
   constructor(
     public dbs: DatabaseService,
     public auth: AuthService,
     private af: AngularFirestore,
     private dialog: MatDialogRef<AddComponent>,
+    private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data
   ) {
     this.dbs.getUsers()
   }
 
   ngOnInit() {
+    this.createForm()
+  }
+
+  createForm() {
+    this.addForm = this.fb.group({
+      income: ['', Validators.required],
+      typeIncome: ['', Validators.required],
+      typePayment: ['', Validators.required],
+      description: [''],
+      user: ['', Validators.required]
+    })
   }
 
   save() {
@@ -42,26 +58,22 @@ export class AddComponent implements OnInit {
       .subscribe(user => {
         inputData = {
           id: inputRef.id,
-          // type: '',
-          description: '',
-          amount: 0,
-          verified: true,
-          status: '',
-          ticketType: '',
-          paymentType: '',
-          originAccount: '',
+          type: 'Ingreso',
+          description: this.addForm.get('description').value,
+          amount: this.addForm.get('income').value,
+          status: 'PAGADO',
+          ticketType: this.addForm.get('typeIncome').value,
+          paymentType: this.addForm.get('typePayment').value,
           editedBy: user,
-          editedAt: 0,
-          approvedBy: user,
-          approvedAt: new Date(),
+          editedAt: new Date(),
           createdAt: new Date(),
-          createdBy: user,
+          createdBy: this.addForm.get('user').value,
         }
 
         batch.set(inputRef, inputData);
 
         batch.commit().then(() => {
-          console.log('orden guardada');
+          console.log('transaction guardada');
           this.dialog.close()
         })
       })

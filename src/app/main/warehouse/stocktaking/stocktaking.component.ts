@@ -4,9 +4,11 @@ import { FormControl, FormBuilder } from '@angular/forms';
 import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
 import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
-import { startWith, debounceTime, switchMap, map, tap, distinctUntilChanged } from 'rxjs/operators';
+import { startWith, debounceTime, switchMap, map, tap, distinctUntilChanged, take } from 'rxjs/operators';
 import { Household } from 'src/app/core/models/warehouse/household.model';
 import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
+import { StocktakingEditDialogComponent } from './stocktaking-edit-dialog/stocktaking-edit-dialog.component';
+import { StocktakingDeleteConfirmComponent } from './stocktaking-delete-confirm/stocktaking-delete-confirm.component';
 
 @Component({
   selector: 'app-stocktaking',
@@ -18,12 +20,14 @@ export class StocktakingComponent implements OnInit {
   loadingItems = new BehaviorSubject<boolean>(false);
   loadingItems$ = this.loadingItems.asObservable();
 
-  itemsTypeFormControl = new FormControl(['INSUMO']);
+  itemsTypeFormControl = new FormControl('INSUMOS');
   itemFormControl = new FormControl();
 
-  displayedColumns: string[] = ['index', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
+  displayedColumns: string[] = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
 
   dataSource = new MatTableDataSource();
+
+  defaultImage = "../../../../assets/images/default-image.jpg";
 
   @ViewChild(MatPaginator, { static: false }) set content(paginator: MatPaginator) {
     this.dataSource.paginator = paginator;
@@ -31,7 +35,7 @@ export class StocktakingComponent implements OnInit {
 
   itemsTypes: Array<string> = [
     'INSUMOS',
-    'MENAJE',
+    'MENAJES',
     'POSTRES',
     'OTROS'
   ];
@@ -54,10 +58,10 @@ export class StocktakingComponent implements OnInit {
           startWith<any>('INSUMOS'),
           debounceTime(300),
           tap(type => {
-            if(type === 'INSUMOS' || type === 'MENAJE') {
-              this.displayedColumns = ['index', 'name', 'sku', 'unit', 'stock', 'averageCost', 'totalValue', 'description', 'createdBy', 'editedBy', 'actions'];
-            } else if(type === 'POSTRES' || type === 'OTROS') {
-              this.displayedColumns = ['index', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
+            if (type === 'INSUMOS' || type === 'MENAJES') {
+              this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'totalValue', 'description', 'createdBy', 'editedBy', 'actions'];
+            } else if (type === 'POSTRES' || type === 'OTROS') {
+              this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
             }
           }),
           switchMap(type => {
@@ -97,7 +101,15 @@ export class StocktakingComponent implements OnInit {
   }
 
   createItem(): void {
-    this.dialog.open(CreateInputDialogComponent);
+    this.dialog.open(CreateInputDialogComponent)
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(type => {
+        if (type) {
+          this.itemsTypeFormControl.setValue(type);
+        }
+
+      })
   }
 
   withdrawHousehold(item: Household): void {
@@ -113,11 +125,22 @@ export class StocktakingComponent implements OnInit {
   }
 
   edit(item: any): void {
-    //
+    this.dialog.open(StocktakingEditDialogComponent, {
+      data: {
+        item: item,
+        type: this.itemsTypeFormControl.value
+      }
+    });
   }
 
   delete(item: any): void {
-    //
+    this.dialog.open(StocktakingDeleteConfirmComponent, {
+      data: {
+        id: item['id'],
+        name: item['name'],
+        type: this.itemsTypeFormControl.value
+      }
+    });
   }
 
 }

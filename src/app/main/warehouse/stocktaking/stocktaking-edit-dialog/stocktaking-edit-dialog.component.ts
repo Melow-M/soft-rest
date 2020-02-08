@@ -1,24 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { BehaviorSubject, Observable, of, combineLatest } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { tap, startWith, map, debounceTime, take, distinctUntilChanged, switchMap, finalize } from 'rxjs/operators';
-import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
-import { MatSnackBar, MatDialogRef } from '@angular/material';
+import { AuthService } from 'src/app/core/auth.service';
+import { MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { CreateInputDialogComponent } from '../create-input-dialog/create-input-dialog.component';
 import { Ng2ImgMaxService } from 'ng2-img-max';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
+import { startWith, switchMap, distinctUntilChanged, map, tap, debounceTime, take, finalize } from 'rxjs/operators';
 import { CostTrend } from 'src/app/core/models/warehouse/costTrend.model';
-import { AuthService } from 'src/app/core/auth.service';
-import { Kardex } from 'src/app/core/models/warehouse/kardex.model';
 
 @Component({
-  selector: 'app-create-input-dialog',
-  templateUrl: './create-input-dialog.component.html',
-  styleUrls: ['./create-input-dialog.component.css']
+  selector: 'app-stocktaking-edit-dialog',
+  templateUrl: './stocktaking-edit-dialog.component.html',
+  styles: []
 })
-
-export class CreateInputDialogComponent implements OnInit {
-  //Variables
+export class StocktakingEditDialogComponent implements OnInit {
 
   savingItem = new BehaviorSubject<boolean>(false);
   savingItem$ = this.savingItem.asObservable();
@@ -59,6 +57,7 @@ export class CreateInputDialogComponent implements OnInit {
 
   inputFormGroup: FormGroup;
 
+
   constructor(
     private fb: FormBuilder,
     public dbs: DatabaseService,
@@ -67,17 +66,17 @@ export class CreateInputDialogComponent implements OnInit {
     private dialogRef: MatDialogRef<CreateInputDialogComponent>,
     private ng2ImgMax: Ng2ImgMaxService,
     private storage: AngularFireStorage,
-    public af: AngularFirestore
+    public af: AngularFirestore,
+    @Inject(MAT_DIALOG_DATA) public data: { item: any, type: string }
   ) { }
 
   ngOnInit() {
-
     this.initForm();
 
     this.inputs$ =
       this.inputFormGroup.get('type').valueChanges
         .pipe(
-          startWith<any>('INSUMOS'),
+          startWith<any>(this.data.type),
           switchMap(type => {
             return this.dbs.getItems(type);
           })
@@ -88,7 +87,7 @@ export class CreateInputDialogComponent implements OnInit {
       this.dbs.getItems(this.inputFormGroup.get('type').value),
       this.inputFormGroup.get('name').valueChanges
         .pipe(
-          startWith<string>(''),
+          startWith<string>(this.data.item['name']),
           distinctUntilChanged(),
           map(res => {
             return res.trim().replace(/\s+/g, " ");
@@ -109,6 +108,8 @@ export class CreateInputDialogComponent implements OnInit {
 
         if (name === '') {
           result = 0;
+        } else if (name === this.data.item['name']) {
+          result = 2;
         } else {
           result = !!exist.length ? 1 : 2; // exist or not exist
         }
@@ -122,7 +123,7 @@ export class CreateInputDialogComponent implements OnInit {
       this.inputs$,
       this.inputFormGroup.get('sku').valueChanges
         .pipe(
-          startWith<string>(''),
+          startWith<string>(this.data.item['sku']),
           distinctUntilChanged(),
           map(res => {
             return res.trim().replace(/\s/g, "");
@@ -143,6 +144,8 @@ export class CreateInputDialogComponent implements OnInit {
 
         if (sku === '') {
           result = 0;
+        } else if (sku === this.data.item['sku']) {
+          result = 2;
         } else {
           result = !!exist.length ? 1 : 2; // exist or not exist
         }
@@ -155,7 +158,7 @@ export class CreateInputDialogComponent implements OnInit {
       this.dbs.onGetUnits(),
       this.inputFormGroup.get('unit').valueChanges
         .pipe(
-          startWith(''),
+          startWith<any>(this.data.item['unit']),
           debounceTime(200),
           map(res => {
             return res.trim().replace(/\s+/g, " ");
@@ -175,7 +178,7 @@ export class CreateInputDialogComponent implements OnInit {
     this.validUnit$ =
       this.inputFormGroup.get('unit').valueChanges
         .pipe(
-          startWith<any>(''),
+          startWith<any>(this.data.item['unit']),
           debounceTime(200),
           distinctUntilChanged(),
           map(res => {
@@ -186,7 +189,7 @@ export class CreateInputDialogComponent implements OnInit {
     this.validStock$ =
       this.inputFormGroup.get('stock').valueChanges
         .pipe(
-          startWith<any>(0),
+          startWith<any>(this.data.item['stock']),
           debounceTime(200),
           distinctUntilChanged(),
           map(res => {
@@ -200,7 +203,7 @@ export class CreateInputDialogComponent implements OnInit {
     this.validEmergencyStock$ =
       this.inputFormGroup.get('emergencyStock').valueChanges
         .pipe(
-          startWith<any>(0),
+          startWith<any>(this.data.item['emergencyStock']),
           debounceTime(200),
           distinctUntilChanged(),
           map(res => {
@@ -214,7 +217,7 @@ export class CreateInputDialogComponent implements OnInit {
     this.validCost$ =
       this.inputFormGroup.get('cost').valueChanges
         .pipe(
-          startWith<any>(0),
+          startWith<any>(this.data.item['averageCost'] ? this.data.item['averageCost'] : this.data.item['cost'], Validators.required),
           debounceTime(200),
           distinctUntilChanged(),
           map(res => {
@@ -228,7 +231,7 @@ export class CreateInputDialogComponent implements OnInit {
     this.validPrice$ =
       this.inputFormGroup.get('price').valueChanges
         .pipe(
-          startWith<any>(0),
+          startWith<any>(this.data.item['price'] ? this.data.item['price'] : 0),
           debounceTime(200),
           distinctUntilChanged(),
           map(res => {
@@ -243,13 +246,13 @@ export class CreateInputDialogComponent implements OnInit {
       this.nameExist$,
       this.skuExist$,
       this.validUnit$,
-      this.validStock$,
+      // this.validStock$,
       this.validEmergencyStock$,
       this.validCost$,
       this.validPrice$
     ).pipe(
-      map(([name, sku, unit, stock, emergencystock, cost, price]) => {
-        return ((name === 2) && (sku === 2) && unit && stock && emergencystock && cost && price);
+      map(([name, sku, unit, emergencystock, cost, price]) => {
+        return ((name === 2) && (sku === 2) && unit && emergencystock && cost && price);
       })
     );
 
@@ -257,16 +260,18 @@ export class CreateInputDialogComponent implements OnInit {
 
   initForm() {
     this.inputFormGroup = this.fb.group({
-      type: ['INSUMOS', Validators.required],
-      name: [null, Validators.required],
-      sku: [null, Validators.required],
-      unit: [null, Validators.required],
-      description: null,
-      stock: [0, Validators.required],
-      emergencyStock: [0, Validators.required],
-      cost: [0, Validators.required],
-      price: [0, Validators.required]
+      type: [{ value: this.data.type, disabled: true }, Validators.required],
+      name: [this.data.item['name'], Validators.required],
+      sku: [this.data.item['sku'], Validators.required],
+      unit: [this.data.item['unit'], Validators.required],
+      description: this.data.item['description'],
+      stock: [{ value: this.data.item['stock'], disabled: true }, Validators.required],
+      emergencyStock: [this.data.item['emergencyStock'], Validators.required],
+      cost: [this.data.item['averageCost'] ? this.data.item['averageCost'] : this.data.item['cost'], Validators.required], //just for caution
+      price: [this.data.item['price'] ? this.data.item['price'] : 0, Validators.required]
     });
+
+    this.imageSrc = this.data.item['picture'];
 
   }
 
@@ -307,7 +312,7 @@ export class CreateInputDialogComponent implements OnInit {
     }
   }
 
-  onCreateInput() {
+  edit() {
     this.savingItem.next(true);
 
     this.auth.user$
@@ -317,24 +322,24 @@ export class CreateInputDialogComponent implements OnInit {
         let batch = this.af.firestore.batch();
 
         let inputData: any = {
-          id: null,
+          // id: null,
           name: this.inputFormGroup.value['name'],
           description: this.inputFormGroup.value['description'],
           sku: this.inputFormGroup.value['sku'],
           unit: this.unitAux === undefined ? this.inputFormGroup.value['unit'] : this.unitAux.unit,
-          stock: this.inputFormGroup.value['stock'],
+          // stock: this.inputFormGroup.value['stock'],
           emergencyStock: this.inputFormGroup.value['emergencyStock'],
-          picture: '',
+          // picture: '',
           status: 'ACTIVO',
-          createdAt: new Date(),
-          createdBy: user,
-          editedAt: null,
-          editedBy: null
+          // createdAt: new Date(),
+          // createdBy: user,
+          editedAt: new Date(),
+          editedBy: user
         }
 
         let typ;
 
-        switch (this.inputFormGroup.value['type']) {
+        switch (this.data.type) {
           case 'INSUMOS':
             typ = 'warehouseInputs';
             inputData['averageCost'] = this.inputFormGroup.value['cost'];
@@ -358,9 +363,9 @@ export class CreateInputDialogComponent implements OnInit {
 
 
         //Input
-        let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/${typ}/`).doc();
-        inputData['id'] = inputRef.id;
-        
+        let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/${typ}/`).doc(this.data.item['id']);
+
+
         //KitchenUnits
         let kitchenUnitsRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenUnits/`).doc();
         let kitchenUnitsData = {
@@ -377,30 +382,9 @@ export class CreateInputDialogComponent implements OnInit {
           id: costTrendRef.id
         }
 
-        //Kardex
-        const kardexRef: DocumentReference = this.af.firestore.collection(`db/deliciasTete/${typ}/${inputRef.id}/kardex`).doc();
-        const kardexData: Kardex = {
-          id: kardexRef.id,
-          details: 'Stock inicial',
-          insQuantity: 0,
-          insPrice: 0,
-          insTotal: 0,
-          outsQuantity: 0,
-          outsPrice: 0,
-          outsTotal: 0,
-          balanceQuantity: 0,
-          balancePrice: 0,
-          balanceTotal: 0,
-          type: 'INICIAL',
-          createdAt: new Date(),
-          createdBy: user
-        }
-
         batch.set(costTrendRef, costTrendData);
 
-        batch.set(inputRef, inputData);
-
-        batch.set(kardexRef, kardexData);
+        batch.update(inputRef, inputData);
 
         //if it doesn't have Id, this unit doesnt exist, so we create it
         if (this.unitAux == undefined) {
@@ -446,7 +430,7 @@ export class CreateInputDialogComponent implements OnInit {
               ).subscribe()
 
             } else {
-              
+
               this.dialogRef.close(this.inputFormGroup.get('type').value);
               this.snackbar.open('Se creo el insumo exitosamente', 'Aceptar', { duration: 6000 });
             }

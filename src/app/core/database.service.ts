@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
 import { AngularFirestoreCollection, AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { shareReplay, tap } from 'rxjs/operators';
@@ -172,34 +172,57 @@ export class DatabaseService {
   }
 
   //To add a new element. We should change it to onAddInput
-  onAddInput(input: KitchenInput, types: string, newUnit?: { id: string, unit: string }): Observable<firebase.firestore.WriteBatch> {
+  onAddInput(input: any, types: string, newUnit?: { id: string, unit: string }): Observable<firebase.firestore.WriteBatch> {
     let batch = this.af.firestore.batch();
     let date = new Date()
     let typ: string;
 
-    switch (types) {
-      case 'Insumos':
-        typ = 'warehouseInputs';
-        break;
-      case 'Otros':
-        typ = 'warehouseGrocery';
-        break;
-      case 'Postres':
-        typ = 'warehouseDesserts';
-        break;
-      case 'Menajes':
-        typ = 'warehouseHousehold';
-        break;
+    let inputData: any = {
+      id: null,
+      name: input['name'],
+      description: input['description'],
+      sku: input['sku'],
+      unit: newUnit == undefined ? input['unit'] : newUnit.unit,
+      stock: input['stock'],
+      emergencyStock: input['emergencyStock'],
+      picture: '',
+      status: 'ACTIVO',
+      createdAt: new Date(),
+      createdBy: null,
+      editedAt: null,
+      editedBy: null
     }
+
+    switch (types) {
+      case 'INSUMOS':
+        typ = 'warehouseInputs';
+        inputData['averageCost'] = input['cost'];
+        break;
+      case 'MENAJES':
+        typ = 'warehouseHousehold';
+        inputData['averageCost'] = input['cost'];
+        break;
+      case 'OTROS':
+        typ = 'warehouseGrocery';
+        inputData['averageCost'] = input['cost'];
+        inputData['price'] = input['price'];
+        break;
+      case 'POSTRES':
+        typ = 'warehouseDesserts';
+        inputData['averageCost'] = input['cost'];
+        inputData['price'] = input['price'];
+        break;
+
+    }
+
 
     //Input
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/${typ}/`).doc();
-    let inputData: KitchenInput;
 
     //KitchenUnits
     let kitchenUnitsRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenUnits/`).doc();
     let kitchenUnitsData = {
-      unit: input.unit,
+      unit: input['unit'],
       id: kitchenUnitsRef.id
     }
 
@@ -207,7 +230,7 @@ export class DatabaseService {
     let costTrendRef: DocumentReference = this.af.firestore
       .collection(`/db/deliciasTete/${typ}/${inputRef.id}/costTrend`).doc();
     let costTrendData: CostTrend = {
-      cost: input.cost,
+      cost: input['cost'],
       createdAt: date,
       id: costTrendRef.id
     }
@@ -217,21 +240,8 @@ export class DatabaseService {
     return this.auth.user$.pipe(
       take(1),
       map(user => {
-        inputData = {
-          id: inputRef.id,
-          name: input.name,
-          description: input.description,
-          sku: input.sku,
-          unit: newUnit == undefined ? input.unit : newUnit.unit,
-          stock: input.stock,
-          cost: input.cost,
-          status: 'ACTIVO',
-          createdAt: new Date(),
-          createdBy: user,
-          editedAt: new Date(),
-          editedBy: user,
-          type: types,
-        }
+
+        inputData['createdBy'] = user;
 
         batch.set(inputRef, inputData);
 
@@ -414,7 +424,7 @@ export class DatabaseService {
         return this.items$;
         break;
 
-      case 'MENAJE':
+      case 'MENAJES':
         this.householdsCollection = this.af.collection(`db/deliciasTete/warehouseHousehold`, ref => ref.orderBy('createdAt', 'desc'));
         this.items$ = this.householdsCollection.valueChanges().pipe(shareReplay(1));
         return this.items$;

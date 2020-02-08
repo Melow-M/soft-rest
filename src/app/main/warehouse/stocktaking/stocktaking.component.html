@@ -28,11 +28,11 @@
               <mat-hint>Filtro de categorías</mat-hint>
             </mat-form-field>
 
-            <!-- Select Provider -->
+            
             <mat-form-field class="w3-margin-right">
               <mat-label>Existencia</mat-label>
               <mat-icon matPrefix class="w3-margin-right">filter_list</mat-icon>
-              <input matInput type="text" [formControl]="itemFormControl" placeholder="Escriba...">
+              <input matInput type="text" [formControl]="itemFormControl" placeholder="Escriba..." autocomplete="off">
               <mat-hint>Filtro de existencias</mat-hint>
             </mat-form-field>
 
@@ -72,6 +72,27 @@
                     <th mat-header-cell style="padding:0px 25px" *matHeaderCellDef>N°</th>
                     <td mat-cell style="padding:0px 25px" *matCellDef="let raw; let i = index">
                       {{i+1}}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="picture">
+                    <th mat-header-cell *matHeaderCellDef class="w3-center" style="padding:0px 25px">
+                      Imagen
+                    </th>
+                    <td mat-cell *matCellDef="let raw" class="w3-center" style="padding:0px 25px">
+                      <a href="{{raw['picture']}}" target="_blank" *ngIf="raw['picture']; else defaultPicture">
+                        <div style="width:200px;height:120px;padding:6px 6px">
+
+                          <img [defaultImage]="defaultImage" [lazyLoad]="raw['picture']" [offset]="100"
+                            style="max-width:100%;height:100%" class="w3-card-4">
+                        </div>
+                      </a>
+                      <ng-template #defaultPicture>
+                        <div style="width:200px;height:120px;padding:6px 6px">
+                          <img src="../../../../assets/images/no-image.png" style="max-width:100%;height:100%"
+                            class="w3-card-4">
+                        </div>
+                      </ng-template>
                     </td>
                   </ng-container>
 
@@ -119,7 +140,15 @@
                   <ng-container matColumnDef="totalValue">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Valor total</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{(raw.stock * raw.averageCost) | currency : 'S/.'}}
+                      <span
+                        *ngIf="itemsTypeFormControl.value === 'OTROS' || itemsTypeFormControl.value === 'POSTRES'">
+                        {{(raw.stock * raw.price) | currency : 'S/.'}}
+                      </span>
+                      <span
+                        *ngIf="itemsTypeFormControl.value === 'INSUMOS' || itemsTypeFormControl.value === 'MENAJES'">
+                        {{(raw.stock * raw.averageCost) | currency : 'S/.'}}
+                      </span>
+
                     </td>
                   </ng-container>
 

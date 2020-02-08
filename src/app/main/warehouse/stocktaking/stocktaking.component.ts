@@ -9,6 +9,7 @@ import { Household } from 'src/app/core/models/warehouse/household.model';
 import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
 import { StocktakingEditDialogComponent } from './stocktaking-edit-dialog/stocktaking-edit-dialog.component';
 import { StocktakingDeleteConfirmComponent } from './stocktaking-delete-confirm/stocktaking-delete-confirm.component';
+import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/stocktaking-kardex-dialog.component';
 
 @Component({
   selector: 'app-stocktaking',
@@ -121,7 +122,13 @@ export class StocktakingComponent implements OnInit {
   }
 
   kardex(item: any): void {
-    //
+    this.dialog.open(StocktakingKardexDialogComponent, {
+      data: {
+        name: item['name'],
+        type: this.itemsTypeFormControl.value,
+        id: item['id'],
+      }
+    });
   }
 
   edit(item: any): void {

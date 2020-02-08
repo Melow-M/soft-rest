@@ -17,6 +17,7 @@ import { Input } from './models/warehouse/input.model';
 import { Household } from './models/warehouse/household.model';
 import { Grocery } from './models/warehouse/grocery.model';
 import { Dessert } from './models/warehouse/desserts.model';
+import { Kardex } from './models/warehouse/kardex.model';
 
 @Injectable({
   providedIn: 'root'
@@ -70,6 +71,9 @@ export class DatabaseService {
   desserts$: Observable<Dessert[]>;
 
   items$: Observable<(any)[]>;
+
+  kardexCollection: AngularFirestoreCollection<Kardex>;
+  kardex$: Observable<Kardex[]>;
 
   constructor(
     public af: AngularFirestore,
@@ -446,6 +450,38 @@ export class DatabaseService {
         console.log('Sin resultados');
         break;
     }
+  }
+
+  getKardex(from: Date, to: Date, type: string, id: string): Observable<Kardex[]> {
+
+    let typ;
+
+    switch (type) {
+      case 'INSUMOS':
+        typ = 'warehouseInputs';
+        break;
+      case 'MENAJES':
+        typ = 'warehouseHousehold';
+        break;
+      case 'OTROS':
+        typ = 'warehouseGrocery';
+        break;
+      case 'POSTRES':
+        typ = 'warehouseDesserts';
+        break;
+    }
+
+    this.kardexCollection = this.af.collection(`db/deliciasTete/${typ}/${id}/kardex`, ref => ref.where('createdAt', '>=', from).where('createdAt', '<=', to));
+    this.kardex$ =
+      this.kardexCollection.valueChanges()
+        .pipe(
+          map(res => {
+            return res.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf());
+          }),
+          shareReplay(1)
+        );
+
+    return this.kardex$;
   }
 
 }

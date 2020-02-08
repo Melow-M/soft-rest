@@ -7,7 +7,7 @@ import { LazyLoadImageModule, intersectionObserverPreset } from 'ng-lazyload-ima
 import { StocktakingComponent } from './stocktaking.component';
 import { StocktakingRoutingModule } from './stocktaking-routing.module';
 import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
-import { MatFormFieldModule, MatAutocompleteModule, MatIconModule, MatButtonModule, MatInputModule, MatSelectModule, MatSnackBarModule, MatDividerModule, MatDatepickerModule, MatDialogModule, MatOptionModule, MatTableModule, MatPaginatorModule, MatProgressBarModule, MatMenuModule } from '@angular/material';
+import { MatFormFieldModule, MatAutocompleteModule, MatIconModule, MatButtonModule, MatInputModule, MatSelectModule, MatSnackBarModule, MatDividerModule, MatDatepickerModule, MatDialogModule, MatOptionModule, MatTableModule, MatPaginatorModule, MatProgressBarModule, MatMenuModule, MatCheckboxModule } from '@angular/material';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { StocktakingEditDialogComponent } from './stocktaking-edit-dialog/stocktaking-edit-dialog.component';
@@ -29,7 +29,7 @@ import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/st
     MatDividerModule,
     MatIconModule,
     SatDatepickerModule,
-    SatNativeDateModule ,
+    SatNativeDateModule,
     MatDatepickerModule,
     MatFormFieldModule,
     ReactiveFormsModule,
@@ -44,6 +44,7 @@ import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/st
     MatPaginatorModule,
     MatProgressBarModule,
     MatMenuModule,
+    MatCheckboxModule,
     LazyLoadImageModule.forRoot({
       preset: intersectionObserverPreset
     }),
@@ -52,7 +53,8 @@ import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/st
   entryComponents: [
     CreateInputDialogComponent,
     StocktakingEditDialogComponent,
-    StocktakingDeleteConfirmComponent
+    StocktakingDeleteConfirmComponent,
+    StocktakingKardexDialogComponent
   ]
 })
 export class StocktakingModule { }

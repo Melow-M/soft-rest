@@ -379,6 +379,7 @@ export class CreateInputDialogComponent implements OnInit {
 
         //Kardex
         const kardexRef: DocumentReference = this.af.firestore.collection(`db/deliciasTete/${typ}/${inputRef.id}/kardex`).doc();
+        const balancePrice = this.inputFormGroup.value['price'] ? this.inputFormGroup.value['price'] : this.inputFormGroup.value['cost'];
         const kardexData: Kardex = {
           id: kardexRef.id,
           details: 'Stock inicial',
@@ -388,9 +389,9 @@ export class CreateInputDialogComponent implements OnInit {
           outsQuantity: 0,
           outsPrice: 0,
           outsTotal: 0,
-          balanceQuantity: 0,
-          balancePrice: 0,
-          balanceTotal: 0,
+          balanceQuantity: this.inputFormGroup.value['stock'],
+          balancePrice: balancePrice,
+          balanceTotal: balancePrice * this.inputFormGroup.value['stock'],
           type: 'INICIAL',
           createdAt: new Date(),
           createdBy: user

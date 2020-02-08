@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
 import { AngularFirestoreCollection, AngularFirestore, DocumentReference } from '@angular/fire/firestore';
-import { shareReplay, tap } from 'rxjs/operators';
+import { shareReplay, tap, combineLatest } from 'rxjs/operators';
 import { Provider } from './models/third-parties/provider.model';
 import { Payable } from './models/admin/payable.model';
 import { Cash } from './models/sales/cash/cash.model';
@@ -13,6 +13,11 @@ import { AuthService } from './auth.service';
 import { take, map } from 'rxjs/operators';
 import { CostTrend } from './models/warehouse/costTrend.model';
 import { Purchase } from './models/warehouse/purchase.model';
+import { Household } from './models/warehouse/household.model';
+import { Input } from './models/warehouse/input.model';
+import { Dessert } from './models/warehouse/desserts.model';
+import { Grocery } from './models/warehouse/grocery.model';
+import { Recipe } from './models/kitchen/recipe.model';
 
 @Injectable({
   providedIn: 'root'
@@ -125,10 +130,6 @@ export class DatabaseService {
   //Warehouse-Stocktaking
   onGetUnits(): Observable<{ id: string, unit: string }[]> {
     return this.af.collection<{ id: string, unit: string }>(`/db/deliciasTete/kitchenUnits`).valueChanges()
-  }
-
-  onGetInputs(): Observable<KitchenInput[]> {
-    return this.af.collection<KitchenInput>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
   }
 
   //To get available elements
@@ -340,7 +341,7 @@ export class DatabaseService {
                 typ = 'warehouseDesserts';
                 break;
               case 'Menajes':
-                typ = 'warehouseTools';
+                typ = 'warehouseHousehold';
                 break;
             }
 
@@ -387,5 +388,36 @@ export class DatabaseService {
     this.purchases$ = this.purchasesCollection.valueChanges().pipe(shareReplay(1));
     return this.purchases$
   }
+
+  onGetInputs(): Observable<Input[]>{
+    return this.af.collection<Input>(`/db/deliciasTete/warehouseInputs`, ref => ref.orderBy('name')).valueChanges();
+  }
+
+  //Kitchen
+  onGetRecipes(): Observable<Recipe[]> {
+    return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.orderBy('name')).valueChanges();
+  }
+
+  onGetRecipesType(category: string): Observable<Recipe[]>{
+    console.log(category);
+    return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.where('category', '==', category)).valueChanges()
+  }
+
+  onUploadRecipe(recipe: Recipe): Observable<firebase.firestore.WriteBatch>{
+    let recipeRef = this.af.firestore.collection(`/db/deliciasTete/kitchenRecipes`).doc();
+    let recipeData = recipe;
+    let date = new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1), map((user)=> {
+      recipeData.createdAt = date;
+      recipeData.createdBy = user;
+      recipeData.id = recipeRef.id;
+      batch.set(recipeRef, recipeData);
+      return batch;
+    }));
+  }
+
+  // onGetRecipe()
 
 }

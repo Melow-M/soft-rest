@@ -8,7 +8,7 @@ export interface Dessert {
   picture: string;
   unit: string; // UND., KG., GR., L., M., PULG. ...
   stock: number;
-  cost: number;
+  averageCost: number;
   emergencyStock: number;
   status: string; // DISPONIBLE, INACTIVO
   price: number;

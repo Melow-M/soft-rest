@@ -8,6 +8,7 @@ export interface Input {
   unit: string;
   stock: number;
   emergencyStock: number;
+  averageCost: number;
   picture?: string | null; 
   status: string; // ACTIVO, INACTIVO
   createdAt: Date;

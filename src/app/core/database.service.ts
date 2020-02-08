@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
 import { AngularFirestoreCollection, AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { shareReplay, tap, combineLatest } from 'rxjs/operators';
@@ -13,10 +13,11 @@ import { AuthService } from './auth.service';
 import { take, map } from 'rxjs/operators';
 import { CostTrend } from './models/warehouse/costTrend.model';
 import { Purchase } from './models/warehouse/purchase.model';
-import { Household } from './models/warehouse/household.model';
 import { Input } from './models/warehouse/input.model';
-import { Dessert } from './models/warehouse/desserts.model';
+import { Household } from './models/warehouse/household.model';
 import { Grocery } from './models/warehouse/grocery.model';
+import { Dessert } from './models/warehouse/desserts.model';
+import { Kardex } from './models/warehouse/kardex.model';
 import { Recipe } from './models/kitchen/recipe.model';
 
 @Injectable({
@@ -55,8 +56,25 @@ export class DatabaseService {
    * WAREHOUSE VARIABLES
    */
 
-   purchasesCollection: AngularFirestoreCollection<Payable>;
-   purchases$: Observable<Payable[]>;
+  purchasesCollection: AngularFirestoreCollection<Payable>;
+  purchases$: Observable<Payable[]>;
+
+  inputsCollection: AngularFirestoreCollection<Input>;
+  inputs$: Observable<Input[]>;
+
+  householdsCollection: AngularFirestoreCollection<Household>;
+  households$: Observable<Household[]>;
+
+  groceriesCollection: AngularFirestoreCollection<Grocery>;
+  groceries$: Observable<Grocery[]>;
+
+  dessertsCollection: AngularFirestoreCollection<Dessert>;
+  desserts$: Observable<Dessert[]>;
+
+  items$: Observable<(any)[]>;
+
+  kardexCollection: AngularFirestoreCollection<Kardex>;
+  kardex$: Observable<Kardex[]>;
 
   constructor(
     public af: AngularFirestore,
@@ -155,34 +173,57 @@ export class DatabaseService {
   }
 
   //To add a new element. We should change it to onAddInput
-  onAddInput(input: KitchenInput, types: string, newUnit?: { id: string, unit: string }): Observable<firebase.firestore.WriteBatch> {
+  onAddInput(input: any, types: string, newUnit?: { id: string, unit: string }): Observable<firebase.firestore.WriteBatch> {
     let batch = this.af.firestore.batch();
     let date = new Date()
     let typ: string;
 
-    switch (types) {
-      case 'Insumos':
-        typ = 'warehouseInputs';
-        break;
-      case 'Otros':
-        typ = 'warehouseGrocery';
-        break;
-      case 'Postres':
-        typ = 'warehouseDesserts';
-        break;
-      case 'Menajes':
-        typ = 'warehouseHousehold';
-        break;
+    let inputData: any = {
+      id: null,
+      name: input['name'],
+      description: input['description'],
+      sku: input['sku'],
+      unit: newUnit == undefined ? input['unit'] : newUnit.unit,
+      stock: input['stock'],
+      emergencyStock: input['emergencyStock'],
+      picture: '',
+      status: 'ACTIVO',
+      createdAt: new Date(),
+      createdBy: null,
+      editedAt: null,
+      editedBy: null
     }
+
+    switch (types) {
+      case 'INSUMOS':
+        typ = 'warehouseInputs';
+        inputData['averageCost'] = input['cost'];
+        break;
+      case 'MENAJES':
+        typ = 'warehouseHousehold';
+        inputData['averageCost'] = input['cost'];
+        break;
+      case 'OTROS':
+        typ = 'warehouseGrocery';
+        inputData['averageCost'] = input['cost'];
+        inputData['price'] = input['price'];
+        break;
+      case 'POSTRES':
+        typ = 'warehouseDesserts';
+        inputData['averageCost'] = input['cost'];
+        inputData['price'] = input['price'];
+        break;
+
+    }
+
 
     //Input
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/${typ}/`).doc();
-    let inputData: KitchenInput;
 
     //KitchenUnits
     let kitchenUnitsRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenUnits/`).doc();
     let kitchenUnitsData = {
-      unit: input.unit,
+      unit: input['unit'],
       id: kitchenUnitsRef.id
     }
 
@@ -190,7 +231,7 @@ export class DatabaseService {
     let costTrendRef: DocumentReference = this.af.firestore
       .collection(`/db/deliciasTete/${typ}/${inputRef.id}/costTrend`).doc();
     let costTrendData: CostTrend = {
-      cost: input.cost,
+      cost: input['cost'],
       createdAt: date,
       id: costTrendRef.id
     }
@@ -200,21 +241,8 @@ export class DatabaseService {
     return this.auth.user$.pipe(
       take(1),
       map(user => {
-        inputData = {
-          id: inputRef.id,
-          name: input.name,
-          description: input.description,
-          sku: input.sku,
-          unit: newUnit == undefined ? input.unit : newUnit.unit,
-          stock: input.stock,
-          cost: input.cost,
-          status: 'ACTIVO',
-          createdAt: new Date(),
-          createdBy: user,
-          editedAt: new Date(),
-          editedBy: user,
-          type: types,
-        }
+
+        inputData['createdBy'] = user;
 
         batch.set(inputRef, inputData);
 
@@ -278,7 +306,7 @@ export class DatabaseService {
 
         payableData = {
           id: purchaseRef.id,
-          documentDate: purchaseData.documentDetails.documentDate,          
+          documentDate: purchaseData.documentDetails.documentDate,
           documentType: purchaseData.documentDetails.documentType, // FACTURA, BOLETA, TICKET
           documentSerial: purchaseData.documentDetails.documentSerial,
           documentCorrelative: purchaseData.documentDetails.documentCorrelative,
@@ -287,7 +315,7 @@ export class DatabaseService {
             name: purchaseData.documentDetails.provider.name,
             ruc: purchaseData.documentDetails.provider.ruc,
           },
-          
+
           payments: purchaseData.documentDetails.paymentType == 'CREDITO' ? [{//SOLO CREDITO
             type: 'PARCIAL',
             paymentType: purchaseData.documentDetails.paymentType,
@@ -295,7 +323,7 @@ export class DatabaseService {
             cashReference: null,
             paidAt: date,
             paidBy: user,
-          }]:[{
+          }] : [{
             type: 'TOTAL',
             paymentType: purchaseData.documentDetails.paymentType,
             amount: purchaseData.imports.totalImport,
@@ -305,16 +333,16 @@ export class DatabaseService {
           }],
 
           itemsList: temp,
-          
-          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null:purchaseData.documentDetails.creditExpirationDate,
+
+          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null : purchaseData.documentDetails.creditExpirationDate,
           paymentDate: null,
           totalAmount: purchaseData.imports.totalImport,
-          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null: purchaseData.imports.subtotalImport,
-          igvAmount: purchaseData.imports.igvImport == undefined ? null: purchaseData.imports.igvImport,
+          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null : purchaseData.imports.subtotalImport,
+          igvAmount: purchaseData.imports.igvImport == undefined ? null : purchaseData.imports.igvImport,
           paymentType: purchaseData.documentDetails.paymentType, // CREDITO, EFECTIVO, TARJETA
-          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ?  purchaseData.imports.paidImport : purchaseData.imports.totalImport,
-          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport: null, //no existe por credito
-          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE': 'PAGADO', // PENDIENTE, PAGADO, ANULADO
+          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.paidImport : purchaseData.imports.totalImport,
+          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport : null, //no existe por credito
+          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE' : 'PAGADO', // PENDIENTE, PAGADO, ANULADO
           createdAt: date,
           createdBy: user,
           editedAt: null,
@@ -419,5 +447,69 @@ export class DatabaseService {
   }
 
   // onGetRecipe()
+
+  getItems(type: string): Observable<(any)[]> {
+    switch (type) {
+      case 'INSUMOS':
+        this.inputsCollection = this.af.collection(`db/deliciasTete/warehouseInputs`, ref => ref.orderBy('createdAt', 'desc'));
+        this.items$ = this.inputsCollection.valueChanges().pipe(shareReplay(1));
+        return this.items$;
+        break;
+
+      case 'MENAJES':
+        this.householdsCollection = this.af.collection(`db/deliciasTete/warehouseHousehold`, ref => ref.orderBy('createdAt', 'desc'));
+        this.items$ = this.householdsCollection.valueChanges().pipe(shareReplay(1));
+        return this.items$;
+        break;
+
+      case 'POSTRES':
+        this.dessertsCollection = this.af.collection(`db/deliciasTete/warehouseDesserts`, ref => ref.orderBy('createdAt', 'desc'));
+        this.items$ = this.dessertsCollection.valueChanges().pipe(shareReplay(1));
+        return this.items$;
+        break;
+
+      case 'OTROS':
+        this.groceriesCollection = this.af.collection(`db/deliciasTete/warehouseGrocery`, ref => ref.orderBy('createdAt', 'desc'));
+        this.items$ = this.groceriesCollection.valueChanges().pipe(shareReplay(1));
+        return this.items$;
+        break;
+
+      default:
+        console.log('Sin resultados');
+        break;
+    }
+  }
+
+  getKardex(from: Date, to: Date, type: string, id: string): Observable<Kardex[]> {
+
+    let typ;
+
+    switch (type) {
+      case 'INSUMOS':
+        typ = 'warehouseInputs';
+        break;
+      case 'MENAJES':
+        typ = 'warehouseHousehold';
+        break;
+      case 'OTROS':
+        typ = 'warehouseGrocery';
+        break;
+      case 'POSTRES':
+        typ = 'warehouseDesserts';
+        break;
+    }
+
+    this.kardexCollection = this.af.collection(`db/deliciasTete/${typ}/${id}/kardex`, ref => ref.where('createdAt', '>=', from).where('createdAt', '<=', to));
+    this.kardex$ =
+      this.kardexCollection.valueChanges()
+        .pipe(
+          map(res => {
+            return res.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf());
+          }),
+          shareReplay(1)
+        );
+
+    return this.kardex$;
+  }
 
 }

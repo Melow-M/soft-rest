@@ -241,7 +241,7 @@
 
                   <ng-container matColumnDef="actions" stickyEnd>
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Acciones</th>
-                    <td mat-cell style="padding:0px 24px" *matCellDef="let raw">
+                    <td mat-cell class="mat-elevation-z4" style="padding:0px 24px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
                         <button mat-menu-item (click)="payTotalDebt(raw)"
                           *ngIf="user.role.accountsPayablePayTotalPayAction">

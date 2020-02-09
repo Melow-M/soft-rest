@@ -2,11 +2,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable, combineLatest } from 'rxjs';
 import { startWith, map, switchMap, tap, debounceTime } from 'rxjs/operators';
-import { MatDialog, MatTableDataSource, MatPaginator } from '@angular/material';
+import { MatDialog, MatTableDataSource, MatPaginator, MatDialogRef, MatSnackBar } from '@angular/material';
 import { CreateNewRecipeDialogComponent } from './create-new-recipe-dialog/create-new-recipe-dialog.component';
 import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Input } from 'src/app/core/models/warehouse/input.model';
+import { EditNewRecipeDialogComponent } from './edit-new-recipe-dialog/edit-new-recipe-dialog.component';
+import { ConfirmRecipeDialogComponent } from './confirm-recipe-dialog/confirm-recipe-dialog.component';
 
 @Component({
   selector: 'app-recipes',
@@ -30,11 +32,13 @@ export class RecipesComponent implements OnInit {
   filteredOptions: Observable<string[]>;
   availableOptions$: Observable<string | Recipe[]>;
   getRecipe$: Observable<Recipe | string>;
+  dialogRef: MatDialogRef<any>
 
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private dbs: DatabaseService
+    private dbs: DatabaseService,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit() {
@@ -86,11 +90,38 @@ export class RecipesComponent implements OnInit {
   }
 
   onEditRecipe(){
-    console.log('editing');
+    this.dialog.open(EditNewRecipeDialogComponent, {
+      data: this.searchForm.get('productName').value,
+      width: '550px',
+    })
   }
 
   onDeleteRecipe(){
-    console.log('deleting')
+    this.dialogRef = this.dialog.open(ConfirmRecipeDialogComponent,{
+      width: '360px',
+      maxWidth: '360px',      
+      data: {
+      warning: `Usted está eliminando la receta.`,
+      content: `¿Está seguro de eliminar la receta ${this.searchForm.get('productName').value['name'].bold()}?`,
+      title: 'Eliminando Receta',
+      titleIcon: 'delete'
+    }
+  });
+
+  this.dialogRef.afterClosed().subscribe((answer: {action: string, lastObservation: string}) => {
+    if(answer != undefined){
+      if(answer.action =="cancel"){
+        //console.log("cancelled");
+      }
+      if(answer.action =="confirm"){
+        this.dbs.onDeleteRecipe(this.searchForm.get('productName').value).commit().then(()=> {
+          this.snackBar.open('La receta se eliminó satisfactoriamente.', 'Aceptar')
+        }).catch(() => {
+          this.snackBar.open('Ocurrió un error. Vuelva a intentarlo.', 'Aceptar')
+        });
+      }
+    }
+    });
   }
 
   filterRecipe(recipeList: Recipe[], recipeName: Recipe | string){

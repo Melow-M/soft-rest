@@ -447,7 +447,32 @@ export class DatabaseService {
     }));
   }
 
-  // onGetRecipe()
+  onEditRecipe(recipe: Recipe): Observable<firebase.firestore.WriteBatch>{
+    let recipeRef = this.af.firestore.collection(`/db/deliciasTete/kitchenRecipes`).doc(recipe.id);
+    let recipeData = recipe;
+    let date = new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1), map((user)=> {
+      recipeData.editedAt = date;
+      recipeData.editedBy = user;
+      console.log(recipeData);
+      batch.update(recipeRef, recipeData);
+      return batch;
+    }));
+  }
+
+  onDeleteRecipe(recipe: Recipe): firebase.firestore.WriteBatch{
+    let recipeRef = this.af.firestore.collection(`/db/deliciasTete/kitchenRecipes`).doc(recipe.id);
+    let batch = this.af.firestore.batch();
+
+    batch.delete(recipeRef);
+    return batch;
+  }
+
+
+  // onGetRecipe(recipe: Recipe): Observable<firebase.firestore.WriteBatch>{}
+
 
   getItems(type: string): Observable<(any)[]> {
     switch (type) {

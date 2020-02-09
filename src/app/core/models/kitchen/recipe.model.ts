@@ -11,7 +11,7 @@ export interface Recipe {
     name: string;
     sku: string;
     quantity: number;
-    inputId: string;
+    id: string;
     unit: string;
   }>;
   createdAt: Date;

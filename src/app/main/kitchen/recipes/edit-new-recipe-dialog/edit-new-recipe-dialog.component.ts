@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, Inject, } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
 import { Observable, combineLatest } from 'rxjs';
@@ -8,22 +8,22 @@ import { Input } from 'src/app/core/models/warehouse/input.model';
 import { Tool } from 'src/app/core/models/warehouse/tools.model';
 import { DatabaseService } from 'src/app/core/database.service';
 import { map, startWith, tap, debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
-import { MatTableDataSource, MatPaginator, MatSnackBar } from '@angular/material';
+import { MatTableDataSource, MatPaginator, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 
 @Component({
-  selector: 'app-create-new-recipe-dialog',
-  templateUrl: './create-new-recipe-dialog.component.html',
-  styleUrls: ['./create-new-recipe-dialog.component.css'],
+  selector: 'app-edit-new-recipe-dialog',
+  templateUrl: './edit-new-recipe-dialog.component.html',
+  styleUrls: ['./edit-new-recipe-dialog.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CreateNewRecipeDialogComponent implements OnInit {
+export class EditNewRecipeDialogComponent implements OnInit {
   //Table
   inputTableDataSource = new MatTableDataSource();
   inputTableDisplayedColumns: string[] = [
     'index', 'itemName', 'itemUnit', 'quantity', 'actions'
   ]
-  @ViewChild('inputTablePaginator', {static:false}) inputTablePaginator: MatPaginator;
+  @ViewChild('inputTablePaginator', {static:true}) inputTablePaginator: MatPaginator;
   
   //Variables
   productCategory: Array<string> = [
@@ -40,41 +40,46 @@ export class CreateNewRecipeDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dbs: DatabaseService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialogRef: MatDialogRef<EditNewRecipeDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Recipe
   ) { }
 
   ngOnInit() {
     this.initForms();
+    this.initTableData();
     this.inputList = combineLatest(this.dbs.onGetInputs(), this.itemForm.get('item').valueChanges)
       .pipe(map(([inputList, inputForm])=> this.onFilterInputs(inputList, inputForm)),
             startWith(''));
-    this.inputTableDataSource.data = [];
+    
+  }
+
+  initTableData(){
+    let aux= [];
+    this.data.inputs.forEach((input, index) => {
+      aux.push({
+        id: input.id,
+        name: input.name,
+        quantity: input.quantity,
+        sku: input.sku,
+        unit: input.unit,
+        index: index
+      })
+    });
+    this.inputTableDataSource.data = aux;
+    this.inputTableDataSource.paginator = this.inputTablePaginator;
   }
 
   initForms(){
     this.productForm = this.fb.group({
-      productCategory: [null, Validators.required],
-      productName: [null, {
-        validators: Validators.required, 
-        asyncValidators: [this.repeatedNameValidator(this.dbs)],
-        updateOn: 'blur'
-      }]
+      productCategory: [{value: this.data.category, disabled: true }],
+      productName: [{value: this.data.name, disabled: true }]
     })
 
     this.itemForm = this.fb.group({
       item: [null, Validators.required],
       quantity: [null, Validators.required]
     })
-
-    this.productNameFormat$ = this.productForm.get('productName').valueChanges
-    .pipe(
-      startWith<any>(''),
-      debounceTime(500),
-      distinctUntilChanged(),
-      tap((name: string) => {
-      console.log('now');
-      this.productForm.get('productName').setValue(this.formatInput(name));
-      }));
 
   }
 
@@ -95,10 +100,20 @@ export class CreateNewRecipeDialogComponent implements OnInit {
   }
 
   onAddItem(){
-    let table = this.inputTableDataSource.data;
-    table.push({...this.itemForm.value, index: this.inputTableDataSource.data.length});
-    this.inputTableDataSource.data = table;
-    this.inputTableDataSource.paginator = this.inputTablePaginator;
+    if(typeof this.itemForm.get('item').value != 'string'){
+      let table = this.inputTableDataSource.data;
+      table.push({
+        ...this.itemForm.get('item').value,
+        quantity: this.itemForm.get('quantity').value,
+        index: this.inputTableDataSource.data.length
+        });
+      console.log(table);
+      this.inputTableDataSource.data = table;
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+    }
+    else{
+      this.snackBar.open('Por favor, seleccione correctamente el item', 'Aceptar');
+    }
   }
 
   onDeleteItem(item){
@@ -110,38 +125,29 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     console.log(item);
   }
 
+  //Change to update
   onUploadRecipe(){
-    let recipe: Recipe = {
-      id: null,
-      name: this.productForm.get('productName').value.toUpperCase(),
-      sku: 'Aún no se',
-      description: null,
-      picture: null,
-      category: this.productForm.get('productCategory').value,
-      inputs: [],
-      createdAt: null,
-      createdBy: null,
-      editedAt: null,
-      editedBy: null
-    };
+    let recipe: Recipe = this.data;
+
+    recipe.inputs = [];
 
     this.inputTableDataSource.data.forEach(el => {
       recipe.inputs.push({
-        name: el['item']['name'],
-        sku: el['item']['sku'],
+        name: el['name'],
+        sku: el['sku'],
         quantity: el['quantity'],
-        id: el['item']['id'],
-        unit: el['item']['unit']
+        id: el['id'],
+        unit: el['unit']
       });
     });
 
-    this.dbs.onUploadRecipe(recipe).pipe(tap((batch)=> {
+    this.dbs.onEditRecipe(recipe).pipe(tap((batch)=> {
       batch.commit().then(()=> {
-        this.snackBar.open('La receta fue guardada satisfactoriamente', 'Aceptar');
+        this.snackBar.open('La receta fue editada satisfactoriamente', 'Aceptar');
       })
       .catch((err)=> {
         console.log(err);
-        this.snackBar.open('Ocurrió un error, por favor, vuelva a subir la receta', 'Aceptar')
+        this.snackBar.open('Ocurrió un error, por favor, vuelva a editar la receta', 'Aceptar')
       })
     })).subscribe();
 
@@ -157,23 +163,5 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     else return value;
   }
 
-  repeatedNameValidator(dbs: DatabaseService){
-    return(control: AbstractControl): Observable<ValidationErrors|null> => {
-      return dbs.onGetRecipes().pipe(
-        //debounceTime(800),
-        take(1),
-        map( res => {
-          console.log('trying');
-          if(!!res.find(recipe => recipe.name.toUpperCase() == this.formatInput(control.value).toUpperCase())){
-            return {repeatedName: true}
-          }
-          else{
-            return null;
-          }
-        }
-        )
-      )
-    }
-  }
 
 }

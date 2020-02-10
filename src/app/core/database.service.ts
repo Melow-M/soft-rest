@@ -607,13 +607,13 @@ export class DatabaseService {
     }, 0);
     
     var doc = new jsPDF({
-        unit: 'px',
+        unit: 'pt',
         format: [414, 353+21*(elements.length-1)],
         orientation: 'l'
     });
     
     doc.setFontStyle("bold");
-    doc.setFontSize(18),
+    doc.setFontSize(15),
     doc.text("TICKET", 207, 59, {
         align: "center",
         baseline: "middle"
@@ -634,6 +634,7 @@ export class DatabaseService {
         baseline: "middle"
     });
     
+    doc.setFontSize(14),
     doc.line(22,168,392,168);
     doc.setFontStyle('bold');
     

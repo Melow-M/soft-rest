@@ -9,6 +9,8 @@ import { DatabaseService } from 'src/app/core/database.service';
 import { Input } from 'src/app/core/models/warehouse/input.model';
 import { EditNewRecipeDialogComponent } from './edit-new-recipe-dialog/edit-new-recipe-dialog.component';
 import { ConfirmRecipeDialogComponent } from './confirm-recipe-dialog/confirm-recipe-dialog.component';
+import * as XLSX from 'xlsx';
+
 
 @Component({
   selector: 'app-recipes',
@@ -33,6 +35,14 @@ export class RecipesComponent implements OnInit {
   availableOptions$: Observable<string | Recipe[]>;
   getRecipe$: Observable<Recipe | string>;
   dialogRef: MatDialogRef<any>
+
+  //Excel
+  data_xls: any
+  headersXlsx: string[] = [
+    'Insumo',
+    'Medida',
+    'Cantidad por Ración',
+  ]
 
   constructor(
     private fb: FormBuilder,
@@ -140,4 +150,30 @@ export class RecipesComponent implements OnInit {
     return this.options.filter(option => option.toLowerCase().includes(filterValue));
   }
 
+
+  downloadXls(): void {
+    let table_xlsx: any[] = [];
+
+    table_xlsx.push(this.headersXlsx);
+
+    this.inputTableDataSource.data.forEach(element => {
+      const temp = [
+        element['name'],
+        element['unit'],
+        element['quantity'],
+      ];
+      table_xlsx.push(temp);
+    })
+
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
+
+    let sheetName = (<string>this.searchForm.get('productName').value['name']).replace(/\s/g, "_");
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Receta de "'+ sheetName +'"');
+
+    const name = 'receta_de_'+sheetName+'.xlsx';
+
+    XLSX.writeFile(wb, name);
+  }
 }

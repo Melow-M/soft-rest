@@ -8,11 +8,11 @@
 
 <div mat-dialog-content>
     <p>Está seguro de imprimir el comprobante:</p>
-    <p>Factura FE001 - 000000089</p>
+    <p>Factura {{data['documentSerial']}} - {{data['documentCorrelative']}}</p>
 </div>
 
 <div class="contain" style="margin-top: 20px;">
     <button mat-button mat-dialog-close style="background: #B70705; color: white">Cancelar</button>
-    <button class="w3-margin-left" mat-raised-button style="background: #EE8434; color: white" mat-dialog-close>Sí,
+    <button class="w3-margin-left" mat-raised-button style="background: #EE8434; color: white" (click)="save()">Sí,
         Imprimir</button>
 </div>

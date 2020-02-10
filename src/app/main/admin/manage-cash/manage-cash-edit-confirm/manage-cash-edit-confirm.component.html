@@ -1,9 +1,9 @@
 <div class="ms-font-montserrat mat-title ms-color-11">
   <mat-icon class="ms-icons-color" style="vertical-align:middle">edit</mat-icon> Editar caja
 </div>
-<mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate" ></mat-progress-bar>
 
-<mat-dialog-content>
+<!--mat-dialog-content>
   <form [formGroup]="dataFormGroup">
 
     <span class="ms-color-11 mat-subheading-1 w3-margin-bottom"><b>Información</b></span>
@@ -41,11 +41,11 @@
       <mat-error *ngIf="!dataFormGroup.valid">Asigne una contraseña *</mat-error>
     </mat-form-field><br>
   </form>
-</mat-dialog-content>
+</!--mat-dialog-content>
 
 <mat-divider></mat-divider>
 <mat-dialog-actions align="end">
   <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
   <button mat-raised-button class="w3-margin-right" color="primary" (click)="save()"
     [disabled]="!dataFormGroup.valid || (name$ | async) || (savingCash$ | async)">Crear</button>
-</mat-dialog-actions>
+</mat-dialog-actions-->

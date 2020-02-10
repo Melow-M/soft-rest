@@ -1,3 +1,6 @@
+import { Order } from './models/sales/menu/order.model';
+import { Meal } from './models/sales/menu/meal.model';
+import { Grocery } from './models/warehouse/grocery.model';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
@@ -76,6 +79,18 @@ export class DatabaseService {
   kardexCollection: AngularFirestoreCollection<Kardex>;
   kardex$: Observable<Kardex[]>;
 
+  /**
+  * SALES VARIABLES
+  */
+  othersCollection: AngularFirestoreCollection<Grocery>;
+  others$: Observable<Grocery[]>;
+
+  dishesCollection: AngularFirestoreCollection<Meal>;
+  dishes$: Observable<Meal[]>;
+
+  ordersCollection: AngularFirestoreCollection<Order>;
+  orders$: Observable<Order[]>;
+
   constructor(
     public af: AngularFirestore,
     private auth: AuthService
@@ -148,6 +163,10 @@ export class DatabaseService {
   //Warehouse-Stocktaking
   onGetUnits(): Observable<{ id: string, unit: string }[]> {
     return this.af.collection<{ id: string, unit: string }>(`/db/deliciasTete/kitchenUnits`).valueChanges()
+  }
+
+  onGetInputs(): Observable<KitchenInput[]> {
+    return this.af.collection<KitchenInput>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
   }
 
   //To get available elements
@@ -254,6 +273,53 @@ export class DatabaseService {
         return batch;
       })
     )
+  }
+
+  addOthers(product) {
+    let batch = this.af.firestore.batch();
+    let date = new Date()
+    let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc();
+    let inputData: Grocery;
+
+    let costTrendRef: DocumentReference = this.af.firestore
+      .collection(`/db/deliciasTete/warehouseGrocery/${inputRef.id}/costTrend`).doc();
+    let costTrendData: CostTrend = {
+      cost: product.cost,
+      createdAt: date,
+      id: costTrendRef.id
+    }
+
+    batch.set(costTrendRef, costTrendData);
+
+    this.auth.user$.pipe(
+      take(1))
+      .subscribe(user => {
+        inputData = {
+          id: inputRef.id,
+          name: product.name,
+          description: '',
+          sku: '',
+          picture: '',
+          unit: product.unit,
+          stock: product.stock,
+          cost: product.cost,
+          emergencyStock: 0,
+          status: 'DISPONIBLE',
+          createdAt: new Date(),
+          createdBy: user,
+          editedAt: new Date(),
+          editedBy: user,
+          price: product.price
+        }
+
+        batch.set(inputRef, inputData);
+
+        batch.commit().then(() => {
+          console.log('otros guardado');
+
+        })
+      })
+
   }
 
   onAddPurchase(purchase: Purchase, itemsList: Array<{ kitchenInputId: string; item: KitchenInput; quantity: number; cost: number; }>):
@@ -512,4 +578,34 @@ export class DatabaseService {
     return this.kardex$;
   }
 
+  /************ SALES METHODS ********* */
+
+  onGetOthers(): Observable<Grocery[]> {
+    this.othersCollection = this.af.collection('db/deliciasTete/warehouseGrocery', ref => ref.orderBy('createdAt', 'desc'));
+    this.others$ = this.othersCollection.valueChanges().pipe(shareReplay(1));
+    return this.others$;
+  }
+  onGetDishes() {
+
+    this.dishesCollection = this.af.collection('db/deliciasTete/kitchenDishes', ref => ref.orderBy('createdAt', 'desc'));
+    this.dishes$ = this.dishesCollection.valueChanges().pipe(shareReplay(1));
+    return this.dishes$;
+  }
+
+  getOrders() {
+    this.ordersCollection = this.af.collection('db/deliciasTete/orders', ref => ref.orderBy('createdAt', 'desc'));
+    this.orders$ = this.ordersCollection.valueChanges().pipe(shareReplay(1));
+    return this.orders$;
+  }
+
+  getOpenCash(cash) {
+    let openingCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cash + '/openings', ref => ref.orderBy('openedAt', 'desc'));
+    return openingCollection.valueChanges().pipe(shareReplay(1));
+  }
+
+  getTransactions(cashId, openingId) {
+    let transactionsCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cashId + '/openings/'+ openingId + '/transactions', ref => ref.orderBy('createdAt', 'desc'));
+  }
+    return transactionsCollection.valueChanges().pipe(shareReplay(1));
+  
 }

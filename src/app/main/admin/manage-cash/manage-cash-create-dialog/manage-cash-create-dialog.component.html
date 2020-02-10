@@ -1,7 +1,7 @@
 <div class="ms-font-montserrat mat-title ms-color-11">
   <mat-icon class="ms-icons-color" style="vertical-align:middle">add_circle</mat-icon> Nueva caja
 </div>
-<mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 
 <mat-dialog-content>
   <form [formGroup]="dataFormGroup">
@@ -47,5 +47,5 @@
 <mat-dialog-actions align="end">
   <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
   <button mat-raised-button class="w3-margin-right" color="primary" (click)="create()"
-    [disabled]="!dataFormGroup.valid || (name$ | async) || (savingCash$ | async)">Crear</button>
+    [disabled]="!dataFormGroup.valid || (savingCash$ | async)">Crear</button>
 </mat-dialog-actions>

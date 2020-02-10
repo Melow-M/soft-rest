@@ -13,15 +13,20 @@ import {
   MatMenuModule,
   MatDialogModule,
   MatCheckboxModule,
-  MatDatepickerModule
+  MatDatepickerModule,
+  MatAutocompleteModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SalesRecordRoutingModule } from './sales-record-routing.module';
+import { ListProductsComponent } from './list-products/list-products.component';
+import { CancelComponent } from './cancel/cancel.component';
 
 
 @NgModule({
   declarations: [
-    SalesRecordComponent
+    SalesRecordComponent,
+    ListProductsComponent,
+    CancelComponent
   ],
   imports: [
     CommonModule,
@@ -39,7 +44,12 @@ import { SalesRecordRoutingModule } from './sales-record-routing.module';
     MatCheckboxModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatAutocompleteModule
+  ],
+  entryComponents: [
+    ListProductsComponent,
+    CancelComponent
   ]
 })
 export class SalesRecordModule { }

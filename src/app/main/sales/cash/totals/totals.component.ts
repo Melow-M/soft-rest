@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { map, tap } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { DatabaseService } from 'src/app/core/database.service';
+import { Component, OnInit, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'app-totals',
@@ -9,61 +13,87 @@ export class TotalsComponent implements OnInit {
 
   displayedColumns: string[] = ['fuente', 'import'];
 
-  cash:Array<any> = [
-    {
-      item: 'Importe Inicial',
-      amount: 100
-    },
-    {
-      item: 'Total ingresos',
-      amount: 1100
-    },
-    {
-      item: 'Egresos',
-      amount: 280
-    }
+  cash: Array<any>
+  income: Array<any>
+  expenses: Array<any>
 
-  ]
 
-  income:Array<any> = [
-    {
-      item: 'Ventas',
-      amount: 100
-    },
-    {
-      item: 'Ingreso efectivo',
-      amount: 1100
-    },
-    {
-      item: 'Tarjeta Visa',
-      amount: 280
-    },
-    {
-      item: 'Tarjeta Mastercard',
-      amount: 380
-    }
+  openingCash$: Observable<any>
 
-  ]
-
-  expenses:Array<any> = [
-    {
-      item: 'Transferencia',
-      amount: 100
-    },
-    {
-      item: 'Egresos',
-      amount: 1100
-    }
-
-  ]
-
-  constructor() { }
-
-  getTotal(array) {
-    return array.map(t => t.amount).reduce((acc, value) => acc + value, 0);
-  }
+  constructor(
+    public dbs: DatabaseService,
+    @Inject(MAT_DIALOG_DATA) public data
+  ) { }
 
   ngOnInit() {
+
+    this.openingCash$ =
+      combineLatest(
+        this.dbs.getOpenCash(this.data['id']),
+        this.dbs.getTransactions(this.data['id'], this.data['currentOpeningId'])
+      ).pipe(
+        map(([cashes, transaction]) => {
+          let cash = cashes.filter(el => el['id'] == this.data['currentOpeningId'])[0]
+          let income = transaction.filter(el => el['type'] == 'Ingreso').filter(el => el['status'] == "PAGADO")
+          let expence = transaction.filter(el => el['type'] == 'Egreso').filter(el => el['status'] == "PAGADO")
+          this.expenses = [
+            {
+              item: 'Transferencia',
+              amount: expence.filter(el => el['paymentType'] == 'TRANSFERENCIA').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
+            },
+            {
+              item: 'Egresos',
+              amount: expence.filter(el => el['paymentType'] == 'EFECTIVO').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
+            }
+          ]
+          this.income = [
+            {
+              item: 'Ingreso efectivo',
+              amount: income.filter(el => el['paymentType'] == 'EFECTIVO').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
+            },
+            {
+              item: 'Tarjeta Visa',
+              amount: income.filter(el => el['paymentType'] == 'VISA').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
+            },
+            {
+              item: 'Tarjeta Mastercard',
+              amount: income.filter(el => el['paymentType'] == 'MASTERCARD').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
+            }
+
+          ]
+          this.cash = [
+            {
+              item: 'Importe Inicial',
+              amount: cash['openingBalance'],
+              value: 1
+            },
+            {
+              item: 'Total ingresos',
+              amount: income.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
+            },
+            {
+              item: 'Egresos',
+              amount: expence.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: -1
+            }
+
+          ]
+          return cash
+        })
+      )
+
   }
+
+  getTotal(array) {
+    return array.map(t => t.amount * t.value).reduce((acc, value) => acc + value, 0);
+  }
+
+  
 
 }

@@ -130,10 +130,10 @@
                     <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
                     <td mat-cell style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
-                        <button mat-menu-item (click)="editCash(raw)" *ngIf="user.role.cashManagementEditAction">
+                        <button mat-menu-item (click)="editCash(raw)" >
                           <mat-icon class="ms-icons-color">edit</mat-icon> Editar
                         </button>
-                        <button mat-menu-item (click)="deleteCash(raw)" *ngIf="user.role.cashManagementDeleteAction">
+                        <button mat-menu-item (click)="deleteCash(raw)">
                           <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
                       </mat-menu>
@@ -165,7 +165,7 @@
 
       </ng-container>
 
-      <ng-template>
+      <ng-template #defaultUser>
         <p class="mat-h2" style="font-family: Raleway; color: #2b2b2b">Cargando credenciales ...</p>
       </ng-template>
     </div>

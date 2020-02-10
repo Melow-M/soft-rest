@@ -20,6 +20,7 @@ import { Dessert } from './models/warehouse/desserts.model';
 import { Kardex } from './models/warehouse/kardex.model';
 import { Recipe } from './models/kitchen/recipe.model';
 import * as jsPDF from 'jspdf';
+import { Promo } from './models/sales/menu/promo.model';
 
 @Injectable({
   providedIn: 'root'
@@ -690,6 +691,48 @@ export class DatabaseService {
   
     doc.autoPrint({variant: 'non-conform'});
     doc.save(`TICKET-${ticketNumber}.pdf`);
+  }
+
+  onCreateOffer(promo: Promo): Observable<firebase.firestore.WriteBatch>{
+    let promoRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/offers`).doc();
+    let promoData: Promo = promo;
+    let date= new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        promoData.createdAt = date;
+        promoData.createdBy = user;
+        promoData.id = promoRef.id;
+        promoData.editedAt = null;
+        promoData.editedBy = null;
+
+        batch.set(promoRef, promoData);
+
+        return batch;
+      }))
+  }
+
+  onGetOffer(): Observable<Promo[]>{
+    return this.af.collection<Promo>(`/db/deliciasTete/offers`).valueChanges();
+  }
+
+  changeOfferState(promo: Promo, newState: string): Observable<firebase.firestore.WriteBatch>{
+    let promoRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/offers`).doc(promo.id);
+    let promoData: Promo = promo;
+    let date= new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        promoData.editedAt = date;
+        promoData.editedBy = user;
+        promoData.state = newState == 'Activar' ? 'Publicado':'Inactivo';
+
+        batch.update(promoRef, promoData);
+
+        return batch;
+      }))
   }
 
 }

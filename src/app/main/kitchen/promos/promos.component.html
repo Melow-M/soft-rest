@@ -12,13 +12,12 @@
 
             <!-- Search Form -->
 
-            <!-- <form> -->
-
                 <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; flex-wrap: wrap ;">  
 
                     <mat-form-field appearance="outline">
                         <mat-label>Filtrar por nombre</mat-label>
-                        <input type="text" placeholder="Filtrar por nombre" matInput>
+                        <input [formControl]="filterControl" (keyup)="filter()"
+                            type="text" placeholder="Filtrar por nombre" matInput>
                         <span matPrefix><mat-icon>filter_list</mat-icon></span>
                     </mat-form-field>
 
@@ -39,69 +38,152 @@
                 </div>
                 
 
-            <!-- </form> -->
-
             <!-- Table -->
             <div>
                 <!-- Table -->
-                <!-- <div class="w3-padding" *ngIf="inputTableDataSource.data.length">
-                    <h1 style="font-size:1.8em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
-                        {{this.searchForm.get('productName').value.name | titlecase}}
-                        <button type="button" mat-icon-button style="vertical-align: top;" (click)="onDeleteRecipe()">
-                            <mat-icon>delete</mat-icon>
-                        </button>
-
-                        <button type="button" mat-icon-button style="vertical-align: top;" (click)="onEditRecipe()">
-                            <mat-icon>edit</mat-icon>
-                        </button>
-                    </h1>
+                <div class="w3-padding" *ngIf="promoData$ | async">
                           
                     <div style="height: auto; width: 100%; overflow: auto; border-radius: 20px 20px 0 0" class="mat-elevation-z8">
-                        <table mat-table [dataSource]="inputTableDataSource" 
+                        <table mat-table [dataSource]="promosTableDataSource" 
                             style="width: 100%; text-align: center !important; width: 100%;">
 
+                            <!-- index -->
                             <ng-container matColumnDef="index">
-                                <th mat-header-cell *matHeaderCellDef
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px;"
                                     class="w3-center w3-padding w3-border-right">
                                     N°</th>
                                 <td mat-cell *matCellDef="let element; let i=index">{{i+1}}</td>
                             </ng-container>
 
-                            <ng-container matColumnDef="name">
+                            <!-- createdAt -->
+                            <ng-container matColumnDef="createdAt">
                                 <th mat-header-cell *matHeaderCellDef
+                                    class="w3-center w3-padding w3-border-right" style="text-align: center; padding-right: 8px; padding-left: 8px">
+                                    Fecha de Creación</th>
+                                <td mat-cell *matCellDef="let element">{{formatDate(element.createdAt) | date:'dd/MM/yyyy'}}</td>
+                            </ng-container>
+
+                            <!-- name -->
+                            <ng-container matColumnDef="name" sticky>
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
                                     class="w3-center w3-padding w3-border-right">
-                                    Insumo</th>
+                                    Nombre</th>
                                 <td mat-cell *matCellDef="let element">{{element.name}}</td>
                             </ng-container>
 
-                            <ng-container matColumnDef="unit">
-                                <th mat-header-cell *matHeaderCellDef
+                            <!-- recipesRecipe -->
+                            <ng-container matColumnDef="recipesRecipe">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
                                     class="w3-center w3-padding w3-border-right">
-                                    Medida</th>
-                                <td mat-cell *matCellDef="let element">{{element.unit}}</td>
+                                    Productos </th>
+                                <td mat-cell *matCellDef="let element" style="text-align: left">
+                                    <ul>
+                                        <li *ngFor="let recipe of element.recipes">
+                                            {{recipe.recipe.name |titlecase}}
+                                        </li>
+                                    </ul>
+                                </td>
                             </ng-container>
 
-                            <ng-container matColumnDef="quantity">
-                                <th mat-header-cell *matHeaderCellDef
+                            <!-- state -->
+                            <ng-container matColumnDef="state">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
                                     class="w3-center w3-padding w3-border-right">
-                                    Cantidad por racion </th>
-                                <td mat-cell *matCellDef="let element">{{element.quantity}}</td>
+                                    Estado</th>
+                                <td mat-cell *matCellDef="let element">{{element.state}}</td>
+                            </ng-container>
+
+                            <!-- dateRange -->
+                            <ng-container matColumnDef="dateRange">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
+                                    class="w3-center w3-padding w3-border-right">
+                                    Rango de Fechas</th>
+                                <td mat-cell *matCellDef="let element">
+                                    {{element.validityPeriod == 'Definido' ? (formatDate(element.dateRange.begin)| date:'dd/MM/yyyy'): null }}
+                                    {{element.validityPeriod == 'Definido' ? '-': 'Indefinido'}}
+                                    {{element.validityPeriod == 'Definido' ? (formatDate(element.dateRange.end)| date:'dd/MM/yyyy'): null}}</td>
+                            </ng-container>
+
+                            <!-- realPrice -->
+                            <ng-container matColumnDef="realPrice">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
+                                    class="w3-center w3-padding w3-border-right">
+                                    Precio de Venta</th>
+                                <td mat-cell *matCellDef="let element">S/.{{element.realPrice.toFixed(2)}}</td>
+                            </ng-container>
+
+                            <!-- promoPrice -->
+                            <ng-container matColumnDef="promoPrice">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
+                                    class="w3-center w3-padding w3-border-right">
+                                    Precio Promocional </th>
+                                <td mat-cell *matCellDef="let element">S/.{{element.promoPrice.toFixed(2)}}</td>
+                            </ng-container>
+
+                            <!-- disccount -->
+                            <ng-container matColumnDef="disccount">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
+                                    class="w3-center w3-padding w3-border-right">
+                                    % DCTO</th>
+                                <td mat-cell *matCellDef="let element">
+                                    {{((element.realPrice-element.promoPrice)/element.realPrice*100.0).toFixed()}}%</td>
+                            </ng-container>
+
+                            <!-- units -->
+                            <ng-container matColumnDef="units">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
+                                    class="w3-center w3-padding w3-border-right">
+                                    Unidades Disponibles</th>
+                                <td mat-cell *matCellDef="let element">
+                                    {{element.quantity == 'Definido' ? element.units: 'ilimitado'}}</td>
+                            </ng-container>
+
+                            <!-- soldUnits -->
+                            <ng-container matColumnDef="soldUnits">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
+                                    class="w3-center w3-padding w3-border-right">
+                                    Unidades Vendidas</th>
+                                <td mat-cell *matCellDef="let element">{{element.soldUnits}}</td>
+                            </ng-container>
+
+                            <!-- createdBy -->
+                            <ng-container matColumnDef="createdBy">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center; padding-right: 8px; padding-left: 8px"
+                                    class="w3-center w3-padding w3-border-right">
+                                    Creado por: </th>
+                                <td mat-cell *matCellDef="let element">{{element.createdBy.displayName}}</td>
+                            </ng-container>
+
+                            <!-- actions -->
+                            <ng-container matColumnDef="actions" stickyEnd>
+                                <th mat-header-cell *matHeaderCellDef style="width: 100px; padding-left: 8px"
+                                    class="w3-center w3-padding w3-border-right">
+                                    Acciones</th>
+                                <td mat-cell *matCellDef="let element; let i=index">
+                                    <button mat-button [matMenuTriggerFor]="menu">
+                                        <mat-icon>more_vert</mat-icon>
+                                    </button>
+                                    <mat-menu #menu="matMenu">
+                                        <button mat-menu-item *ngIf="element.state == 'Inactivo'" (click)="changeOfferState(element, 'Activar')">Activar</button>
+                                        <button mat-menu-item *ngIf="element.state == 'Publicado'" (click)="changeOfferState(element, 'Inactivar')">Inactivar</button>
+                                    </mat-menu>
+                                </td>
                             </ng-container>
 
                 
-                        <tr mat-header-row *matHeaderRowDef="inputTableDisplayedColumns" style="text-align-last: center;"></tr>
-                        <tr mat-row *matRowDef="let row; columns: inputTableDisplayedColumns;"></tr>
+                        <tr mat-header-row *matHeaderRowDef="promosTableDisplayedColumns" style="text-align-last: center;"></tr>
+                        <tr mat-row *matRowDef="let row; columns: promosTableDisplayedColumns;"></tr>
                 
                 
                         </table>
                     </div>
 
-                    <mat-paginator #recipeTablePaginator [pageSizeOptions]="[5,10,25]" 
+                    <mat-paginator #promoTablePaginator [pageSizeOptions]="[5,10,25]" 
                         fixed class="mat-elevation-z8" style="border-radius: 0 0 20px 20px;">
                     </mat-paginator>
                         
 
-                </div> -->
+                </div>
 
             </div>
 

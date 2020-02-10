@@ -1,5 +1,7 @@
 import { User } from '../../general/user.model';
-import { Recipe } from '../../kitchen/recipe.model';
+import { Dessert } from '../../warehouse/desserts.model';
+import { Meal } from './meal.model';
+import { Grocery } from '../../warehouse/grocery.model';
 
 export interface Promo {
   id?: string;
@@ -14,8 +16,8 @@ export interface Promo {
     begin: Date,
     end: Date
   }
-  recipes: {
-    recipe: Recipe,
+  products: {
+    product: Grocery | Meal | Dessert,
     quantity: number
   }[];
   createdAt?: Date;

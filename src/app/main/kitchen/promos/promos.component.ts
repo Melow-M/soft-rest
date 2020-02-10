@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { DatabaseService } from 'src/app/core/database.service';
+import { CreateNewPromoDialogComponent } from './create-new-promo-dialog/create-new-promo-dialog.component';
 
 @Component({
   selector: 'app-promos',
@@ -7,9 +10,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PromosComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private dialog: MatDialog,
+    private dbs: DatabaseService
+  ) { }
 
   ngOnInit() {
+  }
+
+  onCreateNewPromo(){
+    this.dialog.open(CreateNewPromoDialogComponent, {
+      width: '550px',
+    })
   }
 
 }

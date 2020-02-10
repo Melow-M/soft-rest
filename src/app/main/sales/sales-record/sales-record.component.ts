@@ -99,7 +99,7 @@ export class SalesRecordComponent implements OnInit {
         map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase()))
     ).pipe(
       map(([users, name]) => {
-        return name ? users.filter(option => option['displayName'].toLowerCase().includes(name)) : users;
+        return name ? users.filter(option => option['displayName'].toLowerCase().includes(name.toLowerCase())) : users;
       })
     );
 
@@ -144,10 +144,10 @@ export class SalesRecordComponent implements OnInit {
         this.datePipe.transform(element['createdAt'].toMillis(), 'dd/MM/yyyy'),
         this.datePipe.transform(element['createdAt'].toMillis(), 'hh:mm'),
         element['documentType'],
-        element['documentSerial']+'-'+ element['documentCorrelative'],
+        element['documentSerial'] + '-' + element['documentCorrelative'],
         element['customerId'] ? element['customerName'] : 'Sin nombre',
         element['total'],
-        element['orderList'].map(el=>el['name']).join('-'),
+        element['orderList'].map(el => el['name']).join('-'),
         element['createdBy']['displayName']
       ];
       table_xlsx.push(temp);

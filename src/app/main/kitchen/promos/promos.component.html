@@ -78,8 +78,8 @@
                                     Productos </th>
                                 <td mat-cell *matCellDef="let element" style="text-align: left">
                                     <ul>
-                                        <li *ngFor="let recipe of element.recipes">
-                                            {{recipe.recipe.name |titlecase}}
+                                        <li *ngFor="let product of element.products">
+                                            {{product.product.name |titlecase}}
                                         </li>
                                     </ul>
                                 </td>

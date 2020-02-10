@@ -11,6 +11,7 @@ import { map, startWith, tap, debounceTime, distinctUntilChanged, take, switchMa
 import { MatTableDataSource, MatPaginator, MatSnackBar } from '@angular/material';
 import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 import { Promo } from 'src/app/core/models/sales/menu/promo.model';
+import { Meal } from 'src/app/core/models/sales/menu/meal.model';
 
 @Component({
   selector: 'app-create-new-promo-dialog',
@@ -28,7 +29,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
   
   //Variables
   productCategory: Array<string> = [
-    'Platos', 'Piqueo', 'Extras', 'Bebidas'
+    'Platos', 'Postres', 'Otros'
   ]
 
   quantity: Array<string> = [
@@ -44,7 +45,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
   promoForm: FormGroup;
   itemForm: FormGroup;
 
-  recipeList$: Observable<Recipe[]>;
+  productList$: Observable<Array<Grocery | Meal | Dessert>>;
 
   constructor(
     private fb: FormBuilder,
@@ -59,7 +60,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
     //         startWith(''));
     this.inputTableDataSource.data = [];
 
-    this.recipeList$ = this.itemForm.get('recipe').valueChanges.pipe(
+    this.productList$ = this.itemForm.get('product').valueChanges.pipe(
       //First tap to initialize table data
       /*tap((productName: Recipe | string)=>{
         if(typeof productName=='string'){
@@ -71,11 +72,11 @@ export class CreateNewPromoDialogComponent implements OnInit {
       }),*/
       //switchMap to get filtered data of options available
       switchMap((productName)=> {
-        return this.dbs.onGetRecipesType(this.itemForm.get('productCategory').value).pipe(
+        return this.dbs.onGetProductType(this.itemForm.get('productCategory').value).pipe(
           debounceTime(100), 
-          map((recipesList: Recipe[])=> {
-            console.log(recipesList);
-            return this.filterRecipe(recipesList, this.itemForm.get('recipe').value)
+          map((productList)=> {
+            console.log(productList);
+            return this.filterRecipe(productList, this.itemForm.get('product').value)
           }))
       }));
     
@@ -91,7 +92,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
       quantity: [null, Validators.required],
       units: [ {value: null, disabled: true}, Validators.required],
       promoPrice: [null, Validators.required],
-      realPrice: [null, Validators.required],
+      realPrice: [{value: null, disabled: true}, Validators.required],
       percentageDiscount: [{value: null, disabled: true}, Validators.required],
       validityPeriod: [null, Validators.required],
       dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
@@ -101,7 +102,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
 
     this.itemForm = this.fb.group({
       productCategory: [null, Validators.required],
-      recipe: [null, Validators.required],
+      product: [null, Validators.required],
       quantity: [null, Validators.required]
     })
 
@@ -123,6 +124,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
     table.push({...this.itemForm.value, index: this.inputTableDataSource.data.length});
     this.inputTableDataSource.data = table;
     this.inputTableDataSource.paginator = this.inputTablePaginator;
+    this.itemForm.get('product').setValue(''); this.itemForm.get('quantity').setValue('')
   }
 
   onDeleteItem(item){
@@ -134,12 +136,22 @@ export class CreateNewPromoDialogComponent implements OnInit {
     console.log(item);
   }
 
+  getTotal(){
+    if(this.inputTableDataSource.data.length){
+      return this.inputTableDataSource.data.reduce((acc, curr)=> {
+        return <number>acc + <number>(curr['product']['price']*curr['quantity'])
+      }, 0);
+
+    }
+    return 0
+  }
+
   onUploadOffer(){
-    let aux: {recipe: Recipe, quantity: number}[] = [];
+    let aux: {product: Grocery | Meal | Dessert, quantity: number}[] = [];
     this.inputTableDataSource.data.forEach(el => {
       aux.push({
         quantity: el['quantity'],
-        recipe: el['recipe']
+        product: el['product']
       })
     });
     
@@ -149,10 +161,10 @@ export class CreateNewPromoDialogComponent implements OnInit {
       quantity: <string>this.promoForm.get('quantity').value, //Indefinido, Definido
       units: this.promoForm.get('quantity').value == 'Definido' ? <number>this.promoForm.get('units').value: null,
       promoPrice: <number>this.promoForm.get('promoPrice').value,
-      realPrice: <number>this.promoForm.get('realPrice').value,
+      realPrice: <number>this.getTotal(),
       validityPeriod: <string>this.promoForm.get('validityPeriod').value, //Indefinido, Definido
       dateRange: this.promoForm.get('validityPeriod').value == 'Definido' ? <{begin: Date, end: Date}>this.promoForm.get('dateRange').value: null,
-      recipes: aux,
+      products: aux,
       state: 'Publicado',
       soldUnits: 0
     }
@@ -179,7 +191,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
     else return value;
   }
 
-  filterRecipe(recipeList: Recipe[], recipeName: Recipe | string){
+  filterRecipe(recipeList: Array<Grocery | Meal | Dessert>, recipeName: Grocery | Meal | Dessert | string){
     if(typeof recipeName != 'string'){
       return recipeList.filter(recipe => recipe.name.toUpperCase().includes(recipeName.name.toUpperCase()))
     }

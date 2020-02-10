@@ -447,6 +447,7 @@ export class DatabaseService {
     console.log(category);
     return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.where('category', '==', category)).valueChanges()
   }
+  
 
   onUploadRecipe(recipe: Recipe): Observable<firebase.firestore.WriteBatch>{
     let recipeRef = this.af.firestore.collection(`/db/deliciasTete/kitchenRecipes`).doc();
@@ -737,6 +738,22 @@ export class DatabaseService {
   
     doc.autoPrint({variant: 'non-conform'});
     doc.save(`TICKET-${ticketNumber}.pdf`);
+  }
+
+  //Offer
+
+  onGetProductType(type: string): Observable<Array<Grocery | Meal | Dessert>>{
+    switch(type){
+      case 'Otros':
+        return this.af.collection<Grocery>(`/db/deliciasTete/warehouseGrocery`).valueChanges();
+        break;
+      case 'Postres':
+        return this.af.collection<Meal>(`/db/deliciasTete/warehouseDesserts`).valueChanges();
+        break;
+      case 'Platos':
+        return this.af.collection<Dessert>(`/db/deliciasTete/kitchenDishes`).valueChanges();
+        break;
+    }
   }
 
   onCreateOffer(promo: Promo): Observable<firebase.firestore.WriteBatch>{

@@ -1,5 +1,4 @@
 import { map, tap } from 'rxjs/operators';
-import { CashOpening } from './../../../../core/models/sales/cash/cashOpening.model';
 import { Observable, combineLatest } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Component, OnInit, Inject } from '@angular/core';
@@ -26,65 +25,62 @@ export class TotalsComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data
   ) { }
 
-  getTotal(array) {
-    return array.map(t => t.amount).reduce((acc, value) => acc + value, 0);
-  }
-
   ngOnInit() {
 
     this.openingCash$ =
       combineLatest(
         this.dbs.getOpenCash(this.data['id']),
-        this.dbs.getOrders()
+        this.dbs.getTransactions(this.data['id'], this.data['currentOpeningId'])
       ).pipe(
-        map(([cashes, orders]) => {
+        map(([cashes, transaction]) => {
           let cash = cashes.filter(el => el['id'] == this.data['currentOpeningId'])[0]
-          let ordersPay = orders.filter(el => (el['openingId'] == this.data['currentOpeningId']) && (el['orderStatus'] == 'PAGADO'))
-          let efectivo = ordersPay.filter(el => el.paymentType == 'EFECTIVO').map(el => el['total'])
-          let visa = ordersPay.filter(el => el.paymentType == 'VISA').map(el => el['total'])
-          let mastercard = ordersPay.filter(el => el.paymentType == 'MASTERCARD').map(el => el['total'])
-
+          let income = transaction.filter(el => el['type'] == 'Ingreso').filter(el => el['status'] == "PAGADO")
+          let expence = transaction.filter(el => el['type'] == 'Egreso').filter(el => el['status'] == "PAGADO")
           this.expenses = [
             {
               item: 'Transferencia',
-              amount: cash['totalDeparturesByPaymentType']['TRANSFERENCIA']
+              amount: expence.filter(el => el['paymentType'] == 'TRANSFERENCIA').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
             },
             {
               item: 'Egresos',
-              amount: cash['totalDeparturesByPaymentType']['EFECTIVO']
+              amount: expence.filter(el => el['paymentType'] == 'EFECTIVO').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
             }
           ]
           this.income = [
             {
-              item: 'Ventas',
-              amount: 100
-            },
-            {
               item: 'Ingreso efectivo',
-              amount: efectivo.length ? efectivo.reduce((a, b) => a + b, 0) : 0
+              amount: income.filter(el => el['paymentType'] == 'EFECTIVO').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
             },
             {
               item: 'Tarjeta Visa',
-              amount: visa.length ? visa.reduce((a, b) => a + b, 0) : 0
+              amount: income.filter(el => el['paymentType'] == 'VISA').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
             },
             {
               item: 'Tarjeta Mastercard',
-              amount: mastercard ? mastercard.reduce((a, b) => a + b, 0) : 0
+              amount: income.filter(el => el['paymentType'] == 'MASTERCARD').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
             }
 
           ]
           this.cash = [
             {
               item: 'Importe Inicial',
-              amount: cash['openingBalance']
+              amount: cash['openingBalance'],
+              value: 1
             },
             {
               item: 'Total ingresos',
-              amount: cash['totalAmount']
+              amount: income.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: 1
             },
             {
               item: 'Egresos',
-              amount: cash['totalDepartures']
+              amount: expence.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+              value: -1
             }
 
           ]
@@ -93,5 +89,11 @@ export class TotalsComponent implements OnInit {
       )
 
   }
+
+  getTotal(array) {
+    return array.map(t => t.amount * t.value).reduce((acc, value) => acc + value, 0);
+  }
+
+  
 
 }

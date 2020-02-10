@@ -8,7 +8,7 @@
         <form *ngIf="!confirm" [formGroup]="addForm">
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Importe ingresado</mat-label>
-                <input matInput type="text" placeholder="Importe ingresado S/." autocomplete="off"
+                <input matInput type="number" placeholder="Importe ingresado S/." autocomplete="off"
                     formControlName="income">
                 <mat-hint>
                     Requerido*
@@ -60,9 +60,11 @@
             </mat-form-field>
         </form>
         <div *ngIf="confirm">
-            <p>¿Estás seguro de agregar el importe: S/. {{addForm.get('income').value}}?</p>
-            <p>Decripción: ****************</p>
+            <p *ngIf="this.data['edit']">¿Estás seguro de editar el importe: S/. {{addForm.get('income').value}}?</p>
+            <p *ngIf="!this.data['edit']">¿Estás seguro de agregar el importe: S/. {{addForm.get('income').value}}?</p>
+            <p>Decripción: {{addForm.get('description').value}}</p>
         </div>
+        
     </mat-dialog-content>
     <mat-dialog-actions style="margin-bottom: -16px;" align="end">
         <button mat-stroked-button class="w3-margin-right" mat-dialog-close
@@ -70,8 +72,10 @@
         <button *ngIf="!confirm" mat-stroked-button class="w3-margin-right" (click)="confirm = true"
             style="background: #EE8434; color: white; font-family: Raleway;"
             [disabled]="!addForm.valid">Aceptar</button>
-        <button *ngIf="confirm" mat-stroked-button class="w3-margin-right" mat-dialog-close
+        <button *ngIf="confirm && !this.data.edit" mat-stroked-button class="w3-margin-right" mat-dialog-close
             style="background: #EE8434; color: white; font-family: Raleway;" (click)="save()">Sí, agregar</button>
+            <button *ngIf="confirm && this.data.edit" mat-stroked-button class="w3-margin-right" mat-dialog-close
+            style="background: #EE8434; color: white; font-family: Raleway;" (click)="edit()">Sí, editar</button>
 
     </mat-dialog-actions>
 </div>

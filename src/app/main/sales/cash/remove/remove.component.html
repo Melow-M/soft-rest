@@ -8,7 +8,7 @@
         <form *ngIf="!confirm" [formGroup]="removeForm">
             <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                 <mat-label>Importe retirado</mat-label>
-                <input matInput type="text" placeholder="Importe retirado S/." autocomplete="off"
+                <input matInput type="number" placeholder="Importe retirado S/." autocomplete="off"
                     formControlName="expenses">
                 <mat-hint>
                     Requerido*
@@ -60,17 +60,21 @@
             </mat-form-field>
         </form>
         <div *ngIf="confirm">
-            <p>¿Estás seguro de retirar el importe: S/. {{removeForm.get('expenses').value}}?</p>
-            <p>Decripción: ****************</p>
+            <p *ngIf="data['edit']">¿Estás seguro de editar el importe: S/. {{removeForm.get('expenses').value}}?</p>
+            <p *ngIf="!data['edit']">¿Estás seguro de retirar el importe: S/. {{removeForm.get('expenses').value}}?</p>
+            <p>Decripción:{{removeForm.get('description').value}}</p>
         </div>
     </mat-dialog-content>
     <mat-dialog-actions style="margin-bottom: -16px;" align="end">
         <button mat-stroked-button class="w3-margin-right" mat-dialog-close
             style="background: #B70705; color: white; font-family: Raleway;">Cancelar</button>
         <button *ngIf="!confirm" mat-stroked-button class="w3-margin-right" (click)="confirm = true"
-            style="background: #EE8434; color: white; font-family: Raleway;" [disabled]="">Aceptar</button>
-        <button *ngIf="confirm" mat-stroked-button class="w3-margin-right"
+            style="background: #EE8434; color: white; font-family: Raleway;"
+            [disabled]="!removeForm.valid">Aceptar</button>
+        <button *ngIf="confirm && !data.edit" mat-stroked-button class="w3-margin-right" mat-dialog-close
             style="background: #EE8434; color: white; font-family: Raleway;" (click)="save()">Sí, retirar</button>
+        <button *ngIf="confirm && data.edit" mat-stroked-button class="w3-margin-right" mat-dialog-close
+            style="background: #EE8434; color: white; font-family: Raleway;" (click)="edit()">Sí, editar</button>
 
     </mat-dialog-actions>
 </div>

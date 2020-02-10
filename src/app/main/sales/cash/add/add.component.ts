@@ -38,13 +38,24 @@ export class AddComponent implements OnInit {
   }
 
   createForm() {
-    this.addForm = this.fb.group({
-      income: ['', Validators.required],
-      typeIncome: ['', Validators.required],
-      typePayment: ['', Validators.required],
-      description: [''],
-      user: ['', Validators.required]
-    })
+    if(this.data['edit']){
+      this.addForm = this.fb.group({
+        income: [this.data['transaction']['amount'], Validators.required],
+        typeIncome: [this.data['transaction']['ticketType'], Validators.required],
+        typePayment: [this.data['transaction']['paymentType'], Validators.required],
+        description: [this.data['transaction']['description']],
+        user: [this.data['transaction']['createdBy'], Validators.required]
+      })
+    }else{
+      this.addForm = this.fb.group({
+        income: ['', Validators.required],
+        typeIncome: ['', Validators.required],
+        typePayment: ['', Validators.required],
+        description: [''],
+        user: ['', Validators.required]
+      })
+    }
+    
   }
 
   save() {
@@ -77,7 +88,32 @@ export class AddComponent implements OnInit {
           this.dialog.close()
         })
       })
-
   }
 
+  edit(){
+    let batch = this.af.firestore.batch();
+    let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/${this.data['cash']['id']}/openings/${this.data['cash']['currentOpeningId']}/transactions`).doc(this.data['transaction']['id']);
+    let inputData;
+
+
+    this.auth.user$.pipe(
+      take(1))
+      .subscribe(user => {
+        inputData = {
+          description: this.addForm.get('description').value,
+          amount: this.addForm.get('income').value,
+          ticketType: this.addForm.get('typeIncome').value,
+          paymentType: this.addForm.get('typePayment').value,
+          editedBy: user,
+          editedAt: new Date()
+        }
+
+        batch.update(inputRef, inputData);
+
+        batch.commit().then(() => {
+          console.log('transaction editada');
+          this.dialog.close()
+        })
+      })
+  }
 }

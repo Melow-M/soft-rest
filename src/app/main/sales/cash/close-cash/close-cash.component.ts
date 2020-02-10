@@ -1,6 +1,6 @@
 import { FormGroup, Validators, FormBuilder, AsyncValidatorFn, AbstractControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
-import { take, debounceTime, map } from 'rxjs/operators';
+import { take, debounceTime, map, filter } from 'rxjs/operators';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { AuthService } from './../../../../core/auth.service';
 import { DatabaseService } from './../../../../core/database.service';
@@ -66,6 +66,10 @@ export class CloseCashComponent implements OnInit {
 
   closingForm: FormGroup
 
+  cash = null
+  balance: number = 0
+  transactions = null
+
   displayedColumns: string[] = ['name', 'quantity', 'total'];
   dataSource = new MatTableDataSource();
 
@@ -81,6 +85,10 @@ export class CloseCashComponent implements OnInit {
   ngOnInit() {
     this.createForm()
     this.dataSource.data = this.bills
+    this.cash = this.data['cash']
+    this.balance = this.data['openCash']['openingBalance']
+    this.transactions = this.data['transactions']
+
   }
 
   createForm() {
@@ -96,16 +104,18 @@ export class CloseCashComponent implements OnInit {
         debounceTime(500),
         take(1),
         map(pass => {
-          return pass !== this.data.password ? { passValid: true } : null
+          return pass !== this.cash.password ? { passValid: true } : null
         })
       );
     }
   }
   close() {
     let batch = this.af.firestore.batch();
-    let cashRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/`).doc(this.data['id']);
-    let openingRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/${this.data['id']}/openings`).doc(this.data['currentOpeningId']);
+    let cashRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/`).doc(this.cash['id']);
+    let openingRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/${this.cash['id']}/openings`).doc(this.cash['currentOpeningId']);
 
+    let income = this.transactions.filter(el => el['type'] == 'Ingreso').filter(el => el['status'] == "PAGADO")
+    let expence = this.transactions.filter(el => el['type'] == 'Egreso').filter(el => el['status'] == "PAGADO")
 
     this.auth.user$.pipe(
       take(1))
@@ -113,7 +123,23 @@ export class CloseCashComponent implements OnInit {
         const openUpdate = {
           closedAt: new Date(),
           closedBy: user,
-          closureBalance: this.closingForm.get('amount').value
+          closureBalance: this.balance + income.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0) - expence.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+          totalAmount: this.balance + income.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0) - expence.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+          amountAdded: 0,
+          amountWithdrawn: this.closingForm.get('amount').value,
+          cashCount: 0,
+          totalIncomes: income.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+          totalTickets: this.transactions.filter(el => el['description'].split(' ')[0] == 'Venta').length,
+          totalDepartures: expence.map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+          totalTicketsByPaymentType: {
+            VISA: income.filter(el => el['paymentType'] == 'VISA').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+            MASTERCARD: income.filter(el => el['paymentType'] == 'MASTERCARD').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+            EFECTIVO: income.filter(el => el['paymentType'] == 'EFECTIVO').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+          },
+          totalDeparturesByPaymentType: {
+            TRANSFERENCIA: expence.filter(el => el['paymentType'] == 'TRANSFERENCIA').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+            EFECTIVO: expence.filter(el => el['paymentType'] == 'EFECTIVO').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0),
+          }
         }
 
         const inputUpdate = {

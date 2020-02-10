@@ -37,13 +37,23 @@ export class RemoveComponent implements OnInit {
   }
 
   createForm() {
-    this.removeForm = this.fb.group({
-      expenses: ['', Validators.required],
-      typeExpenses: ['', Validators.required],
-      typePayment: ['', Validators.required],
-      description: [''],
-      user: ['', Validators.required]
-    })
+    if(this.data['edit']){
+      this.removeForm = this.fb.group({
+        expenses: [this.data['transaction']['amount'], Validators.required],
+        typeExpenses: [this.data['transaction']['ticketType'], Validators.required],
+        typePayment: [this.data['transaction']['paymentType'], Validators.required],
+        description: [this.data['transaction']['description']],
+        user: [this.data['transaction']['createdBy'], Validators.required]
+      })
+    }else{
+      this.removeForm = this.fb.group({
+        expenses: ['', Validators.required],
+        typeExpenses: ['', Validators.required],
+        typePayment: ['', Validators.required],
+        description: [''],
+        user: ['', Validators.required]
+      })
+    }
   }
 
   save() {
@@ -77,5 +87,32 @@ export class RemoveComponent implements OnInit {
         })
       })
 
+  }
+
+  edit(){
+    let batch = this.af.firestore.batch();
+    let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/${this.data['cash']['id']}/openings/${this.data['cash']['currentOpeningId']}/transactions`).doc(this.data['transaction']['id']);
+    let inputData;
+
+
+    this.auth.user$.pipe(
+      take(1))
+      .subscribe(user => {
+        inputData = {
+          description: this.removeForm.get('description').value,
+          amount: this.removeForm.get('expenses').value,
+          ticketType: this.removeForm.get('typeExpenses').value,
+          paymentType: this.removeForm.get('typePayment').value,
+          editedBy: user,
+          editedAt: new Date()
+        }
+
+        batch.update(inputRef, inputData);
+
+        batch.commit().then(() => {
+          console.log('transaction editada');
+          this.dialog.close()
+        })
+      })
   }
 }

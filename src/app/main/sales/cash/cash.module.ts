@@ -61,7 +61,8 @@ import { DeleteTransactionComponent } from './delete-transaction/delete-transact
     RecordComponent,
     AddComponent,
     RemoveComponent,
-    TotalsComponent
+    TotalsComponent,
+    DeleteTransactionComponent  
   ]
 })
 export class CashModule { }

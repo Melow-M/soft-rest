@@ -1,3 +1,4 @@
+import { DeleteTransactionComponent } from './delete-transaction/delete-transaction.component';
 import { AuthService } from './../../../core/auth.service';
 import { Cash } from './../../../core/models/sales/cash/cash.model';
 import { DatabaseService } from './../../../core/database.service';
@@ -13,6 +14,8 @@ import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
 import { map, tap, startWith, take, distinctUntilChanged, debounceTime, filter, switchMap } from 'rxjs/operators';
 import { Observable, combineLatest, of } from 'rxjs';
 import { Transaction } from 'src/app/core/models/sales/cash/transaction.model';
+import { DatePipe } from '@angular/common';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-cash',
@@ -30,7 +33,13 @@ export class CashComponent implements OnInit {
   transactions$: Observable<any>
 
   currentCash: Cash = null
+  currentOpening: any
+  transactions = null
+
   balance: number = 0
+  balance$: Observable<number>
+
+  search = new FormControl('')
 
   displayedColumns: string[] = ['index', 'date', 'type', 'description', 'amount', 'user', 'payment', 'actions'];
   dataSource = new MatTableDataSource();
@@ -39,11 +48,24 @@ export class CashComponent implements OnInit {
     this.dataSource.paginator = paginator;
   }
 
+  data_xls: any
+  headersXlsx: string[] = [
+    'Fecha',
+    'Hora',
+    'Tipo',
+    'Descripción',
+    'Importe',
+    'Usuario',
+    'Tipo de pago'
+  ]
+
+
   constructor(
     private dialog: MatDialog,
     public dbs: DatabaseService,
     private fb: FormBuilder,
-    public auth: AuthService
+    public auth: AuthService,
+    public datePipe: DatePipe
   ) { }
 
   ngOnInit() {
@@ -61,17 +83,52 @@ export class CashComponent implements OnInit {
       })
     )
 
+    this.balance$ = this.dbs.getCashes().pipe(
+      switchMap(cashes => {
+        let cash = cashes.filter(el => el['open'])[0]
+        return this.dbs.getOpenCash(cash['id']).pipe(
+          map(opens => {
+            return opens.filter(el => el['id'] == cash['currentOpeningId'])
+          })
+        )
+      }),
+      map(cash => {
+        let openCash = cash[0]
+        this.currentOpening = cash[0]
+        return openCash['openingBalance']
+      })
+    )
+
     this.transactions$ = this.dbs.getCashes().pipe(
       switchMap(cashes => {
         let cash = cashes.filter(el => el['open'])[0]
-        return this.dbs.getTransactions(cash.id, cash.currentOpeningId)
+        return combineLatest(
+          this.dbs.getTransactions(cash.id, cash.currentOpeningId),
+          this.search.valueChanges.pipe(
+            startWith('')
+          )
+        ).pipe(
+          map(([cashes, search]) => {
+            this.transactions = cashes
+            let income = cashes.filter(el => el['status'] == 'PAGADO').filter(el => el['type'] == 'Ingreso').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0)
+            let expenses = cashes.filter(el => el['status'] == 'PAGADO').filter(el => el['type'] == 'Egreso').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0)
+
+            this.balance = income - expenses
+            return cashes.filter(el => {
+              if (search) {
+                let type = el['type'].toLowerCase().includes(search.toLowerCase())
+                let descrip = el['description'].toLowerCase().includes(search.toLowerCase())
+                return type || descrip
+              } else {
+                return true
+              }
+            })
+          })
+        )
       }),
       tap(res => {
-        let income = res.filter(el => el['type'] == 'Ingreso').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0)
-        let expenses = res.filter(el => el['type'] == 'Egreso').map(el => Number(el['amount'])).reduce((a, b) => a + b, 0)
-
-        this.balance = income - expenses
-        this.dataSource.data = res
+        this.dataSource.data = res.filter(el => el['status'] == 'PAGADO')
+        this.data_xls = res.filter(el => el['status'] == 'PAGADO')
       })
     )
 
@@ -110,7 +167,11 @@ export class CashComponent implements OnInit {
 
   closeCash() {
     this.dialog.open(CloseCashComponent, {
-      data: this.currentCash
+      data: {
+        cash: this.currentCash,
+        openCash: this.currentOpening,
+        transactions: this.transactions
+      }
     })
   }
 
@@ -137,5 +198,62 @@ export class CashComponent implements OnInit {
       data: this.currentCash
     })
   }
+
+  deleteTransaction(transaction) {
+    this.dialog.open(DeleteTransactionComponent, {
+      data: {
+        cash: this.currentCash,
+        transaction: transaction
+      }
+    })
+  }
+
+  editTransaction(transaction) {
+    if (transaction['type'] == 'Ingreso') {
+      this.dialog.open(AddComponent, {
+        data: {
+          cash: this.currentCash,
+          edit: true,
+          transaction: transaction
+        }
+      })
+    } else {
+      this.dialog.open(RemoveComponent, {
+        data: {
+          cash: this.currentCash,
+          edit: true,
+          transaction: transaction
+        }
+      })
+    }
+  }
+
+  downloadXls(): void {
+    let table_xlsx: any[] = [];
+
+    table_xlsx.push(this.headersXlsx);
+
+    this.data_xls.forEach(element => {
+      const temp = [
+        this.datePipe.transform(element['createdAt'].toMillis(), 'yyyy/MM/dd'),
+        this.datePipe.transform(element['createdAt'].toMillis(), 'hh:mm'),
+        element['type'],
+        element['description'],
+        element['amount'],
+        element['createdBy']['displayName'],
+        element['paymentType'],
+      ];
+      table_xlsx.push(temp);
+    })
+
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Movimientos de caja');
+
+    const name = 'Transacciones.xlsx'
+    XLSX.writeFile(wb, name);
+  }
+
 
 }

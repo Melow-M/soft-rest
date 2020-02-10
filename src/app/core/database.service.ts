@@ -23,6 +23,7 @@ import { Kardex } from './models/warehouse/kardex.model';
 import { Recipe } from './models/kitchen/recipe.model';
 import * as jsPDF from 'jspdf';
 import { Promo } from './models/sales/menu/promo.model';
+import { Combo } from './models/sales/menu/combo.model';
 
 @Injectable({
   providedIn: 'root'
@@ -799,6 +800,43 @@ export class DatabaseService {
   }
 
   onGetCombo(): Observable<Combo[]>{
+    return this.af.collection<Combo>(`/db/deliciasTete/combos`).valueChanges();
+  }
 
+  onCreateCombo(combo: Combo): Observable<firebase.firestore.WriteBatch>{
+    let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc();
+    let comboData: Combo = combo;
+    let date= new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        comboData.createdAt = date;
+        comboData.createdBy = user;
+        comboData.id = comboRef.id;
+        comboData.editedAt = null;
+        comboData.editedBy = null;
+
+        batch.set(comboRef, comboData);
+
+        return batch;
+      }))
+  }
+  changeComboState(combo: Combo, newState: string): Observable<firebase.firestore.WriteBatch>{
+    let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc(combo.id);
+    let comboData: Combo = combo;
+    let date= new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        comboData.editedAt = date;
+        comboData.editedBy = user;
+        comboData.state = newState == 'Activar' ? 'Publicado':'Inactivo';
+
+        batch.update(comboRef, comboData);
+
+        return batch;
+      }))
   }
 }

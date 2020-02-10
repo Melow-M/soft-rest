@@ -14,7 +14,8 @@
 
             <form [formGroup] = "searchForm" (ngSubmit)="onSearchProduct()">
 
-                <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; flex-wrap: wrap ;">
+                <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; flex-wrap: wrap ;
+                    margin-right:0.2em;margin-left:1.5em">
                     <mat-form-field appearance="outline">
                         <mat-label>Categoría de Producto</mat-label>
                         <mat-select placeholder="Categoría de Producto" formControlName="productCategory" (selectionChange)="this.searchForm.get('productName').setValue('')">
@@ -73,34 +74,38 @@
                           
                     <div style="height: auto; width: 100%; overflow: auto; border-radius: 20px 20px 0 0" class="mat-elevation-z8">
                         <table mat-table [dataSource]="inputTableDataSource" 
-                            style="width: 100%; text-align: center !important; width: 100%;">
+                            style="width: 100%; text-align: center !important; width: 100%; font-family: Raleway;">
 
                             <ng-container matColumnDef="index">
-                                <th mat-header-cell *matHeaderCellDef
+                                <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
                                     class="w3-center w3-padding w3-border-right">
                                     N°</th>
-                                <td mat-cell *matCellDef="let element; let i=index">{{i+1}}</td>
+                                <td mat-cell *matCellDef="let element; let i=index" style="color:#2b2b2b;">{{i+1}}</td>
                             </ng-container>
 
                             <ng-container matColumnDef="name">
-                                <th mat-header-cell *matHeaderCellDef
+                                <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
                                     class="w3-center w3-padding w3-border-right">
                                     Insumo</th>
-                                <td mat-cell *matCellDef="let element">{{element.name}}</td>
+                                <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">{{element.name}}</td>
                             </ng-container>
 
                             <ng-container matColumnDef="unit">
-                                <th mat-header-cell *matHeaderCellDef
+                                <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
                                     class="w3-center w3-padding w3-border-right">
                                     Medida</th>
-                                <td mat-cell *matCellDef="let element">{{element.unit}}</td>
+                                <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">{{element.unit}}</td>
                             </ng-container>
 
                             <ng-container matColumnDef="quantity">
-                                <th mat-header-cell *matHeaderCellDef
+                                <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
                                     class="w3-center w3-padding w3-border-right">
                                     Cantidad por racion </th>
-                                <td mat-cell *matCellDef="let element">{{element.quantity}}</td>
+                                <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">{{element.quantity}}</td>
                             </ng-container>
 
                 

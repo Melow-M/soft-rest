@@ -17,8 +17,8 @@ export class CombosComponent implements OnInit {
   combosTableDataSource= new MatTableDataSource();
 
   combosTableDisplayedColumns: string[] = [
-    'index', 'createdAt', 'name', 'recipesRecipe', 'state', 'dateRange', 'realPrice', 'comboPrice', 'disccount',
-    'units', 'soldUnits', 'createdBy', 'actions'
+    'index', 'createdAt', 'name', 'recipesRecipe', 'state', 'dateRange', 'price',
+    'soldUnits', 'createdBy', 'actions'
   ]
 
   comboData$: Observable<Combo[]>;
@@ -37,10 +37,11 @@ export class CombosComponent implements OnInit {
   }
   
   ngOnInit() {
-    this.comboData$ = this.dbs.onGetOffer().pipe(
+    this.comboData$ = this.dbs.onGetCombo().pipe(
       tap(offerList => {
         console.log(offerList);
         this.combosTableDataSource.data = offerList;
+        console.log(this.combosTableDataSource.data);
       }));
   }
 

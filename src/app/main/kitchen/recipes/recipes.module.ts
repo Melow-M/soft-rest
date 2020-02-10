@@ -5,11 +5,15 @@ import { MatSelectModule, MatDividerModule, MatIconModule, MatOptionModule, MatA
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CreateNewRecipeDialogComponent } from './create-new-recipe-dialog/create-new-recipe-dialog.component';
+import { EditNewRecipeDialogComponent } from './edit-new-recipe-dialog/edit-new-recipe-dialog.component';
+import { ConfirmRecipeDialogComponent } from './confirm-recipe-dialog/confirm-recipe-dialog.component';
 
 @NgModule({
   declarations: [
     RecipesComponent,
     CreateNewRecipeDialogComponent,
+    EditNewRecipeDialogComponent,
+    ConfirmRecipeDialogComponent,
   ],
   imports: [
     RecipesRoutingModule,
@@ -30,7 +34,9 @@ import { CreateNewRecipeDialogComponent } from './create-new-recipe-dialog/creat
 
   ],
   entryComponents: [
-    CreateNewRecipeDialogComponent
+    CreateNewRecipeDialogComponent,
+    EditNewRecipeDialogComponent,
+    ConfirmRecipeDialogComponent
   ],
 
 })

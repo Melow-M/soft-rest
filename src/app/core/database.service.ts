@@ -798,4 +798,7 @@ export class DatabaseService {
       }))
   }
 
+  onGetCombo(): Observable<Combo[]>{
+
+  }
 }

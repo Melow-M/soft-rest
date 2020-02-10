@@ -16,7 +16,7 @@
                 <div class="order-list">
                     <ol>
                         <li class="order" *ngFor="let plate of order; let i = index"
-                            (click)="selectablePlate = plate; MenuList=true; categoriesList=false"
+                            (click)="selectablePlate = plate;selectIndex=i; MenuList=true; categoriesList=false"
                             [ngStyle]="{'border':selectablePlate==plate?'1px solid black':'none'}">
                             <div class="flex-div"
                                 style="justify-content: space-between; width: 100%; font-weight: bold; font-size: medium;">

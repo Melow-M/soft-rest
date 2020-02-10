@@ -45,6 +45,7 @@ export class MenuComponent implements OnInit {
   masterCardView = false
 
   selectablePlate: any = null
+  selectIndex: number = null
 
   others$: Observable<Grocery[]>
   other: Array<Grocery> = []
@@ -156,9 +157,15 @@ export class MenuComponent implements OnInit {
         this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
         this.second = plates.filter(el => el['type'] == 'FONDO')
         this.dessert = plates.filter(el => el['type'] == 'POSTRE')
-        this.plates = plates
+        this.plates = plates.map(el => {
+          return {
+            ...el,
+            sold: 0
+          }
+        })
       })
     )
+
     this.numberOrder$ = this.dbs.getOrders().pipe(
       map(orders => {
         this.cancelOrder()
@@ -244,12 +251,15 @@ export class MenuComponent implements OnInit {
   showRucCustomer(user): string | undefined {
     return user ? user['ruc'] : undefined;
   }
+
   showDniCustomer(user): string | undefined {
     return user ? user['dni'] : undefined;
   }
+
   showNameCustomer(user): string | undefined {
     return user ? user['name'] : undefined;
   }
+
   showBusinessNameCustomer(user): string | undefined {
     return user ? user['businessName'] : undefined;
   }
@@ -278,6 +288,7 @@ export class MenuComponent implements OnInit {
     this.checketView = false
     this.ticketForm.reset('')
   }
+
   cancelOrder() {
     this.MenuList = false;
     this.otherList = false
@@ -304,11 +315,11 @@ export class MenuComponent implements OnInit {
       appetizer: type != 'second' ? this.plates.filter(el => el['stock'] == Math.min(...selectEntry) && el['type'] == 'ENTRADA')[0] : '',
       mainDish: this.plates.filter(el => el['stock'] == Math.min(...selectSecond) && el['type'] == 'FONDO')[0],
       dessert: type == 'executive' ? this.plates.filter(el => el['stock'] == Math.min(...selectDessert) && el['type'] == 'POSTRE')[0] : '',
-      amount: 1,
-      index: this.order.length
+      amount: 1
     }
     this.order.push(newDish)
     this.selectablePlate = newDish
+    this.selectIndex = this.order.length - 1
     this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
   }
 
@@ -345,7 +356,7 @@ export class MenuComponent implements OnInit {
       }
     }
     if (this.selectablePlate) {
-      let i = this.selectablePlate['index']
+      let i = this.order.findIndex(el => el == this.selectablePlate)
       if (this.selectMenu == 'executive') {
         this.order[i][typePlate] = plate
       } else {

@@ -141,7 +141,7 @@ export class SalesRecordComponent implements OnInit {
 
     this.data_xls.forEach(element => {
       const temp = [
-        this.datePipe.transform(element['createdAt'].toMillis(), 'yyyy/MM/dd'),
+        this.datePipe.transform(element['createdAt'].toMillis(), 'dd/MM/yyyy'),
         this.datePipe.transform(element['createdAt'].toMillis(), 'hh:mm'),
         element['documentType'],
         element['documentSerial']+'-'+ element['documentCorrelative'],

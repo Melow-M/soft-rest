@@ -81,7 +81,7 @@
                         <mat-icon style="vertical-align: middle;">settings</mat-icon>
                     </button>
                 </div>
-                <div>
+                <div *ngIf="transactions$ | async">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2vh;">
                         <div *ngIf="balance$|async as init">
                             <span class="currentBalance">Saldo Actual s/. {{balance + init | number: '.2'}}</span>
@@ -91,21 +91,19 @@
                                 <mat-label>Filtrar</mat-label>
                                 <input matInput placeholder="Filtrar" autocomplete="off" [formControl]="search">
                                 <span matPrefix>
-                                    <mat-icon class="w3-margin-right" style="vertical-align: middle;">filter_list</mat-icon>
+                                    <mat-icon class="w3-margin-right" style="vertical-align: middle;">filter_list
+                                    </mat-icon>
                                 </span>
                             </mat-form-field>
-                            <button mat-raised-button class="w3-margin-left selected">
-                                <mat-icon style="vertical-align: middle;">search</mat-icon>
-                                Buscar
-                            </button>
+
                             <button mat-raised-button (click)="downloadXls()" class="w3-margin-left selected">
                                 <mat-icon style="vertical-align: middle;">cloud_download</mat-icon>
                                 Descargar
                             </button>
                         </div>
                     </div>
-                    <div class="mat-elevation-z8 w3-margin-top w3-round" *ngIf="transactions$ | async"
-                        style="border-radius: 10px 10px 0 0; margin-top: 2vh;">
+                    <div class="mat-elevation-z8 w3-margin-top w3-round" *ngIf="dataSource.data.length; else default"
+                        style="border-radius: 10px 10px 0 0; margin-top: 2vh;" >
                         <div class="w3-round-large" style="overflow:auto; border-radius: 10px 10px 0 0;">
                             <table mat-table [dataSource]="dataSource" style="width: 100%; font-family: Raleway;">
                                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
@@ -207,6 +205,14 @@
                         <mat-paginator #firstView class="w3-round-large" [pageSizeOptions]="[5, 10, 20]"
                             showFirstLastButtons></mat-paginator>
                     </div>
+                    <ng-template #default>
+                        <div
+                            class="w3-container w3-center  w3-round-large mat-elevation-z8 w3-margin-top w3-margin-bottom">
+                            <h2 style="font-family: Raleway; color: dimgray">
+                                No hay movimientos
+                            </h2>
+                        </div>
+                    </ng-template>
                 </div>
 
             </div>

@@ -25,6 +25,7 @@ import { RemoveComponent } from './remove/remove.component';
 import { TotalsComponent } from './totals/totals.component';
 import { RecordComponent } from './record/record.component';
 import { DeleteTransactionComponent } from './delete-transaction/delete-transaction.component';
+import { TransactionsComponent } from './record/transactions/transactions.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { DeleteTransactionComponent } from './delete-transaction/delete-transact
     RemoveComponent,
     TotalsComponent,
     RecordComponent,
-    DeleteTransactionComponent
+    DeleteTransactionComponent,
+    TransactionsComponent
   ],
   imports: [
     CommonModule,
@@ -62,7 +64,8 @@ import { DeleteTransactionComponent } from './delete-transaction/delete-transact
     AddComponent,
     RemoveComponent,
     TotalsComponent,
-    DeleteTransactionComponent  
+    DeleteTransactionComponent,
+    TransactionsComponent
   ]
 })
 export class CashModule { }

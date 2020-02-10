@@ -3,7 +3,7 @@ import { User } from '../../general/user.model';
 export interface CashOpening {
   id: string;
   openedBy: User;
-  openendAt: Date;
+  openedAt: Date;
   closedBy: User;
   closedAt: Date;
   openingBalance: number;

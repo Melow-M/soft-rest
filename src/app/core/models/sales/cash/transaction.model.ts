@@ -2,10 +2,9 @@ import { User } from '../../general/user.model';
 
 export interface Transaction {
   id: string;
-  // type: string;
+  type: string;
   description?: string;
   amount: number;
-  verified: boolean;
   status: string;
   ticketType: string;
   paymentType: string;
@@ -15,9 +14,7 @@ export interface Transaction {
   destinationAccount?: string;
   debt?: number;
   editedBy: User;
-  editedAt: number;
-  approvedBy: User;
-  approvedAt: Date;
+  editedAt: Date;
   createdAt: Date;
   createdBy: User;
 }

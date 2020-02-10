@@ -13,44 +13,49 @@
                 Caja
             </h1>
 
-            <div *ngIf="opening" class="w3-displau-container">
+            <ng-template #openView class="w3-display-container">
                 <div style="width: 400px; font-family: Raleway;" class="w3-display-middle">
                     <h3>Apertura de caja</h3>
-                    <form>
+                    <form [formGroup]="openingForm">
                         <mat-form-field class="w3-block" appearance="outline">
                             <mat-label>Elija una caja</mat-label>
-                            <mat-select>
-                                <mat-option *ngFor="let food of cashRegisters" [value]="food">
-                                    {{food}}
+                            <mat-select formControlName='cash'>
+                                <mat-option *ngFor="let cash of cashRegisters$ | async" [value]="cash"
+                                    (click)="currentCash = cash" [disabled]="cash.open">
+                                    {{cash.name}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
                         <mat-form-field class="w3-block" appearance="outline">
                             <mat-label>Contraseña</mat-label>
-                            <input matInput [type]="hidePass ? 'password' : 'text'" placeholder="***"
-                                autocomplete="off">
+                            <input matInput [type]="hidePass ? 'password' : 'text'" placeholder="***" autocomplete="off"
+                                formControlName="password" [disabled]="!currentCash">
                             <button mat-icon-button matSuffix (click)="hidePass = !hidePass"
                                 [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePass">
                                 <mat-icon>{{hidePass ? 'visibility_off' : 'visibility'}}</mat-icon>
                             </button>
-                            <mat-error>Contraseña requerida *</mat-error>
+                            <mat-error *ngIf="openingForm.get('password').hasError('required')">
+                                Contraseña requerida *</mat-error>
+                            <mat-error *ngIf="openingForm.get('password').hasError('passValid')">No coincide contraseña
+                            </mat-error>
                         </mat-form-field>
                         <mat-form-field appearance="outline" class="w3-block">
-                            <mat-label>Importe Inicial (S/. Efectivo</mat-label>
-                            <input matInput placeholder="Placeholder" autocomplete="off">
+                            <mat-label>Importe Inicial (S/. Efectivo)</mat-label>
+                            <input matInput placeholder="S/" type="number" autocomplete="off" formControlName='amount'>
                         </mat-form-field>
                     </form>
 
                     <div style="text-align: center;">
-                        <button mat-raised-button style="background: #EE8434; color: white" (click)="openCash()">
+                        <button mat-raised-button style="background: #EE8434; color: white" (click)="openCash()"
+                            [disabled]="!openingForm.valid">
                             <mat-icon style="vertical-align: middle;">vpn_key</mat-icon>
                             Abrir Caja
                         </button>
                     </div>
                 </div>
-            </div>
+            </ng-template>
 
-            <div *ngIf="!opening" style="margin-top: 3vh;">
+            <div *ngIf="isOpening$ | async; else openView" style="margin-top: 3vh;">
                 <div style="display: flex; justify-content: space-around;">
                     <button mat-raised-button style="background: #EE8434; color: white" (click)="closeCash()">
                         <mat-icon style="vertical-align: middle;">vpn_key</mat-icon>
@@ -78,29 +83,28 @@
                 </div>
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2vh;">
-                        <div>
-                            <span class="currentBalance">Saldo Actual s/. 830.00</span>
+                        <div *ngIf="balance$|async as init">
+                            <span class="currentBalance">Saldo Actual s/. {{balance + init | number: '.2'}}</span>
                         </div>
                         <div style="display: flex; align-items: center; flex-wrap: wrap;">
-                            <mat-form-field appearance="outline">
+                            <mat-form-field>
                                 <mat-label>Filtrar</mat-label>
-                                <input matInput placeholder="Filtrar">
+                                <input matInput placeholder="Filtrar" autocomplete="off" [formControl]="search">
                                 <span matPrefix>
-                                    <mat-icon class="w3-margin-right">filter_list</mat-icon>
+                                    <mat-icon class="w3-margin-right" style="vertical-align: middle;">filter_list</mat-icon>
                                 </span>
-
                             </mat-form-field>
-                            <button mat-raised-button (click)="opening = false" class="w3-margin-left selected">
+                            <button mat-raised-button class="w3-margin-left selected">
                                 <mat-icon style="vertical-align: middle;">search</mat-icon>
                                 Buscar
                             </button>
-                            <button mat-raised-button (click)="opening = false" class="w3-margin-left selected">
+                            <button mat-raised-button (click)="downloadXls()" class="w3-margin-left selected">
                                 <mat-icon style="vertical-align: middle;">cloud_download</mat-icon>
                                 Descargar
                             </button>
                         </div>
                     </div>
-                    <div class="mat-elevation-z8 w3-margin-top w3-round"
+                    <div class="mat-elevation-z8 w3-margin-top w3-round" *ngIf="transactions$ | async"
                         style="border-radius: 10px 10px 0 0; margin-top: 2vh;">
                         <div class="w3-round-large" style="overflow:auto; border-radius: 10px 10px 0 0;">
                             <table mat-table [dataSource]="dataSource" style="width: 100%; font-family: Raleway;">
@@ -122,8 +126,8 @@
                                         Fecha </th>
                                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b; padding-left:0.5em"
                                         class="w3-center w3-border-left">
-                                        <span>{{element.date.getTime() | date: 'dd/MM/yyyy'}} </span><br>
-                                        <span>{{element.date.getTime() | date: 'hh:mm a'}} </span>
+                                        <span>{{element['createdAt'].toMillis() | date: 'dd/MM/yyyy'}} </span><br>
+                                        <span>{{element['createdAt'].toMillis() | date: 'hh:mm a'}} </span>
                                     </td>
                                 </ng-container>
 
@@ -133,7 +137,7 @@
                                         style="background: #C8C8C8;color: #828282;font-size: medium;padding:0px 1.5em 0px 1em; border-left:1px solid #B9B9B9;">
                                         Tipo </th>
                                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b; padding-left:0.5em"
-                                        class="w3-center w3-border-left"> {{element.type}} </td>
+                                        class="w3-center w3-border-left"> {{element['type']}} </td>
                                 </ng-container>
 
                                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
@@ -143,7 +147,7 @@
                                         Descripción
                                     </th>
                                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b; padding-left:0.5em"
-                                        class="w3-center w3-border-left"> {{element.description}} </td>
+                                        class="w3-center w3-border-left"> {{element['description']}} </td>
                                 </ng-container>
 
                                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
@@ -153,7 +157,7 @@
                                         Importe </th>
                                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b; padding-left:0.5em"
                                         class="w3-center w3-border-left"> S/.
-                                        {{element.amount | number: '.2'}} </td>
+                                        {{element['amount'] | number: '.2'}} </td>
                                 </ng-container>
 
                                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
@@ -162,7 +166,7 @@
                                         style="background: #C8C8C8;color: #828282;font-size: medium;padding:0px 1.5em 0px 1em; border-left:1px solid #B9B9B9;">
                                         Usuario </th>
                                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b; padding-left:0.5em"
-                                        class="w3-center w3-border-left"> {{element.user}} </td>
+                                        class="w3-center w3-border-left"> {{element['createdBy']['displayName']}} </td>
                                 </ng-container>
 
                                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
@@ -172,7 +176,7 @@
                                         Tipo de pago
                                     </th>
                                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b; padding-left:0.5em"
-                                        class="w3-center w3-border-left"> {{element.payment}} </td>
+                                        class="w3-center w3-border-left"> {{element['paymentType'] | titlecase}} </td>
                                 </ng-container>
 
                                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
@@ -180,14 +184,14 @@
                                     <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
                                         style="background: #C8C8C8;color: #828282;font-size: medium;padding:0px 1.5em 0px 1em; border-left:1px solid #B9B9B9;">
                                         Acciones</th>
-                                    <td mat-cell *matCellDef="let rack"
+                                    <td mat-cell *matCellDef="let element"
                                         style="color:#2b2b2b; padding:0px 1.5em 0px 1em; border-left:1px solid #B9B9B9"
                                         class="w3-center">
                                         <mat-menu #requestsMenu="matMenu">
-                                            <button mat-menu-item>
+                                            <button mat-menu-item (click)="editTransaction(element)">
                                                 <mat-icon>edit</mat-icon> Editar
                                             </button>
-                                            <button mat-menu-item>
+                                            <button mat-menu-item (click)="deleteTransaction(element)">
                                                 <mat-icon>delete</mat-icon> Borrar
                                             </button>
                                         </mat-menu>

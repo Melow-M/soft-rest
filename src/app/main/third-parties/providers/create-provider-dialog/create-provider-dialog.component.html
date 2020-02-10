@@ -83,7 +83,7 @@
                         <ol>
                             <li *ngFor="let item of bankAccounts" class="w3-small">
                                 {{item.bank}} / {{item.type}} / {{item.accountNumber}}
-                                <button mat-icon-button color="warn" (click)="removeBank(item.index)">
+                                <button mat-icon-button color="warn" >
                                     <mat-icon>delete</mat-icon>
                                 </button>
                             </li>
@@ -124,9 +124,9 @@
                     <div class="w3-block">
                         <ol>
                             <li *ngFor="let item of contactList" class="w3-small">
-                                {{item.contactName}} / {{item.contactPhone ? item.contactPhone : 'Ninguno'}} /
+                                / {{item.contactPhone ? item.contactPhone : 'Ninguno'}} /
                                 {{item.contactMail ? item.contactMail : 'Ninguno'}}
-                                <button mat-icon-button color="warn" (click)="removeContact(item.index)">
+                                <button mat-icon-button color="warn" >
                                     <mat-icon>delete</mat-icon>
                                 </button>
                             </li>

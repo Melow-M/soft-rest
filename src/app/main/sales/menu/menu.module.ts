@@ -10,7 +10,8 @@ import {
   MatFormFieldModule,
   MatDialogModule,
   MatDividerModule,
-  MatAutocompleteModule
+  MatAutocompleteModule,
+  MatSnackBarModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VoucherComponent } from './voucher/voucher.component';
@@ -31,7 +32,8 @@ import { VoucherComponent } from './voucher/voucher.component';
     MatDividerModule,
     MatAutocompleteModule,
     FormsModule, 
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatSnackBarModule
   ],
   entryComponents:[
     VoucherComponent

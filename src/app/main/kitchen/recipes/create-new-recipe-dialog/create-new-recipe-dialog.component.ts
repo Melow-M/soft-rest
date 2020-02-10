@@ -122,7 +122,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
       createdAt: null,
       createdBy: null,
       editedAt: null,
-      editedBy: null
+      editedBy: null,
     };
 
     this.inputTableDataSource.data.forEach(el => {
@@ -130,7 +130,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
         name: el['item']['name'],
         sku: el['item']['sku'],
         quantity: el['quantity'],
-        inputId: el['item']['id'],
+        id: el['item']['id'],
         unit: el['item']['unit']
       });
     });

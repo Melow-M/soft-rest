@@ -1,3 +1,5 @@
+import { Order } from './models/sales/menu/order.model';
+import { Meal } from './models/sales/menu/meal.model';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
@@ -19,6 +21,8 @@ import { Grocery } from './models/warehouse/grocery.model';
 import { Dessert } from './models/warehouse/desserts.model';
 import { Kardex } from './models/warehouse/kardex.model';
 import { Recipe } from './models/kitchen/recipe.model';
+import * as jsPDF from 'jspdf';
+import { Promo } from './models/sales/menu/promo.model';
 
 @Injectable({
   providedIn: 'root'
@@ -75,6 +79,18 @@ export class DatabaseService {
 
   kardexCollection: AngularFirestoreCollection<Kardex>;
   kardex$: Observable<Kardex[]>;
+
+  /**
+  * SALES VARIABLES
+  */
+  othersCollection: AngularFirestoreCollection<Grocery>;
+  others$: Observable<Grocery[]>;
+
+  dishesCollection: AngularFirestoreCollection<Meal>;
+  dishes$: Observable<Meal[]>;
+
+  ordersCollection: AngularFirestoreCollection<Order>;
+  orders$: Observable<Order[]>;
 
   constructor(
     public af: AngularFirestore,
@@ -148,6 +164,10 @@ export class DatabaseService {
   //Warehouse-Stocktaking
   onGetUnits(): Observable<{ id: string, unit: string }[]> {
     return this.af.collection<{ id: string, unit: string }>(`/db/deliciasTete/kitchenUnits`).valueChanges()
+  }
+
+  onGetInputs(): Observable<Input[]> {
+    return this.af.collection<Input>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
   }
 
   //To get available elements
@@ -255,6 +275,7 @@ export class DatabaseService {
       })
     )
   }
+
 
   onAddPurchase(purchase: Purchase, itemsList: Array<{ kitchenInputId: string; item: KitchenInput; quantity: number; cost: number; }>):
     Observable<firebase.firestore.WriteBatch> {
@@ -417,10 +438,6 @@ export class DatabaseService {
     return this.purchases$
   }
 
-  onGetInputs(): Observable<Input[]>{
-    return this.af.collection<Input>(`/db/deliciasTete/warehouseInputs`, ref => ref.orderBy('name')).valueChanges();
-  }
-
   //Kitchen
   onGetRecipes(): Observable<Recipe[]> {
     return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.orderBy('name')).valueChanges();
@@ -446,7 +463,32 @@ export class DatabaseService {
     }));
   }
 
-  // onGetRecipe()
+  onEditRecipe(recipe: Recipe): Observable<firebase.firestore.WriteBatch>{
+    let recipeRef = this.af.firestore.collection(`/db/deliciasTete/kitchenRecipes`).doc(recipe.id);
+    let recipeData = recipe;
+    let date = new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1), map((user)=> {
+      recipeData.editedAt = date;
+      recipeData.editedBy = user;
+      console.log(recipeData);
+      batch.update(recipeRef, recipeData);
+      return batch;
+    }));
+  }
+
+  onDeleteRecipe(recipe: Recipe): firebase.firestore.WriteBatch{
+    let recipeRef = this.af.firestore.collection(`/db/deliciasTete/kitchenRecipes`).doc(recipe.id);
+    let batch = this.af.firestore.batch();
+
+    batch.delete(recipeRef);
+    return batch;
+  }
+
+
+  // onGetRecipe(recipe: Recipe): Observable<firebase.firestore.WriteBatch>{}
+
 
   getItems(type: string): Observable<(any)[]> {
     switch (type) {
@@ -510,6 +552,233 @@ export class DatabaseService {
         );
 
     return this.kardex$;
+  }
+
+  /************ SALES METHODS ********* */
+
+  onGetOthers(): Observable<Grocery[]> {
+    this.othersCollection = this.af.collection('db/deliciasTete/warehouseGrocery', ref => ref.orderBy('createdAt', 'desc'));
+    this.others$ = this.othersCollection.valueChanges().pipe(shareReplay(1));
+    return this.others$;
+  }
+  onGetDishes() {
+
+    this.dishesCollection = this.af.collection('db/deliciasTete/kitchenDishes', ref => ref.orderBy('createdAt', 'desc'));
+    this.dishes$ = this.dishesCollection.valueChanges().pipe(shareReplay(1));
+    return this.dishes$;
+  }
+
+  getOrders() {
+    this.ordersCollection = this.af.collection('db/deliciasTete/orders', ref => ref.orderBy('createdAt', 'desc'));
+    this.orders$ = this.ordersCollection.valueChanges().pipe(shareReplay(1));
+    return this.orders$;
+  }
+
+  getOpenCash(cash) {
+    let openingCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cash + '/openings', ref => ref.orderBy('openedAt', 'desc'));
+    return openingCollection.valueChanges().pipe(shareReplay(1));
+  }
+
+  getTransactions(cashId, openingId) {
+    let transactionsCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cashId + '/openings/'+ openingId + '/transactions', ref => ref.orderBy('createdAt', 'desc'));
+    return transactionsCollection.valueChanges().pipe(shareReplay(1));
+  }
+    
+  
+  printTicket(elements: {quantity: number, description: string, vUnit: number, import: number}[], ticketNumber: string){
+    //Ejemplo: 
+    // let elements = [{
+    //   quantity: 2,
+    //   description: 'ALMUERZO BASICO BASICOOOo',
+    //   vUnit: 10.55,
+    //   import: 20.39
+    //   },{
+    //   quantity: 1,
+    //   description: 'Coca Cola 475 ml',
+    //   vUnit: 3,
+    //   import: 3
+    //   }];
+    
+    // let ticketNumber = 'T001-000001';
+    
+    let total = elements.reduce((accumulator, currentValue) => {
+        return accumulator + currentValue.import;
+    }, 0);
+    
+    var doc = new jsPDF({
+        unit: 'px',
+        format: [414, 353+21*(elements.length-1)],
+        orientation: 'l'
+    });
+    
+    doc.setFontStyle("bold");
+    doc.setFontSize(18),
+    doc.text("TICKET", 207, 59, {
+        align: "center",
+        baseline: "middle"
+    });
+    
+    doc.text(ticketNumber, 207, 82, {
+        align: "center",
+        baseline: "middle"
+    });
+    
+    doc.text("DELICIAS TETE S.A.C. - 20603001304", 207, 122, {
+        align: "center",
+        baseline: "middle"
+    });
+    doc.setFontStyle('normal'),
+    doc.text("Comedor SENATI", 207, 143, {
+        align: "center",
+        baseline: "middle"
+    });
+    
+    doc.line(22,168,392,168);
+    doc.setFontStyle('bold');
+    
+    doc.text("Cant.", 39, 188, {
+        align: "left",
+        baseline: "bottom"
+    });
+    
+    doc.text("Descrip.", 138, 188, {
+        align: "left",
+        baseline: "bottom"
+    });
+    
+    doc.text("V Unit.", 268, 188, {
+        align: "left",
+        baseline: "bottom"
+    });
+    
+    doc.text("Importe.", 331, 188, {
+        align: "left",
+        baseline: "bottom"
+    });
+    
+    doc.line(22,196,392,196);
+    
+    //Inside elements
+    doc.setFontStyle('normal');
+    
+    for(let i=0; i<elements.length; i++){
+    
+        doc.setFontStyle('normal');
+        doc.text(elements[i].quantity.toFixed(2), 70, 228+21*i, {
+            align: "right",
+            baseline: "bottom"
+        });
+        
+        doc.setFontStyle('bold');
+        
+        //Cutting text
+        if(doc.getTextWidth(elements[i].description) >= 175){
+        //Cut description
+        let descriptionSliced = "ERROR";
+            for(let j = elements[i].description.length; j>0; j--){
+                if(doc.getTextWidth(elements[i].description.slice(0, j))<175){
+                    descriptionSliced = elements[i].description.slice(0, j);
+                    j=0;
+                    doc.text(descriptionSliced, 88, 228+21*i, {
+                        align: "left",
+                        baseline: "bottom",
+                    });
+                };
+            }
+        }
+        else{
+        //Original description
+            doc.text(elements[i].description, 88, 228+21*i, {
+                align: "left",
+                baseline: "bottom",
+            });
+        
+        }
+        
+    
+        
+        doc.setFontStyle('normal');
+        doc.text(elements[i].vUnit.toFixed(2), 309, 228+21*i, {
+            align: "right",
+            baseline: "bottom"
+        });
+        
+        doc.text(elements[i].import.toFixed(2), 379, 228+21*i, {
+            align: "right",
+            baseline: "bottom"
+        });
+        
+        if(i==elements.length-1){
+            doc.setFontStyle('bold');
+            doc.text('TOTAL', 70, 278+21*i, {
+                align: "right",
+                baseline: "bottom"
+            });
+            
+            doc.text("S/.", 207, 278+21*i, {
+                align: "center",
+                baseline: "bottom"
+            });
+            
+            
+            doc.text(total.toFixed(2), 379, 278+21*i, {
+                align: "right",
+                baseline: "bottom"
+            });
+            
+            doc.setFontStyle('normal');
+            doc.text("----- Gracias por su preferencia -----", 207, 323+21*i, {
+                align: "center",
+                baseline: "bottom"
+            });
+            
+        }
+    }
+  
+    doc.autoPrint({variant: 'non-conform'});
+    doc.save(`TICKET-${ticketNumber}.pdf`);
+  }
+
+  onCreateOffer(promo: Promo): Observable<firebase.firestore.WriteBatch>{
+    let promoRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/offers`).doc();
+    let promoData: Promo = promo;
+    let date= new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        promoData.createdAt = date;
+        promoData.createdBy = user;
+        promoData.id = promoRef.id;
+        promoData.editedAt = null;
+        promoData.editedBy = null;
+
+        batch.set(promoRef, promoData);
+
+        return batch;
+      }))
+  }
+
+  onGetOffer(): Observable<Promo[]>{
+    return this.af.collection<Promo>(`/db/deliciasTete/offers`).valueChanges();
+  }
+
+  changeOfferState(promo: Promo, newState: string): Observable<firebase.firestore.WriteBatch>{
+    let promoRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/offers`).doc(promo.id);
+    let promoData: Promo = promo;
+    let date= new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        promoData.editedAt = date;
+        promoData.editedBy = user;
+        promoData.state = newState == 'Activar' ? 'Publicado':'Inactivo';
+
+        batch.update(promoRef, promoData);
+
+        return batch;
+      }))
   }
 
 }

@@ -4,6 +4,7 @@ import { Meal } from './meal.model';
 import { Combo } from './combo.model';
 import { Promo } from './promo.model';
 import { Grocery } from '../../warehouse/grocery.model';
+import { Customer } from '../../third-parties/customer.model';
 
 export interface Order {
   id: string;
@@ -21,6 +22,7 @@ export interface Order {
   documentSerial?: string; // FE001 ...
   documentCorrelative?: string; // 0000124 ...
   customerId: string;
+  customerName? : string;
   cashId: string;
   openingId: string;
   canceledAt: Date;

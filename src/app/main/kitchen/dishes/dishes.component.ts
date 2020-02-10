@@ -103,7 +103,7 @@ export class DishesComponent implements OnInit {
     ).pipe(
       map(([dishes, category, dish]) => {
         let dishesC = dishes.filter(el => category ? el['type'] == category['value'] : false)
-        return dish ? dishesC.filter(option => option['name'].toLowerCase().includes(dish.toLowerCase())) : dishes;
+        return dish ? dishesC.filter(option => option['name'].toLowerCase().includes(dish.toLowerCase())) : dishesC;
       })
     )
 
@@ -123,6 +123,8 @@ export class DishesComponent implements OnInit {
   }
 
   missingInputs(){
+    console.log('open');
+    
     this.dialog.open(MissingInputsComponent)
   }
 }

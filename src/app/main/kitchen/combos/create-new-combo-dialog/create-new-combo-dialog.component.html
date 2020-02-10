@@ -3,7 +3,7 @@
         style="font-size: x-large; margin-bottom: 8px; display: flex; flex-direction: row; justify-content: space-between;">
         <span>
             <mat-icon style="vertical-align: middle; margin-right: 4px;">add_circle</mat-icon>
-            Crear nueva Promoción
+            Crear nuevo Combo
         </span>
         <button mat-button mat-dialog-close>
             <mat-icon>close</mat-icon>
@@ -13,63 +13,44 @@
 </div>
 
 <div mat-dialog-content>
-    <p><b>Detalle de Promoción</b></p>
-    <form [formGroup]="promoForm">
+    <p><b>Detalle de Combo</b></p>
+    <form [formGroup]="comboForm">
         <div class="w3-row">
-            <!-- Nombre de Promoción -->
+            <!-- Nombre de Combo -->
             <div class="w3-col s12 m6 l6 w3-padding" >
                 <mat-form-field appearance="outline" style="display: block" >
-                    <mat-label>Nombre de Promoción</mat-label>
-                    <input type="text" placeholder="Nombre de Promoción" matInput formControlName="name" autocomplete="off">
+                    <mat-label>Nombre de Combo</mat-label>
+                    <input type="text" placeholder="Nombre de Combo" matInput formControlName="name">
                     <mat-hint>*Requerido</mat-hint>
                 </mat-form-field>
             </div>
 
-            <div class="w3-col s12 m6 l6 w3-padding" 
-                style="display:flex; flex-direction: row; justify-content: space-between;">
-                <!-- Quantity -->
-                <mat-form-field appearance="outline" style="width: 48%" >
-                    <mat-label>Cantidad</mat-label>
-                    <mat-select formControlName="quantity" 
-                        (selectionChange)="$event.value == 'Indefinido' ? promoForm.get('units').disable() : promoForm.get('units').enable()">
-                        <mat-option *ngFor="let quant of quantity" [value]="quant">
-                            {{quant}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-
-                <!-- Units -->
-                <mat-form-field appearance="outline" style="width: 48%" >
-                    <mat-label>Unidades</mat-label>
-                    <input type="number" placeholder="Unidades" matInput formControlName="units">
+            <div class="w3-col s12 m6 l6 w3-padding" >
+                <!-- Precio -->
+                <mat-form-field appearance="outline" style="display: block" >
+                    <mat-label>Precio (S/.)</mat-label>
+                    <input type="number" placeholder="Precio" matInput formControlName="price">
+                    <mat-hint>*Requerido</mat-hint>
                 </mat-form-field>
             </div>
         </div>
 
         <div class="w3-row">
-            <!-- Precio promocional -->
-            <div class="w3-col s12 m6 l6 w3-padding" >
-                <mat-form-field appearance="outline" style="display: block" >
-                    <mat-label>Precio promocional (S/.)</mat-label>
-                    <input type="number" placeholder="Precio promocional" matInput formControlName="promoPrice">
-                    <mat-hint>*Requerido</mat-hint>
-                </mat-form-field>
-            </div>
-
-            <div class="w3-col s12 m6 l6 w3-padding" 
-                style="display:flex; flex-direction: row; justify-content: space-between;">
                 <!-- Precio Real -->
-                <mat-form-field appearance="outline" style="width: 48%" >
+            <div class="w3-col s12 m6 l6 w3-padding" >
+                <mat-form-field appearance="outline" style="display: block">
                     <mat-label>Precio Real (S/.)</mat-label>
                     <input [value]="getTotal().toFixed(2)"
                         type="number" placeholder="Precio Real" matInput formControlName="realPrice">
                 </mat-form-field>
+            </div>
 
+            <div class="w3-col s12 m6 l6 w3-padding">
                 <!-- Percentage -->
-                <mat-form-field appearance="outline" style="width: 48%" >
+                <mat-form-field appearance="outline" style="display: block">
                     <mat-label>% de descuento</mat-label>
                     <input formControlName="percentageDiscount" matInput
-                        [value]="((getTotal()-promoForm.get('promoPrice').value)/getTotal()).toFixed(2)"
+                        [value]="((getTotal()-comboForm.get('price').value)/getTotal()).toFixed(2)"
                         type="text" placeholder="% de descuento">
                 </mat-form-field>
             </div>
@@ -78,10 +59,10 @@
         <div class="w3-row">
             <div class="w3-col s12 m6 l6 w3-padding" >
                 <!-- validityPeriod -->
-                <mat-form-field appearance="outline" >
+                <mat-form-field appearance="outline" style="display: block">
                     <mat-label>Periodo de Validez</mat-label>
                     <mat-select formControlName="validityPeriod" 
-                        (selectionChange)="$event.value == 'Indefinido' ? promoForm.get('dateRange').disable() : promoForm.get('dateRange').enable()">
+                        (selectionChange)="$event.value == 'Indefinido' ? comboForm.get('dateRange').disable() : comboForm.get('dateRange').enable()">
                         <mat-option *ngFor="let quant of period" [value]="quant">
                             {{quant}}
                         </mat-option>
@@ -89,6 +70,7 @@
                 </mat-form-field>
             </div>
             <div class="w3-col s12 m6 l6" style="padding-bottom: 8px; padding-top: 8px;" >
+                <!-- dateRange -->
                 <mat-form-field style="margin-right: 16px" color="accent" appearance="outline">
                     <input matInput placeholder="Seleccione un rango de fechas" [satDatepicker]="picker"
                         formControlName="dateRange">
@@ -222,6 +204,6 @@
 
 <mat-dialog-actions align="end">
     <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close type="button">Cancelar</button>
-    <button [disabled]="!inputTableDataSource.data.length || promoForm.status != 'VALID'"
-        mat-raised-button class="w3-margin-right" color="primary" mat-dialog-close type="button" (click)="onUploadOffer()">Crear</button>
+    <button [disabled]="!inputTableDataSource.data.length || comboForm.status != 'VALID'"
+        mat-raised-button class="w3-margin-right" color="primary" mat-dialog-close type="button" (click)="onUploadCombo()">Crear</button>
 </mat-dialog-actions>

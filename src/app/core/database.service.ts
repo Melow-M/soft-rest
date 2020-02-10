@@ -23,6 +23,7 @@ import { Kardex } from './models/warehouse/kardex.model';
 import { Recipe } from './models/kitchen/recipe.model';
 import * as jsPDF from 'jspdf';
 import { Promo } from './models/sales/menu/promo.model';
+import { Combo } from './models/sales/menu/combo.model';
 
 @Injectable({
   providedIn: 'root'
@@ -620,14 +621,14 @@ export class DatabaseService {
     }, 0);
 
     var doc = new jsPDF({
-      unit: 'px',
-      format: [414, 353 + 21 * (elements.length - 1)],
-      orientation: 'l'
+        unit: 'pt',
+        format: [414, 353+21*(elements.length-1)],
+        orientation: 'l'
     });
 
     doc.setFontStyle("bold");
-    doc.setFontSize(18),
-      doc.text("TICKET", 207, 59, {
+    doc.setFontSize(15),
+    doc.text("TICKET", 207, 59, {
         align: "center",
         baseline: "middle"
       });
@@ -645,9 +646,10 @@ export class DatabaseService {
       doc.text("Comedor SENATI", 207, 143, {
         align: "center",
         baseline: "middle"
-      });
-
-    doc.line(22, 168, 392, 168);
+    });
+    
+    doc.setFontSize(14),
+    doc.line(22,168,392,168);
     doc.setFontStyle('bold');
 
     doc.text("Cant.", 39, 188, {
@@ -811,4 +813,44 @@ export class DatabaseService {
       }))
   }
 
+  onGetCombo(): Observable<Combo[]>{
+    return this.af.collection<Combo>(`/db/deliciasTete/combos`).valueChanges();
+  }
+
+  onCreateCombo(combo: Combo): Observable<firebase.firestore.WriteBatch>{
+    let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc();
+    let comboData: Combo = combo;
+    let date= new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        comboData.createdAt = date;
+        comboData.createdBy = user;
+        comboData.id = comboRef.id;
+        comboData.editedAt = null;
+        comboData.editedBy = null;
+
+        batch.set(comboRef, comboData);
+
+        return batch;
+      }))
+  }
+  changeComboState(combo: Combo, newState: string): Observable<firebase.firestore.WriteBatch>{
+    let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc(combo.id);
+    let comboData: Combo = combo;
+    let date= new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        comboData.editedAt = date;
+        comboData.editedBy = user;
+        comboData.state = newState == 'Activar' ? 'Publicado':'Inactivo';
+
+        batch.update(comboRef, comboData);
+
+        return batch;
+      }))
+  }
 }

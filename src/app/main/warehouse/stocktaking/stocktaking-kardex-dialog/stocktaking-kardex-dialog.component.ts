@@ -17,7 +17,7 @@ export class StocktakingKardexDialogComponent implements OnInit {
   loadingKardex = new BehaviorSubject<boolean>(false);
   loadingKardex$ = this.loadingKardex.asObservable();
 
-  dateFormControl = new FormControl({begin: new Date(), end: new Date()});
+  dateFormControl = new FormControl({ begin: new Date(), end: new Date() });
   kardexTypeFormControl = new FormControl(true);
 
   displayedColumns: string[] = ['index', 'createdAt', 'details', 'insQuantity', 'insPrice', 'insTotal', 'outsQuantity', 'outsPrice', 'outsTotal', 'balanceQuantity', 'balancePrice', 'balanceTotal'];
@@ -29,7 +29,7 @@ export class StocktakingKardexDialogComponent implements OnInit {
   }
 
   currentDate = Date.now();
-  
+
   dateAndKardex$: Observable<Kardex[]>;
   kardex$: Observable<Kardex[]>;
 
@@ -47,7 +47,7 @@ export class StocktakingKardexDialogComponent implements OnInit {
     this.dateAndKardex$ =
       this.dateFormControl.valueChanges
         .pipe(
-          startWith<any>({begin: view.from, end: new Date()}),
+          startWith<any>({ begin: view.from, end: new Date() }),
           debounceTime(300),
           switchMap(date => {
             return this.observeKardex(date.begin, date.end);
@@ -62,9 +62,38 @@ export class StocktakingKardexDialogComponent implements OnInit {
       .pipe(
         tap(kardex => {
           this.loadingKardex.next(false);
-          this.dataSource.data = [...kardex];
+          this.dataSource.data = [... this.calcBalance(kardex)];
         })
       )
+  }
+
+  calcBalance(kardex: Array<Kardex>): Array<Kardex> {
+    kardex.forEach((item, index) => {
+      if(item.type === 'ENTRADA') {
+        const balanceQuantity = kardex[index - 1].balanceQuantity + item.insQuantity;
+        const balanceTotal = kardex[index - 1].balanceTotal + item.insTotal;
+        const balancePrice = balanceTotal / balanceQuantity;
+
+        kardex[index].balanceQuantity = balanceQuantity;
+        kardex[index].balancePrice = balancePrice;
+        kardex[index].balanceTotal = balanceTotal;
+      }
+
+      if(item.type === 'SALIDA') {
+        const balanceQuantity = kardex[index - 1].balanceQuantity - item.outsQuantity;
+        const balanceTotal = kardex[index - 1].balanceTotal - item.outsTotal;
+        const balancePrice = balanceTotal / balanceQuantity;
+
+      console.log(balanceQuantity, balanceTotal, balancePrice);
+
+        kardex[index].balanceQuantity = balanceQuantity;
+        kardex[index].balancePrice = balancePrice;
+        kardex[index].balanceTotal = balanceTotal;
+      }  
+    });
+
+    console.log(kardex);
+    return kardex
   }
 
 }

@@ -1,6 +1,5 @@
 import { Order } from './models/sales/menu/order.model';
 import { Meal } from './models/sales/menu/meal.model';
-import { Grocery } from './models/warehouse/grocery.model';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
@@ -166,8 +165,8 @@ export class DatabaseService {
     return this.af.collection<{ id: string, unit: string }>(`/db/deliciasTete/kitchenUnits`).valueChanges()
   }
 
-  onGetInputs(): Observable<KitchenInput[]> {
-    return this.af.collection<KitchenInput>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
+  onGetInputs(): Observable<Input[]> {
+    return this.af.collection<Input>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
   }
 
   //To get available elements
@@ -276,52 +275,6 @@ export class DatabaseService {
     )
   }
 
-  addOthers(product) {
-    let batch = this.af.firestore.batch();
-    let date = new Date()
-    let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc();
-    let inputData: Grocery;
-
-    let costTrendRef: DocumentReference = this.af.firestore
-      .collection(`/db/deliciasTete/warehouseGrocery/${inputRef.id}/costTrend`).doc();
-    let costTrendData: CostTrend = {
-      cost: product.cost,
-      createdAt: date,
-      id: costTrendRef.id
-    }
-
-    batch.set(costTrendRef, costTrendData);
-
-    this.auth.user$.pipe(
-      take(1))
-      .subscribe(user => {
-        inputData = {
-          id: inputRef.id,
-          name: product.name,
-          description: '',
-          sku: '',
-          picture: '',
-          unit: product.unit,
-          stock: product.stock,
-          cost: product.cost,
-          emergencyStock: 0,
-          status: 'DISPONIBLE',
-          createdAt: new Date(),
-          createdBy: user,
-          editedAt: new Date(),
-          editedBy: user,
-          price: product.price
-        }
-
-        batch.set(inputRef, inputData);
-
-        batch.commit().then(() => {
-          console.log('otros guardado');
-
-        })
-      })
-
-  }
 
   onAddPurchase(purchase: Purchase, itemsList: Array<{ kitchenInputId: string; item: KitchenInput; quantity: number; cost: number; }>):
     Observable<firebase.firestore.WriteBatch> {
@@ -484,10 +437,6 @@ export class DatabaseService {
     return this.purchases$
   }
 
-  onGetInputs(): Observable<Input[]>{
-    return this.af.collection<Input>(`/db/deliciasTete/warehouseInputs`, ref => ref.orderBy('name')).valueChanges();
-  }
-
   //Kitchen
   onGetRecipes(): Observable<Recipe[]> {
     return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.orderBy('name')).valueChanges();
@@ -631,8 +580,9 @@ export class DatabaseService {
 
   getTransactions(cashId, openingId) {
     let transactionsCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cashId + '/openings/'+ openingId + '/transactions', ref => ref.orderBy('createdAt', 'desc'));
-  }
     return transactionsCollection.valueChanges().pipe(shareReplay(1));
+  }
+    
   
   printTicket(elements: {quantity: number, description: string, vUnit: number, import: number}[], ticketNumber: string){
     //Ejemplo: 

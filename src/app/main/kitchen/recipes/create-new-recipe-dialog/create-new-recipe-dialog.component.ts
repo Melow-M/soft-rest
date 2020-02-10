@@ -45,9 +45,8 @@ export class CreateNewRecipeDialogComponent implements OnInit {
 
   ngOnInit() {
     this.initForms();
-    this.inputList = combineLatest(this.dbs.onGetInputs(), this.itemForm.get('item').valueChanges)
-      .pipe(map(([inputList, inputForm])=> this.onFilterInputs(inputList, inputForm)),
-            startWith(''));
+    this.inputList = combineLatest(this.dbs.onGetInputs(), this.itemForm.get('item').valueChanges.pipe(startWith('')))
+      .pipe(map(([inputList, inputForm])=> this.onFilterInputs(inputList, inputForm)));
     this.inputTableDataSource.data = [];
   }
 

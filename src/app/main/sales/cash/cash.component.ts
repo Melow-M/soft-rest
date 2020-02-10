@@ -13,7 +13,6 @@ import { FormBuilder, FormGroup, FormControl, Validators, AsyncValidatorFn, Abst
 import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
 import { map, tap, startWith, take, distinctUntilChanged, debounceTime, filter, switchMap } from 'rxjs/operators';
 import { Observable, combineLatest, of } from 'rxjs';
-import { Transaction } from 'src/app/core/models/sales/cash/transaction.model';
 import { DatePipe } from '@angular/common';
 import * as XLSX from 'xlsx';
 
@@ -105,7 +104,12 @@ export class CashComponent implements OnInit {
         return combineLatest(
           this.dbs.getTransactions(cash.id, cash.currentOpeningId),
           this.search.valueChanges.pipe(
-            startWith('')
+            startWith(''),
+            distinctUntilChanged(),
+            debounceTime(800),
+            map(res => {
+              return res.trim().replace(/\s+/g, " ");
+            }),
           )
         ).pipe(
           map(([cashes, search]) => {

@@ -14,6 +14,10 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 })
 export class VoucherComponent implements OnInit {
 
+  orders: Array<any>
+  countDishes: Array<any>
+  print: Array<any>
+
   constructor(
     public dbs: DatabaseService,
     public auth: AuthService,
@@ -29,48 +33,90 @@ export class VoucherComponent implements OnInit {
         case 'executive':
           array.push({
             name: el['appetizer']['name'],
-            id: el['appetizer']['id']
+            id: el['appetizer']['id'],
+            stock: el['appetizer']['stock']
           })
           array.push({
             name: el['mainDish']['name'],
-            id: el['mainDish']['id']
+            id: el['mainDish']['id'],
+            stock: el['mainDish']['stock']
           })
           array.push({
             name: el['dessert']['name'],
-            id: el['dessert']['id']
+            id: el['dessert']['id'],
+            stock: el['dessert']['stock']
           })
           return array
           break;
         case 'simple':
           array.push({
             name: el['appetizer']['name'],
-            id: el['appetizer']['id']
+            id: el['appetizer']['id'],
+            stock: el['appetizer']['stock']
           })
           array.push({
             name: el['mainDish']['name'],
-            id: el['mainDish']['id']
+            id: el['mainDish']['id'],
+            stock: el['mainDish']['stock']
           })
           return array
           break;
         case 'second':
-          return {
+          array.push({
             name: el['mainDish']['name'],
             id: el['mainDish']['id'],
-          }
+            stock: el['mainDish']['stock']
+          })
+          return array
           break;
         default:
           break;
       }
     })
-    let orders = this.data['orderList'].filter(el => el['id']).map(el => {
+
+    this.countDishes = dishes.reduce((a, b) => a.concat(b)).map((el, index, array) => {
+      let counter = 0
+      array.forEach(al => {
+        if (al['id'] == el['id']) {
+          counter++
+        }
+      })
+      return {
+        ...el,
+        amount: counter
+      }
+    }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
+
+    this.orders = this.data['orderList'].filter(el => el['id']).map(el => {
       return {
         name: el['name'],
         id: el['id'],
-        amount: el['amount']
+        amount: el['amount'],
+        stock: el['stock'],
+        price: el['price']
       }
     })
-    console.log(orders);
-    console.log(dishes.reduce((a, b) => a.concat(b)));
+
+    this.print = this.data['orderList'].map(el => {
+      return {
+        quantity: el['amount'],
+        description: el['name'],
+        vUnit: el['price'],
+        import: el['amount'] * el['price']
+      }
+    }).map((el, index, array) => {
+      let counter = 0
+      array.forEach(al => {
+        if (al['description'] == el['description']) {
+          counter++
+        }
+      })
+      if (el['quantity'] < counter) {
+        el['quantity'] = counter
+      }
+
+      return el
+    }).filter((dish, index, array) => array.findIndex(el => el['description'] === dish['description']) === index)
 
 
   }
@@ -146,6 +192,7 @@ export class VoucherComponent implements OnInit {
       }
     }
 
+
     this.auth.user$.pipe(
       take(1))
       .subscribe(user => {
@@ -193,6 +240,44 @@ export class VoucherComponent implements OnInit {
         batch.set(inputRef, inputData);
 
         batch.set(transactionRef, transactionData)
+
+        this.countDishes.forEach(dish => {
+          let dishRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(dish['id']);
+
+          batch.update(dishRef, {
+            stock: dish['stock'] - dish['amount']
+          })
+        })
+
+        this.orders.forEach(order => {
+          let groceryRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc(order['id']);
+          let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/${order['id']}/kardex`).doc(inputRef.id)
+
+          let inputKardex = {
+            id: inputRef.id,
+            details: this.data['documentType'] + ': ' + this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
+            insQuantity: 0,
+            insPrice: 0,
+            insTotal: 0,
+            outsQuantity: order['amount'],
+            outsPrice: order['price'],
+            outsTotal: order['amount'] * order['price'],
+            balanceQuantity: 0,
+            balancePrice: 0,
+            balanceTotal: 0,
+            type: 'SALIDA',
+            createdAt: new Date(),
+            createdBy: user
+          }
+
+          batch.update(groceryRef, {
+            stock: order['stock'] - order['amount']
+          })
+
+          batch.set(kardexRef, inputKardex)
+        })
+
+        this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
 
         batch.commit().then(() => {
           console.log('orden guardada');

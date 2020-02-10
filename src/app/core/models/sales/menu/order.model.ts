@@ -21,6 +21,8 @@ export interface Order {
   documentSerial?: string; // FE001 ...
   documentCorrelative?: string; // 0000124 ...
   customerId: string;
+  cashId: string;
+  openingId: string;
   canceledAt: Date;
   canceledBy: User;
   createdAt: Date;

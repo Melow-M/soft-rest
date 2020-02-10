@@ -1,3 +1,5 @@
+import { Order } from './models/sales/menu/order.model';
+import { Meal } from './models/sales/menu/meal.model';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
@@ -78,6 +80,18 @@ export class DatabaseService {
   kardexCollection: AngularFirestoreCollection<Kardex>;
   kardex$: Observable<Kardex[]>;
 
+  /**
+  * SALES VARIABLES
+  */
+  othersCollection: AngularFirestoreCollection<Grocery>;
+  others$: Observable<Grocery[]>;
+
+  dishesCollection: AngularFirestoreCollection<Meal>;
+  dishes$: Observable<Meal[]>;
+
+  ordersCollection: AngularFirestoreCollection<Order>;
+  orders$: Observable<Order[]>;
+
   constructor(
     public af: AngularFirestore,
     private auth: AuthService
@@ -150,6 +164,10 @@ export class DatabaseService {
   //Warehouse-Stocktaking
   onGetUnits(): Observable<{ id: string, unit: string }[]> {
     return this.af.collection<{ id: string, unit: string }>(`/db/deliciasTete/kitchenUnits`).valueChanges()
+  }
+
+  onGetInputs(): Observable<Input[]> {
+    return this.af.collection<Input>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
   }
 
   //To get available elements
@@ -257,6 +275,7 @@ export class DatabaseService {
       })
     )
   }
+
 
   onAddPurchase(purchase: Purchase, itemsList: Array<{ kitchenInputId: string; item: KitchenInput; quantity: number; cost: number; }>):
     Observable<firebase.firestore.WriteBatch> {
@@ -419,10 +438,6 @@ export class DatabaseService {
     return this.purchases$
   }
 
-  onGetInputs(): Observable<Input[]>{
-    return this.af.collection<Input>(`/db/deliciasTete/warehouseInputs`, ref => ref.orderBy('name')).valueChanges();
-  }
-
   //Kitchen
   onGetRecipes(): Observable<Recipe[]> {
     return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`, ref => ref.orderBy('name')).valueChanges();
@@ -539,6 +554,37 @@ export class DatabaseService {
     return this.kardex$;
   }
 
+  /************ SALES METHODS ********* */
+
+  onGetOthers(): Observable<Grocery[]> {
+    this.othersCollection = this.af.collection('db/deliciasTete/warehouseGrocery', ref => ref.orderBy('createdAt', 'desc'));
+    this.others$ = this.othersCollection.valueChanges().pipe(shareReplay(1));
+    return this.others$;
+  }
+  onGetDishes() {
+
+    this.dishesCollection = this.af.collection('db/deliciasTete/kitchenDishes', ref => ref.orderBy('createdAt', 'desc'));
+    this.dishes$ = this.dishesCollection.valueChanges().pipe(shareReplay(1));
+    return this.dishes$;
+  }
+
+  getOrders() {
+    this.ordersCollection = this.af.collection('db/deliciasTete/orders', ref => ref.orderBy('createdAt', 'desc'));
+    this.orders$ = this.ordersCollection.valueChanges().pipe(shareReplay(1));
+    return this.orders$;
+  }
+
+  getOpenCash(cash) {
+    let openingCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cash + '/openings', ref => ref.orderBy('openedAt', 'desc'));
+    return openingCollection.valueChanges().pipe(shareReplay(1));
+  }
+
+  getTransactions(cashId, openingId) {
+    let transactionsCollection = this.af.collection('db/deliciasTete/cashRegisters/' + cashId + '/openings/'+ openingId + '/transactions', ref => ref.orderBy('createdAt', 'desc'));
+    return transactionsCollection.valueChanges().pipe(shareReplay(1));
+  }
+    
+  
   printTicket(elements: {quantity: number, description: string, vUnit: number, import: number}[], ticketNumber: string){
     //Ejemplo: 
     // let elements = [{

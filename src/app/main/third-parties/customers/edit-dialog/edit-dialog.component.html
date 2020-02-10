@@ -119,9 +119,9 @@
           <div class="w3-block">
             <ol>
               <li *ngFor="let item of contactsList" class="w3-small">
-                {{item.contactName}} / {{item.contactPhone ? item.contactPhone : 'Ninguno'}} /
+                / {{item.contactPhone ? item.contactPhone : 'Ninguno'}} /
                 {{item.contactMail ? item.contactMail : 'Ninguno'}}
-                <button mat-icon-button color="warn" (click)="removeContact(item.index)">
+                <button mat-icon-button color="warn" >
                   <mat-icon>delete</mat-icon>
                 </button>
               </li>

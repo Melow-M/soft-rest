@@ -12,7 +12,7 @@ export interface Kardex {
   balanceQuantity: number;
   balancePrice: number;
   balanceTotal: number;
-  type: string; /**@ ENTRADA, SALIDA, INICIAL, REINICIO */
+  type: string; /**@ ENTRADA, SALIDA, INICIAL, REINICIO, ANULADO */
   createdAt: Date;
   createdBy: User;
 }

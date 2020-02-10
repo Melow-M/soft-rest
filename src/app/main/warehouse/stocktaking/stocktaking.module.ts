@@ -13,6 +13,8 @@ import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { StocktakingEditDialogComponent } from './stocktaking-edit-dialog/stocktaking-edit-dialog.component';
 import { StocktakingDeleteConfirmComponent } from './stocktaking-delete-confirm/stocktaking-delete-confirm.component';
 import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/stocktaking-kardex-dialog.component';
+import { StocktakingAddHouseholdDialogComponent } from './stocktaking-add-household-dialog/stocktaking-add-household-dialog.component';
+import { StocktakingRemoveHouseholdDialogComponent } from './stocktaking-remove-household-dialog/stocktaking-remove-household-dialog.component';
 
 
 @NgModule({
@@ -21,7 +23,9 @@ import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/st
     CreateInputDialogComponent,
     StocktakingEditDialogComponent,
     StocktakingDeleteConfirmComponent,
-    StocktakingKardexDialogComponent
+    StocktakingKardexDialogComponent,
+    StocktakingAddHouseholdDialogComponent,
+    StocktakingRemoveHouseholdDialogComponent
   ],
   imports: [
     CommonModule,
@@ -54,7 +58,8 @@ import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/st
     CreateInputDialogComponent,
     StocktakingEditDialogComponent,
     StocktakingDeleteConfirmComponent,
-    StocktakingKardexDialogComponent
+    StocktakingKardexDialogComponent,
+    StocktakingRemoveHouseholdDialogComponent
   ]
 })
 export class StocktakingModule { }

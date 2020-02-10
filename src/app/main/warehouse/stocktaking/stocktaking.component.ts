@@ -10,6 +10,7 @@ import { CreateInputDialogComponent } from './create-input-dialog/create-input-d
 import { StocktakingEditDialogComponent } from './stocktaking-edit-dialog/stocktaking-edit-dialog.component';
 import { StocktakingDeleteConfirmComponent } from './stocktaking-delete-confirm/stocktaking-delete-confirm.component';
 import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/stocktaking-kardex-dialog.component';
+import { StocktakingRemoveHouseholdDialogComponent } from './stocktaking-remove-household-dialog/stocktaking-remove-household-dialog.component';
 
 @Component({
   selector: 'app-stocktaking',
@@ -109,16 +110,23 @@ export class StocktakingComponent implements OnInit {
         if (type) {
           this.itemsTypeFormControl.setValue(type);
         }
-
       })
   }
 
   withdrawHousehold(item: Household): void {
-    //
+    this.dialog.open(StocktakingRemoveHouseholdDialogComponent)
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(type => {
+        if (type) {
+          this.itemsTypeFormControl.setValue(type);
+        }
+
+      })
   }
 
   addHousehold(item: Household): void {
-    //
+    // this.dialog.open()
   }
 
   kardex(item: any): void {

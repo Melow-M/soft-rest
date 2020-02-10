@@ -41,14 +41,13 @@
                 <mat-icon class="ms-icons-color">add_circle</mat-icon> Crear nuevo
               </button>
               <button mat-menu-item (click)="withdrawHousehold(raw)"
-                *ngIf="user.role.warehouseStocktakingWithdrawHouseholdAction"
-                [disabled]="itemsTypeFormControl.value !== 'MENAJE'">
+                *ngIf="user.role.warehouseStocktakingWithdrawHouseholdAction">
                 <mat-icon class="ms-icons-color">remove_circle</mat-icon> Retirar Menaje
               </button>
-              <button mat-menu-item (click)="addHousehold(raw)" *ngIf="user.role.warehouseStocktakingAddHouseholdAction"
+              <!-- <button mat-menu-item (click)="addHousehold(raw)" *ngIf="user.role.warehouseStocktakingAddHouseholdAction"
                 [disabled]="itemsTypeFormControl.value !== 'MENAJE'">
                 <mat-icon class="ms-icons-color">add_circle</mat-icon> Agregar Menaje
-              </button>
+              </button> -->
             </mat-menu>
             <button mat-raised-button style="margin-right: 16px" color="secondary" [matMenuTriggerFor]="rawMenu">
               <mat-icon>more_vert</mat-icon> Más acciones

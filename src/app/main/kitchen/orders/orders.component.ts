@@ -15,6 +15,8 @@ import { OrdersShowInputsComponent } from './orders-show-inputs/orders-show-inpu
   styleUrls: ['./orders.component.css']
 })
 export class OrdersComponent implements OnInit {
+  //Table
+  ordersTableDataSource= new MatTableDataSource();
 
   loadingOrders = new BehaviorSubject<boolean>(false);
   loadingOrders$ = this.loadingOrders.asObservable();

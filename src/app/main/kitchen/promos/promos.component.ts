@@ -6,6 +6,8 @@ import { Observable } from 'rxjs';
 import { Promo } from 'src/app/core/models/sales/menu/promo.model';
 import { tap } from 'rxjs/operators';
 import { FormBuilder, FormControl } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-promos',
@@ -25,11 +27,27 @@ export class PromosComponent implements OnInit {
 
   filterControl: FormControl = new FormControl()
 
-  //Paginator
+  //Excel
+  headersXlsx: string[] = [
+    'Fecha de Creación',
+    'Nombre',
+    'Productos',
+    'Estado',
+    'Rango de Fechas',
+    'Precio de Venta',
+    'Precio Promocional',
+    '% DCTO',
+    'Unidades Disponibles',
+    'Unidades Vendidas',
+    'Creado por:'
+  ]
+
   constructor(
     private dialog: MatDialog,
     private dbs: DatabaseService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public datePipe: DatePipe
+
   ) { }
 
   @ViewChild('promoTablePaginator', {static: false}) set matPaginator(mp: MatPaginator){
@@ -70,5 +88,52 @@ export class PromosComponent implements OnInit {
       })
     })
 
+  }
+
+  
+  downloadXls(): void {
+    let table_xlsx: any[] = [];
+    let dateRange;
+    let availableUnits;
+    table_xlsx.push(this.headersXlsx);
+
+    this.promosTableDataSource.data.forEach((element: Promo) => {
+      dateRange = element.validityPeriod == 'Indefinido'? 'Indefinido': 
+      (this.datePipe.transform(this.getDate(element.dateRange.begin['seconds']), 'dd/MM/yyyy')+ " - " +
+        this.datePipe.transform(this.getDate(element.dateRange.end['seconds']), 'dd/MM/yyyy'));
+
+      availableUnits = element.quantity == 'Indefinido' ? 'Indefinido':
+        element.units;
+
+      const temp = [
+        this.datePipe.transform(this.getDate(element.createdAt['seconds']), 'dd/MM/yyyy'),
+        element.name,
+        element.products.map(el => el.product.name).join(', '),
+        element.state,
+        dateRange,
+        'S/.'+element.realPrice.toFixed(2),
+        'S/.'+element.promoPrice.toFixed(2),
+        ((element.realPrice-element.promoPrice)/element.realPrice*100.0).toFixed(2) + "%",
+        element.soldUnits,
+        availableUnits,
+        element.createdBy.displayName
+      ];
+      table_xlsx.push(temp);
+    })
+
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'promos');
+
+    const name = 'promos.xlsx';
+
+    XLSX.writeFile(wb, name);
+  }
+
+  getDate(seconds: number){
+    let date = new Date(1970);
+    date.setSeconds(seconds);
+    return date.valueOf();
   }
 }

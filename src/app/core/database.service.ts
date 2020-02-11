@@ -853,4 +853,12 @@ export class DatabaseService {
         return batch;
       }))
   }
+
+  //Kitchen
+  getOrdersKitchen(from: Date, to: Date): Observable<Order[]> {
+
+    let orderRef= this.af.collection<Order>(`db/deliciasTete/orders`, ref => ref.where('createdAt', '>=', from).where('createdAt', '<=', to));
+    
+    return orderRef.valueChanges();
+  }
 }

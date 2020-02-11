@@ -6,6 +6,8 @@ import { FormControl } from '@angular/forms';
 import { DatabaseService } from 'src/app/core/database.service';
 import { tap } from 'rxjs/operators';
 import { CreateNewComboDialogComponent } from './create-new-combo-dialog/create-new-combo-dialog.component';
+import * as XLSX from 'xlsx';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-combos',
@@ -25,11 +27,26 @@ export class CombosComponent implements OnInit {
 
   filterControl: FormControl = new FormControl()
 
+    //Excel
+    headersXlsx: string[] = [
+      'Fecha de Creación',
+      'Nombre',
+      'Productos',
+      'Estado',
+      'Rango de Fechas',
+      'Precio real',
+      'Precio de venta',
+      'Unidades Vendidas',
+      'Creado por:'
+    ]
+
+
   //Paginator
   constructor(
     private dialog: MatDialog,
     private dbs: DatabaseService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private datePipe: DatePipe
   ) { }
 
   @ViewChild('comboTablePaginator', {static: false}) set matPaginator(mp: MatPaginator){
@@ -71,5 +88,47 @@ export class CombosComponent implements OnInit {
       })
     })
 
+  }
+
+  downloadXls(): void {
+    let table_xlsx: any[] = [];
+    let dateRange;
+    table_xlsx.push(this.headersXlsx);
+
+    this.combosTableDataSource.data.forEach((element: Combo) => {
+      dateRange = element.validityPeriod == 'Indefinido'? 'Indefinido': 
+      (this.datePipe.transform(this.getDate(element.dateRange.begin['seconds']), 'dd/MM/yyyy')+ " - " +
+        this.datePipe.transform(this.getDate(element.dateRange.end['seconds']), 'dd/MM/yyyy'));
+
+
+
+      const temp = [
+        this.datePipe.transform(this.getDate(element.createdAt['seconds']), 'dd/MM/yyyy'),
+        element.name,
+        element.products.map(el => el.product.name).join(', '),
+        element.state,
+        dateRange,
+        'S/.'+element.realPrice.toFixed(2),
+        'S/.'+element.price.toFixed(2),
+        element.soldUnits,
+        element.createdBy.displayName
+      ];
+      table_xlsx.push(temp);
+    })
+
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'combos');
+
+    const name = 'combos.xlsx';
+
+    XLSX.writeFile(wb, name);
+  }
+
+  getDate(seconds: number){
+    let date = new Date(1970);
+    date.setSeconds(seconds);
+    return date.valueOf();
   }
 }

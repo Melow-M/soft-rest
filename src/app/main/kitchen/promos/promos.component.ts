@@ -7,6 +7,7 @@ import { Promo } from 'src/app/core/models/sales/menu/promo.model';
 import { tap } from 'rxjs/operators';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-promos',
@@ -28,9 +29,17 @@ export class PromosComponent implements OnInit {
 
   //Excel
   headersXlsx: string[] = [
-    'Insumo',
-    'Medida',
-    'Cantidad por Ración',
+    'Fecha de Creación',
+    'Nombre',
+    'Productos',
+    'Estado',
+    'Rango de Fechas',
+    'Precio de Venta',
+    'Precio Promocional',
+    '% DCTO',
+    'Unidades Disponibles',
+    'Unidades Vendidas',
+    'Creado por:'
   ]
 
   constructor(
@@ -90,21 +99,21 @@ export class PromosComponent implements OnInit {
 
     this.promosTableDataSource.data.forEach((element: Promo) => {
       dateRange = element.validityPeriod == 'Indefinido'? 'Indefinido': 
-      (this.datePipe.transform(element.dateRange.begin.getTime(), 'dd/MM/yyyy')+ " + " +
-        this.datePipe.transform(element.dateRange.end.getTime(), 'dd/MM/yyyy'));
+      (this.datePipe.transform(this.getDate(element.dateRange.begin['seconds']), 'dd/MM/yyyy')+ " - " +
+        this.datePipe.transform(this.getDate(element.dateRange.end['seconds']), 'dd/MM/yyyy'));
 
       availableUnits = element.quantity == 'Indefinido' ? 'Indefinido':
         element.units;
 
       const temp = [
-        this.datePipe.transform(element.createdAt.getTime(), 'dd/MM/yyyy'),
+        this.datePipe.transform(this.getDate(element.createdAt['seconds']), 'dd/MM/yyyy'),
         element.name,
         element.products.map(el => el.product.name).join(', '),
         element.state,
         dateRange,
-        element.realPrice,
-        element.promoPrice,
-        "S/."+((element.realPrice-element.promoPrice)/element.realPrice*100.0).toFixed(2),
+        'S/.'+element.realPrice.toFixed(2),
+        'S/.'+element.promoPrice.toFixed(2),
+        ((element.realPrice-element.promoPrice)/element.realPrice*100.0).toFixed(2) + "%",
         element.soldUnits,
         availableUnits,
         element.createdBy.displayName
@@ -114,13 +123,17 @@ export class PromosComponent implements OnInit {
 
     const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
 
-    let sheetName = (<string>this.searchForm.get('productName').value['name']).replace(/\s/g, "_");
-
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Receta de "'+ sheetName +'"');
+    XLSX.utils.book_append_sheet(wb, ws, 'promos');
 
-    const name = 'receta_de_'+sheetName+'.xlsx';
+    const name = 'promos.xlsx';
 
     XLSX.writeFile(wb, name);
+  }
+
+  getDate(seconds: number){
+    let date = new Date(1970);
+    date.setSeconds(seconds);
+    return date.valueOf();
   }
 }

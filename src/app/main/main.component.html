@@ -1,4 +1,4 @@
-<div class="animated fadeIn dalay-4 slower" *ngIf="auth.user$ | async as user">
+<div class="animated fadeIn dalay-4 slower" *ngIf="auth.userAndRole$ | async as user">
     <mat-toolbar style="color: #B70705; background: #EFEFEF;">
 
         <button mat-icon-button class="redText" (click)="toggleSideMenu()">
@@ -15,6 +15,10 @@
             <mat-menu #menu="matMenu">
                 <button mat-menu-item (click)="auth.signOut()">
                     <mat-icon>exit_to_app</mat-icon> Cerrar sesión
+                </button>
+                <button mat-menu-item class="ms-font-3" routerLink="configuration/users"
+                    *ngIf="user['role']['configurationSection']">
+                    <mat-icon>settings_box</mat-icon> Configuración
                 </button>
             </mat-menu>
         </div>

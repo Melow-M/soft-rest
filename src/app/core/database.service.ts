@@ -24,6 +24,7 @@ import { Recipe } from './models/kitchen/recipe.model';
 import * as jsPDF from 'jspdf';
 import { Promo } from './models/sales/menu/promo.model';
 import { Combo } from './models/sales/menu/combo.model';
+import { Role } from './models/general/role.model';
 
 @Injectable({
   providedIn: 'root'
@@ -93,10 +94,45 @@ export class DatabaseService {
   ordersCollection: AngularFirestoreCollection<Order>;
   orders$: Observable<Order[]>;
 
+
+  // -------------------------- USERS --------------------------------------
+  public permitsCollection: AngularFirestoreCollection<Role>;
   constructor(
     public af: AngularFirestore,
     private auth: AuthService
-  ) { }
+  ) {
+      //SYSTEM
+      this.getPermits();
+      this.getUsers();
+      this.getCustomers();
+
+   }
+
+
+  //PErmits
+  permitsList$: Observable<Role[]>;
+
+
+
+   // *************** USERS
+  addUser(data): Promise<any> {
+    return this.usersCollection.doc(data['uid']).set(data);
+  }
+
+  getPermits(): void {
+    this.permitsCollection = this.af.collection<Role>(`/db/deliciasTete/roles`, ref => ref.orderBy('createdAt', 'asc'));
+    this.permitsList$ =
+      this.permitsCollection.valueChanges()
+        .pipe(
+          map(res => {
+            res.forEach((element, index) => {
+              element['index'] = index;
+            })
+            return res;
+          }),
+          shareReplay(1)
+        );
+  }
 
   /********** GENERAL METHODS *********************** */
 

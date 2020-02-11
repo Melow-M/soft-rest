@@ -9,6 +9,10 @@ const routes: Routes = [
     component: MainComponent,
     children: [
       {
+        path: 'configuration',
+        loadChildren: () => import('./configuration/configuration.module').then(mod => mod.ConfigurationModule)
+      },
+      {
         path: 'ventas/menu',
         loadChildren: () => import('./sales/menu/menu.module').then(mod => mod.MenuModule)
       },

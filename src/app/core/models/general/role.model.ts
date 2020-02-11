@@ -13,4 +13,5 @@ export interface Role {
   kitchenDishes: boolean;
   AdministrativeSection: boolean;
   thirdPartiesSection: boolean;
+  configurationSection: boolean;
 }

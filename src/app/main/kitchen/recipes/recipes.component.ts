@@ -37,7 +37,6 @@ export class RecipesComponent implements OnInit {
   dialogRef: MatDialogRef<any>
 
   //Excel
-  data_xls: any
   headersXlsx: string[] = [
     'Insumo',
     'Medida',

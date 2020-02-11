@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { Promo } from 'src/app/core/models/sales/menu/promo.model';
 import { tap } from 'rxjs/operators';
 import { FormBuilder, FormControl } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-promos',
@@ -25,11 +26,19 @@ export class PromosComponent implements OnInit {
 
   filterControl: FormControl = new FormControl()
 
-  //Paginator
+  //Excel
+  headersXlsx: string[] = [
+    'Insumo',
+    'Medida',
+    'Cantidad por Ración',
+  ]
+
   constructor(
     private dialog: MatDialog,
     private dbs: DatabaseService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public datePipe: DatePipe
+
   ) { }
 
   @ViewChild('promoTablePaginator', {static: false}) set matPaginator(mp: MatPaginator){
@@ -70,5 +79,48 @@ export class PromosComponent implements OnInit {
       })
     })
 
+  }
+
+  
+  downloadXls(): void {
+    let table_xlsx: any[] = [];
+    let dateRange;
+    let availableUnits;
+    table_xlsx.push(this.headersXlsx);
+
+    this.promosTableDataSource.data.forEach((element: Promo) => {
+      dateRange = element.validityPeriod == 'Indefinido'? 'Indefinido': 
+      (this.datePipe.transform(element.dateRange.begin.getTime(), 'dd/MM/yyyy')+ " + " +
+        this.datePipe.transform(element.dateRange.end.getTime(), 'dd/MM/yyyy'));
+
+      availableUnits = element.quantity == 'Indefinido' ? 'Indefinido':
+        element.units;
+
+      const temp = [
+        this.datePipe.transform(element.createdAt.getTime(), 'dd/MM/yyyy'),
+        element.name,
+        element.products.map(el => el.product.name).join(', '),
+        element.state,
+        dateRange,
+        element.realPrice,
+        element.promoPrice,
+        "S/."+((element.realPrice-element.promoPrice)/element.realPrice*100.0).toFixed(2),
+        element.soldUnits,
+        availableUnits,
+        element.createdBy.displayName
+      ];
+      table_xlsx.push(temp);
+    })
+
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
+
+    let sheetName = (<string>this.searchForm.get('productName').value['name']).replace(/\s/g, "_");
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Receta de "'+ sheetName +'"');
+
+    const name = 'receta_de_'+sheetName+'.xlsx';
+
+    XLSX.writeFile(wb, name);
   }
 }

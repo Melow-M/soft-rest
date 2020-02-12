@@ -94,6 +94,12 @@ export class TotalsComponent implements OnInit {
     return array.map(t => t.amount * t.value).reduce((acc, value) => acc + value, 0);
   }
 
-  
+  onPrintPDF(){
+    console.log(this.expenses);
+    console.log(this.income);
+    console.log(this.cash);
+
+    this.dbs.printCash(this.cash, this.income, this.expenses);
+  }
 
 }

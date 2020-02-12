@@ -635,6 +635,127 @@ export class DatabaseService {
     return transactionsCollection.valueChanges().pipe(shareReplay(1));
   }
 
+  printCash(cash, income, expenses){
+    var doc = new jsPDF({
+      unit: 'pt',
+      orientation: 'l',
+      format: 'A4'
+    });
+    
+    //Imagen
+    let actualDate = this.getDate();
+    //Importando Plantilla
+    let img = new Image()
+    img.src = '../../assets/images/cashPDF.jpg';
+
+    doc.addImage(img, 'JPEG', 0, 0, 841, 594);
+    
+    //Efectivo
+    doc.setFontStyle("normal");
+    doc.setFontSize(18),
+    doc.text("S/. "+cash[0]['amount'].toFixed(2), 268, 244, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +cash[1]['amount'].toFixed(2), 268, 280, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +cash[2]['amount'].toFixed(2), 268, 314, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +
+      (cash[0]['amount']*cash[0]['value']+
+      cash[1]['amount']*cash[1]['value']+
+      cash[2]['amount']*cash[2]['value']).toFixed(2)
+      , 268, 363, {
+        align: "right",
+        baseline: "bottom"
+      });
+      
+    //Ingresos por TIpo
+    doc.setFontSize(18),
+    doc.text("S/. " + income[0]['amount'].toFixed(2), 519, 244, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " + income[1]['amount'].toFixed(2), 519, 280, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " + income[2]['amount'].toFixed(2), 519, 314, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " + 
+      (income[0]['amount']*income[0]['value']+
+      income[1]['amount']*income[1]['value']+
+      income[2]['amount']*income[2]['value']).toFixed(2)
+      , 519, 363, {
+        align: "right",
+        baseline: "bottom"
+      });
+      
+    // doc.text("S/. " + "TITULO".toUpperCase(), 519, 401, {
+    //     align: "right",
+    //     baseline: "bottom"
+    //   });
+      
+    //Egresos por tipo
+    doc.setFontSize(18),
+    doc.text("S/. " +expenses[0]['amount'].toFixed(), 768, 244, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +expenses[1]['amount'].toFixed(), 768, 280, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +
+      (expenses[0]['amount']*expenses[0]['value']+
+      expenses[1]['amount']*expenses[1]['value']).toFixed(2)
+      , 768, 327, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    //Footer
+    doc.text(actualDate[2]+"/"+actualDate[1]+"/"+actualDate[0]+" "+actualDate[3]+":"+actualDate[4], 676, 541, {
+        align: "left",
+        baseline: "bottom"
+      });
+      
+      doc.autoPrint({ variant: 'non-conform' });
+      doc.save(`Caja.pdf`);
+  }
+
+    //Funcion para obtener valores de fechas
+    getDate(){
+      let date = new Date();
+        let month = '' + (date.getMonth() + 1);
+        let day = '' + date.getDate();
+        let year = date.getFullYear();
+        let hours = date.getHours();
+        let minutes = '' + date.getMinutes();
+  
+        if (minutes.length < 2) 
+            minutes = '0' + minutes;
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+    
+        return [year, month, day, hours, minutes]
+    }
 
   //SE tiene que enviar contenido como en el ejemplo (titulo y content comentados). El numero máximo de columnas es 4,
   //pero se pueden incluir menos. El numero maximo de filas es 24

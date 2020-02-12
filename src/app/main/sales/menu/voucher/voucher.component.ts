@@ -74,7 +74,7 @@ export class VoucherComponent implements OnInit {
       }
     })
 
-    this.countDishes = dishes.reduce((a, b) => a.concat(b),[]).map((el, index, array) => {
+    this.countDishes = dishes.reduce((a, b) => a.concat(b), []).map((el, index, array) => {
       let counter = 0
       array.forEach(al => {
         if (al['id'] == el['id']) {
@@ -279,10 +279,10 @@ export class VoucherComponent implements OnInit {
 
         this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
 
-        // batch.commit().then(() => {
-        //   console.log('orden guardada');
-        //   this.dialog.close()
-        // })
+        batch.commit().then(() => {
+          console.log('orden guardada');
+          this.dialog.close()
+        })
       })
 
   }

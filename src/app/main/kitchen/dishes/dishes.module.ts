@@ -20,11 +20,15 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MissingInputsComponent } from './missing-inputs/missing-inputs.component';
+import { OrdersComponent } from './orders/orders.component';
+import { PlanningComponent } from './planning/planning.component';
 
 @NgModule({
   declarations: [
     DishesComponent,
-    MissingInputsComponent
+    MissingInputsComponent,
+    OrdersComponent,
+    PlanningComponent
   ],
   imports: [
     CommonModule,

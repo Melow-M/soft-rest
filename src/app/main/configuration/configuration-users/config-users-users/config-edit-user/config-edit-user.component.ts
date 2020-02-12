@@ -56,17 +56,6 @@ export class ConfigEditUserComponent implements OnInit {
       })
     );
 
-    this.filteredUsers$ = combineLatest(
-      this.dbs.users$,
-      this.jobDataFormGroup.get('supervisor').valueChanges.pipe(
-        filter(input => input !== null),
-        startWith<any>(''),
-        map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase()))
-    ).pipe(
-      map(([users, name]) => {
-        return name ? users.filter(option => option['displayName'].toLowerCase().includes(name)) : users;
-      })
-    );
   }
 
   createForms(): void{
@@ -81,10 +70,8 @@ export class ConfigEditUserComponent implements OnInit {
     })
 
     this.jobDataFormGroup = this.fb.group({
-      code: this.data['code'],
       jobTitle: [this.data['jobTitle'], Validators.required],
-      supervisor: [this.data['supervisor'], [Validators.required]],
-      permit: [this.data['permit'], [Validators.required]]
+      permit: [this.data['role'], [Validators.required]]
     })
   }
 
@@ -146,10 +133,8 @@ export class ConfigEditUserComponent implements OnInit {
           phone: this.personalDataFormGroup.get('phone').value,
           dni: this.personalDataFormGroup.get('dni').value,
           password: this.personalDataFormGroup.get('password').value,
-          code: this.jobDataFormGroup.get('code').value,
           jobTitle: this.jobDataFormGroup.get('jobTitle').value,
-          supervisor: this.jobDataFormGroup.get('supervisor').value,
-          permit: this.jobDataFormGroup.get('permit').value
+          role: this.jobDataFormGroup.get('permit').value
         }
 
         this.dbs.usersCollection

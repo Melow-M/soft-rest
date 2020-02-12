@@ -79,17 +79,6 @@ export class CreateNewUserComponent implements OnInit {
       })
     );
 
-    this.filteredUsers$ = combineLatest(
-      this.dbs.users$,
-      this.jobDataFormGroup.get('supervisor').valueChanges.pipe(
-        filter(input => input !== null),
-        startWith<any>(''),
-        map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase()))
-    ).pipe(
-      map(([users, name]) => {
-        return name ? users.filter(option => option['displayName'].toLowerCase().includes(name)) : users;
-      })
-    );
   }
 
   createForms(): void {
@@ -103,9 +92,7 @@ export class CreateNewUserComponent implements OnInit {
     })
 
     this.jobDataFormGroup = this.fb.group({
-      code: '',
       jobTitle: ['', Validators.required],
-      supervisor: ['', [Validators.required]],
       permit: ['', [Validators.required]]
     })
   }
@@ -166,9 +153,7 @@ export class CreateNewUserComponent implements OnInit {
             phone: this.personalDataFormGroup.get('phone').value,
             dni: this.personalDataFormGroup.get('dni').value,
             password: this.personalDataFormGroup.get('password').value,
-            code: this.jobDataFormGroup.get('code').value,
             jobTitle: this.jobDataFormGroup.get('jobTitle').value,
-            supervisor: this.jobDataFormGroup.get('supervisor').value,
             role: this.jobDataFormGroup.get('permit').value,
             uid: res['uid'],
             regDate: Date.now(),

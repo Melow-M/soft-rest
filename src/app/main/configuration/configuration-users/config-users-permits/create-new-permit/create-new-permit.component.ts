@@ -22,6 +22,96 @@ export class CreateNewPermitComponent implements OnInit {
   detailsFormGroup: FormGroup;
   permitsConfigurationFormGroup: FormGroup;
 
+  kitchenSelection = new SelectionModel<any>(true, []);
+  kitchenKeys: Array<any> = [
+    { name: 'Combos', value: 'kitchenCombos' },
+    { name: 'Crear Combo', value: 'kitchenCombosCreate' },
+    { name: 'Descargar Combo', value: 'kitchenCombosDownload' },
+    { name: 'Cambio de estado de Combo', value: 'kitchenCombosActions' },
+    { name: 'Recetas', value: 'kitchenRecipes' },
+    { name: 'Crear Receta', value: 'kitchenRecipesCreate' },
+    { name: 'Descargar Receta', value: 'kitchenRecipesDownload' },
+    { name: 'Editar Receta', value: 'kitchenRecipesEdit' },
+    { name: 'Eliminar Receta', value: 'kitchenRecipesDelete' },
+    { name: 'Pedidos', value: 'kitchenOrders' },
+    { name: 'Descargar Pedido', value: 'kitchenOrdersDownload' },
+    { name: 'Detalles de Pedido', value: 'kitchenOrdersDetails' },
+    { name: 'Promociones', value: 'kitchenPromos' },
+    { name: 'Crear Promoción', value: 'kitchenPromosCreate' },
+    { name: 'Descargar Promoción', value: 'kitchenPromosDownload' },
+    { name: 'Cambio de estado de Promoción', value: 'kitchenPromosActions' },
+  ]
+
+  warehouseSelection = new SelectionModel<any>(true, []);
+  warehouseKeys: Array<any> = [
+    { name: 'Compras', value: 'warehousePurchases' },
+    { name: 'Registrar Compra', value: 'warehousePurchasesRegister' },
+    { name: 'Descargar Compra', value: 'warehousePurchasesDownload' },
+    { name: 'Cancelar Compra', value: 'warehousePurchasesCancel' },
+    { name: 'Inventario', value: 'warehouseStocktaking' },
+    { name: 'Crear Nuevo', value: 'warehouseStocktakingCreate' },
+    { name: 'Retirar Menaje', value: 'warehouseStocktakingRemove' },
+    { name: 'Descargar inventario', value: 'warehouseStocktakingDownload' },
+    { name: 'Kardex', value: 'warehouseStocktakingKardex' },
+    { name: 'Editar Item', value: 'warehouseStocktakingEdit' },
+    { name: 'Borrar item', value: 'warehouseStocktakingDelete' },
+  ]
+
+  salesSelection = new SelectionModel<any>(true, []);
+  salesKeys: Array<any> = [
+    { name: 'Menu', value: 'salesMenu' },
+    { name: 'Historial', value: 'salesRecord' },
+    { name: 'Descargar Historial', value: 'salesRecordDownload' },
+    { name: 'Anular Registro de Historial', value: 'salesRecordCancel' },
+    { name: 'Caja', value: 'salesCash' },
+    { name: 'Cerrar Caja', value: 'salesCashClose' },
+    { name: 'Total Ventas', value: 'salesCashTotal' },
+    { name: 'Historial', value: 'salesCashHistory' },
+    { name: 'Agregar Dinero', value: 'salesCashAddMoney' },
+    { name: 'Retirar Dinero', value: 'salesCashRetrieveMoney' },
+    { name: 'Configuración', value: 'salesCashConfiguration' },
+    { name: 'Descargar Caja', value: 'salesCashDownload' },
+  ]
+
+  adminSection = new SelectionModel<any>(true, []);
+  adminKeys: Array<any> = [
+    { name: 'Cuentas por Pagar', value: 'adminAccountsPayable' },
+    { name: 'Lista de Items', value: 'adminAccountsPayableList' },
+    { name: 'Pagos a cuenta', value: 'adminAccountsPayablePays' },
+    { name: 'Pago total', value: 'adminAccountsPayableTotalPay' },
+    { name: 'Pago parcial', value: 'adminAccountsPayablePartialPay' },
+
+    { name: 'Cuentas por Cobrar', value: 'adminAccountsReceivable' },
+
+    { name: 'Admin. Cajas', value: 'adminManageCash' },
+    { name: 'Crear', value: 'adminManageCashCreate' },
+    { name: 'Editar', value: 'adminManageCashEdit' },
+    { name: 'Borrar', value: 'adminManageCashDelete' },
+
+  ]
+
+  thirdPartiesSection = new SelectionModel<any>(true, []);
+  thirdPartiesKeys: Array<any> = [
+    { name: 'Clientes', value: 'thirdPartiesCustomers' },
+    { name: 'Crear', value: 'thirdPartiesCustomersCreate' },
+    { name: 'Editar', value: 'thirdPartiesCustomersEdit' },
+    { name: 'Borrar', value: 'thirdPartiesCustomersDelete' },
+    { name: 'Cuentas', value: 'thirdPartiesCustomersContacts' },
+
+
+    { name: 'Proveedores', value: 'thirdPartiesProviders' },
+    { name: 'Crear', value: 'thirdPartiesProvidersCreate' },
+    { name: 'Editar', value: 'thirdPartiesProvidersEdit' },
+    { name: 'Borrar', value: 'thirdPartiesProvidersDelete' },
+    { name: 'Cuentas', value: 'thirdPartiesProvidersAccounts' },
+    { name: 'Contactos', value: 'thirdPartiesProvidersContacts' },
+  ]
+
+  configurationSelection = new SelectionModel<any>(true, []);
+  configurationKeys: Array<any> = [
+    { name: 'Usuarios', value: 'configurationUsers' },
+  ];
+
   securitySelection = new SelectionModel<any>(true, []);
   securityKeys: Array<any> = [
     { name: 'FRED', value: 'securityFred' },
@@ -124,12 +214,7 @@ export class CreateNewPermitComponent implements OnInit {
     { name: 'Master', value: 'rtdMaster' }
   ];
 
-  configurationSelection = new SelectionModel<any>(true, []);
-  configurationKeys: Array<any> = [
-    { name: 'Usuarios', value: 'configurationUsers' },
-    { name: 'Valores del sistema', value: 'configurationSystem' },
-    { name: 'Notificaciones', value: 'configurationNotification' }
-  ];
+
 
   constructor(
     private fb: FormBuilder,
@@ -163,191 +248,337 @@ export class CreateNewPermitComponent implements OnInit {
 
     this.permitsConfigurationFormGroup = this.fb.group({
 
-      securitySection: false,
-      securityFred: false,
-      securityFredForm: false,
-      securityFredGeneralList: false,
-      securityFredPersonalList: false,
-      securityFredDownload: false,
-      securityFredEdit: false,
-      securityFredDelete: false,
-      securityInspections: false,
-      securityInspectionsCrono: false,
-      securityInspectionsGeneralList: false,
-      securityInspectionsPersonalList: false,
-      securityInspectionsDownload: false,
-      securityInspectionsEdit: false,
-      securityInspectionsDelete: false,
-      securityTasks: false,
-      securityTasksGeneralList: false,
-      securityTasksPersonalList: false,
-      securityTasksEdit: false,
-      securityTasksDelete: false,
+      kitchenCombosSection: false,
+      kitchenCombosCreate: false,
+      kitchenCombosDownload: false,
+      kitchenCombosActions: false,
 
-      qualitySection: false,
-      qualityRedos: false,
-      qualityRedosGeneralList: false,
-      qualityRedosPersonalList: false,
-      qualityRedosDownload: false,
-      qualityRedosEdit: false,
-      qualityRedosDelete: false,
-      qualityInspections: false,
-      qualityInspectionsCrono: false,
-      qualityInspectionsGeneralList: false,
-      qualityInspectionsPersonalList: false,
-      qualityInspectionsDownload: false,
-      qualityInspectionsEdit: false,
-      qualityInspectionsDelete: false,
-      qualityInspectionsSingleObservations: false,
-      qualityInspectionsSingleObservationsDelete: false,
-      qualityInspectionsSingleObservationsGeneralList: false,
-      qualityInspectionsSingleObservationsPersonalList: false,
-      qualityTasks: false,
-      qualityTasksForm: false,
-      qualityTasksGeneralList: false,
-      qualityTasksPersonalList: false,
-      qualityTasksEdit: false,
-      qualityTasksDelete: false,
+      kitchenRecipesSection: false,
+      kitchenRecipesCreate: false,
+      kitchenRecipesDownload: false,
+      kitchenRecipesEdit: false,
+      kitchenRecipesDelete: false,
 
-      maintenanceSection: false,
-      maintenanceRequests: false,
-      maintenanceRequestsForm: false,
-      maintenanceRequestsGeneralList: false,
-      maintenanceRequestsPersonalList: false,
-      maintenanceRequestsDownload: false,
-      maintenanceRequestsEdit: false,
-      maintenanceRequestsDelete: false,
+      kitchenOrdersSection: false,
+      kitchenOrdersDownload: false,
+      kitchenOrdersDetails: false,
 
-      ssggSection: false,
-      ssggRequests: false,
-      ssggRequestsForm: false,
-      ssggRequestsGeneralList: false,
-      ssggRequestsPersonalList: false,
-      ssggRequestsDownload: false,
-      ssggRequestsEdit: false,
-      ssggRequestsDelete: false,
+      kitchenPromosSection: false,
+      kitchenPromosCreate: false,
+      kitchenPromosDownload: false,
+      kitchenPromosActions: false,
 
-      logisticsSection: false,
-      logisticsOutOfService: false,
-      logisticsOutOfServiceConfiguration: false,
-      logisticsOutOfServiceSearch: false,
-      logisticsOutOfServiceStocktaking: false,
-      logisticsOutOfServiceStocktakingEditAction: false,
-      logisticsOutOfServiceStocktakingDeleteAction: false,
-      logisticsRunner: false,
 
-      utilizationSection: false,
-      utilizationRegisters: false,
-      utilizationHorometers: false,
-      utilizationTrends: false,
+      warehousePurchasesSection: false,
+      warehousePurchasesRegister: false,
+      warehousePurchasesDownload: false,
+      warehousePurchasesCancel: false,
 
-      rtdSection: false,
-      rtdTags: false,
-      rtdMaster: false,
+      warehouseStocktakingSection: false,
+      warehouseStocktakingCreate: false,
+      warehouseStocktakingRemove: false,
+      warehouseStocktakingDownload: false,
+      warehouseStocktakingKardex: false,
+      warehouseStocktakingEdit: false,
+      warehouseStocktakingDelete: false,
+
+
+      salesMenuSection: false,
+
+      salesRecordSection: false,
+      salesRecordDownload: false,
+      salesRecordCancel: false,
+
+      salesCashSection: false,
+      salesCashClose: false,
+      salesCashTotal: false,
+      salesCashHistory: false,
+      salesCashAddMoney: false,
+      salesCashRetrieveMoney: false,
+      salesCashConfiguration: false,
+      salesCashDownload: false,
+
+      adminAccountsPayableSection: false,
+      adminAccountsPayableList: false,
+      adminAccountsPayablePays: false,
+      adminAccountsPayableTotalPay: false,
+      adminAccountsPayablePartialPay: false,
+
+      adminAccountsReceivableSection: false,
+
+      adminManageCashSection: false,
+      adminManageCashCreate: false,
+      adminManageCashEdit: false,
+      adminManageCashDelete: false,
+
+      thirdPartiesCustomersSection: false,
+      thirdPartiesCustomersCreate: false,
+      thirdPartiesCustomersEdit: false,
+      thirdPartiesCustomersDelete: false,
+      thirdPartiesCustomersContacts: false,
+
+      thirdPartiesProvidersSection: false,
+      thirdPartiesProvidersCreate: false,
+      thirdPartiesProvidersEdit: false,
+      thirdPartiesProvidersDelete: false,
+      thirdPartiesProvidersAccounts: false,
+      thirdPartiesProvidersContacts: false,
 
       configurationSection: false,
       configurationUsers: false,
-      configurationSystem: false,
-      configurationNotification: false
+
+
+      //
+
+      // securitySection: false,
+      // securityFred: false,
+      // securityFredForm: false,
+      // securityFredGeneralList: false,
+      // securityFredPersonalList: false,
+      // securityFredDownload: false,
+      // securityFredEdit: false,
+      // securityFredDelete: false,
+      // securityInspections: false,
+      // securityInspectionsCrono: false,
+      // securityInspectionsGeneralList: false,
+      // securityInspectionsPersonalList: false,
+      // securityInspectionsDownload: false,
+      // securityInspectionsEdit: false,
+      // securityInspectionsDelete: false,
+      // securityTasks: false,
+      // securityTasksGeneralList: false,
+      // securityTasksPersonalList: false,
+      // securityTasksEdit: false,
+      // securityTasksDelete: false,
+
+      // qualitySection: false,
+      // qualityRedos: false,
+      // qualityRedosGeneralList: false,
+      // qualityRedosPersonalList: false,
+      // qualityRedosDownload: false,
+      // qualityRedosEdit: false,
+      // qualityRedosDelete: false,
+      // qualityInspections: false,
+      // qualityInspectionsCrono: false,
+      // qualityInspectionsGeneralList: false,
+      // qualityInspectionsPersonalList: false,
+      // qualityInspectionsDownload: false,
+      // qualityInspectionsEdit: false,
+      // qualityInspectionsDelete: false,
+      // qualityInspectionsSingleObservations: false,
+      // qualityInspectionsSingleObservationsDelete: false,
+      // qualityInspectionsSingleObservationsGeneralList: false,
+      // qualityInspectionsSingleObservationsPersonalList: false,
+      // qualityTasks: false,
+      // qualityTasksForm: false,
+      // qualityTasksGeneralList: false,
+      // qualityTasksPersonalList: false,
+      // qualityTasksEdit: false,
+      // qualityTasksDelete: false,
+
+      // maintenanceSection: false,
+      // maintenanceRequests: false,
+      // maintenanceRequestsForm: false,
+      // maintenanceRequestsGeneralList: false,
+      // maintenanceRequestsPersonalList: false,
+      // maintenanceRequestsDownload: false,
+      // maintenanceRequestsEdit: false,
+      // maintenanceRequestsDelete: false,
+
+      // ssggSection: false,
+      // ssggRequests: false,
+      // ssggRequestsForm: false,
+      // ssggRequestsGeneralList: false,
+      // ssggRequestsPersonalList: false,
+      // ssggRequestsDownload: false,
+      // ssggRequestsEdit: false,
+      // ssggRequestsDelete: false,
+
+      // logisticsSection: false,
+      // logisticsOutOfService: false,
+      // logisticsOutOfServiceConfiguration: false,
+      // logisticsOutOfServiceSearch: false,
+      // logisticsOutOfServiceStocktaking: false,
+      // logisticsOutOfServiceStocktakingEditAction: false,
+      // logisticsOutOfServiceStocktakingDeleteAction: false,
+      // logisticsRunner: false,
+
+      // utilizationSection: false,
+      // utilizationRegisters: false,
+      // utilizationHorometers: false,
+      // utilizationTrends: false,
+
+      // rtdSection: false,
+      // rtdTags: false,
+      // rtdMaster: false,
 
     })
+    
 
-    this.securitySelection.onChange
+    this.kitchenSelection.onChange
       .pipe(
         debounceTime(1000)
-      )
-      .subscribe(res => {
+        ).subscribe(res => {
+          if(!this.kitchenSelection.hasValue()){
+            this.permitsConfigurationFormGroup.get('kitchenSelection').setValue(false);
+          } else {
+            this.permitsConfigurationFormGroup.get('kitchenSelection').setValue(true);
+          }
+        });
 
-        if (!this.securitySelection.hasValue()) {
-          this.permitsConfigurationFormGroup.get('securitySection').setValue(false);
-        } else {
-          this.permitsConfigurationFormGroup.get('securitySection').setValue(true);
-        }
-      })
-
-    this.qualitySelection.onChange
+    this.warehouseSelection.onChange
       .pipe(
         debounceTime(1000)
-      )
-      .subscribe(res => {
-        if (!this.qualitySelection.hasValue()) {
-          this.permitsConfigurationFormGroup.get('qualitySection').setValue(false);
-        } else {
-          this.permitsConfigurationFormGroup.get('qualitySection').setValue(true);
-        }
-      })
+        ).subscribe(res => {
+          if(!this.warehouseSelection.hasValue()){
+            this.permitsConfigurationFormGroup.get('warehouseSelection').setValue(false);
+          } else {
+            this.permitsConfigurationFormGroup.get('warehouseSelection').setValue(true);
+          }
+        });
 
-    this.maintenanceSelection.onChange
+    this.salesSelection.onChange
       .pipe(
         debounceTime(1000)
-      )
-      .subscribe(res => {
-        if (!this.maintenanceSelection.hasValue()) {
-          this.permitsConfigurationFormGroup.get('maintenanceSection').setValue(false);
-        } else {
-          this.permitsConfigurationFormGroup.get('maintenanceSection').setValue(true);
-        }
-      })
+        ).subscribe(res => {
+          if(!this.salesSelection.hasValue()){
+            this.permitsConfigurationFormGroup.get('salesSelection').setValue(false);
+          } else {
+            this.permitsConfigurationFormGroup.get('salesSelection').setValue(true);
+          }
+        });
 
-    this.ssggSelection.onChange
+    this.adminSection.onChange
       .pipe(
         debounceTime(1000)
-      )
-      .subscribe(res => {
-        if (!this.ssggSelection.hasValue()) {
-          this.permitsConfigurationFormGroup.get('ssggSection').setValue(false);
-        } else {
-          this.permitsConfigurationFormGroup.get('ssggSection').setValue(true);
-        }
-      })
+        ).subscribe(res => {
+          if(!this.adminSection.hasValue()){
+            this.permitsConfigurationFormGroup.get('adminSection').setValue(false);
+          } else {
+            this.permitsConfigurationFormGroup.get('adminSection').setValue(true);
+          }
+        });
 
-    this.logisticsSelection.onChange
+    this.thirdPartiesSection.onChange
       .pipe(
         debounceTime(1000)
-      )
-      .subscribe(res => {
-        if (!this.logisticsSelection.hasValue()) {
-          this.permitsConfigurationFormGroup.get('logisticsSection').setValue(false);
-        } else {
-          this.permitsConfigurationFormGroup.get('logisticsSection').setValue(true);
-        }
-      })
-
-    this.utilizationSelection.onChange
-      .pipe(
-        debounceTime(1000)
-      )
-      .subscribe(res => {
-        if (!this.utilizationSelection.hasValue()) {
-          this.permitsConfigurationFormGroup.get('utilizationSection').setValue(false);
-        } else {
-          this.permitsConfigurationFormGroup.get('utilizationSection').setValue(true);
-        }
-      })
-
-    this.rtdSelection.onChange
-      .pipe(
-        debounceTime(1000)
-      )
-      .subscribe(res => {
-        if (!this.rtdSelection.hasValue()) {
-          this.permitsConfigurationFormGroup.get('rtdSection').setValue(false);
-        } else {
-          this.permitsConfigurationFormGroup.get('rtdSection').setValue(true);
-        }
-      })
+        ).subscribe(res => {
+          if(!this.thirdPartiesSection.hasValue()){
+            this.permitsConfigurationFormGroup.get('thirdPartiesSection').setValue(false);
+          } else {
+            this.permitsConfigurationFormGroup.get('thirdPartiesSection').setValue(true);
+          }
+        });
 
     this.configurationSelection.onChange
       .pipe(
         debounceTime(1000)
-      )
-      .subscribe(res => {
-        if (!this.configurationSelection.hasValue()) {
-          this.permitsConfigurationFormGroup.get('configurationSection').setValue(false);
-        } else {
-          this.permitsConfigurationFormGroup.get('configurationSection').setValue(true);
-        }
-      })
+        ).subscribe(res => {
+          if(!this.configurationSelection.hasValue()){
+            this.permitsConfigurationFormGroup.get('configurationSelection').setValue(false);
+          } else {
+            this.permitsConfigurationFormGroup.get('configurationSelection').setValue(true);
+          }
+        });
+
+
+    //
+    // this.securitySelection.onChange
+    //   .pipe(
+    //     debounceTime(1000)
+    //   )
+    //   .subscribe(res => {
+
+    //     if (!this.securitySelection.hasValue()) {
+    //       this.permitsConfigurationFormGroup.get('securitySection').setValue(false);
+    //     } else {
+    //       this.permitsConfigurationFormGroup.get('securitySection').setValue(true);
+    //     }
+    //   })
+
+    // this.qualitySelection.onChange
+    //   .pipe(
+    //     debounceTime(1000)
+    //   )
+    //   .subscribe(res => {
+    //     if (!this.qualitySelection.hasValue()) {
+    //       this.permitsConfigurationFormGroup.get('qualitySection').setValue(false);
+    //     } else {
+    //       this.permitsConfigurationFormGroup.get('qualitySection').setValue(true);
+    //     }
+    //   })
+
+    // this.maintenanceSelection.onChange
+    //   .pipe(
+    //     debounceTime(1000)
+    //   )
+    //   .subscribe(res => {
+    //     if (!this.maintenanceSelection.hasValue()) {
+    //       this.permitsConfigurationFormGroup.get('maintenanceSection').setValue(false);
+    //     } else {
+    //       this.permitsConfigurationFormGroup.get('maintenanceSection').setValue(true);
+    //     }
+    //   })
+
+    // this.ssggSelection.onChange
+    //   .pipe(
+    //     debounceTime(1000)
+    //   )
+    //   .subscribe(res => {
+    //     if (!this.ssggSelection.hasValue()) {
+    //       this.permitsConfigurationFormGroup.get('ssggSection').setValue(false);
+    //     } else {
+    //       this.permitsConfigurationFormGroup.get('ssggSection').setValue(true);
+    //     }
+    //   })
+
+    // this.logisticsSelection.onChange
+    //   .pipe(
+    //     debounceTime(1000)
+    //   )
+    //   .subscribe(res => {
+    //     if (!this.logisticsSelection.hasValue()) {
+    //       this.permitsConfigurationFormGroup.get('logisticsSection').setValue(false);
+    //     } else {
+    //       this.permitsConfigurationFormGroup.get('logisticsSection').setValue(true);
+    //     }
+    //   })
+
+    // this.utilizationSelection.onChange
+    //   .pipe(
+    //     debounceTime(1000)
+    //   )
+    //   .subscribe(res => {
+    //     if (!this.utilizationSelection.hasValue()) {
+    //       this.permitsConfigurationFormGroup.get('utilizationSection').setValue(false);
+    //     } else {
+    //       this.permitsConfigurationFormGroup.get('utilizationSection').setValue(true);
+    //     }
+    //   })
+
+    // this.rtdSelection.onChange
+    //   .pipe(
+    //     debounceTime(1000)
+    //   )
+    //   .subscribe(res => {
+    //     if (!this.rtdSelection.hasValue()) {
+    //       this.permitsConfigurationFormGroup.get('rtdSection').setValue(false);
+    //     } else {
+    //       this.permitsConfigurationFormGroup.get('rtdSection').setValue(true);
+    //     }
+    //   })
+
+    // this.configurationSelection.onChange
+    //   .pipe(
+    //     debounceTime(1000)
+    //   )
+    //   .subscribe(res => {
+    //     if (!this.configurationSelection.hasValue()) {
+    //       this.permitsConfigurationFormGroup.get('configurationSection').setValue(false);
+    //     } else {
+    //       this.permitsConfigurationFormGroup.get('configurationSection').setValue(true);
+    //     }
+    //   })
   }
 
   // SECURITY METHODS

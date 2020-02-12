@@ -91,12 +91,7 @@
       <ng-template matStepLabel>Datos de trabajo</ng-template>
 
       <form [formGroup]="jobDataFormGroup">
-        <mat-form-field class="w3-margin-right w3-block w3-margin-bottom" style="max-width:200px" appearance="outline">
-          <mat-label>Código</mat-label>
-          <!-- <mat-icon matPrefix style="vertical-align:middle;margin-right:0.5em">work</mat-icon> -->
-          <input matInput type="text" placeholder="Escriba..." formControlName="code" autocomplete="off">
-        </mat-form-field>
-
+ 
         <mat-form-field class="w3-margin-right w3-block w3-margin-bottom" style="max-width:200px" appearance="outline">
           <mat-label>Puesto/Cargo</mat-label>
           <!-- <mat-icon matPrefix style="vertical-align:middle;margin-right:0.5em">work</mat-icon> -->
@@ -109,28 +104,6 @@
           </mat-error>
         </mat-form-field>
         <br>
-
-        <mat-form-field class="w3-margin-right w3-block w3-margin-bottom" style="max-width:200px" appearance="outline">
-          <mat-label>Supervisor/Jefe</mat-label>
-          <!-- <mat-icon matPrefix style="vertical-align:middle;margin-right:0.5em">supervised_user_circle</mat-icon> -->
-          <input matInput type="text" placeholder="Seleccione..." formControlName="supervisor"
-            [matAutocomplete]="autoSupervisor" autocomplete="off">
-          <mat-hint *ngIf="!jobDataFormGroup.value['supervisor']['jobTitle']">
-            <strong>requerido *</strong>
-          </mat-hint>
-          <mat-error>
-            <strong>requerido *</strong>
-          </mat-error>
-          <mat-hint *ngIf="jobDataFormGroup.value['supervisor']['jobTitle']">
-            {{jobDataFormGroup.value['supervisor']['jobTitle']}}
-          </mat-hint>
-          <mat-autocomplete #autoSupervisor="matAutocomplete"
-            [displayWith]="showSelectedSupervisor">
-            <mat-option *ngFor="let option of filteredUsers$ | async" [value]="option" style="font-size:14px">
-              <strong>{{option['displayName']}}</strong> | <span class="w3-small">{{option['jobTitle']}}</span>
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
 
         <mat-form-field class="w3-margin-right w3-block w3-margin-bottom" style="max-width:200px" appearance="outline">
           <mat-label>Nivel/Permisos</mat-label>

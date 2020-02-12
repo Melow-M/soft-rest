@@ -60,6 +60,7 @@ export class AuthService {
       this.role$
     ).pipe(
       map(([user, role]) => {
+        console.log(role);
         return { ...user, role: role }
       }),
       shareReplay(1)

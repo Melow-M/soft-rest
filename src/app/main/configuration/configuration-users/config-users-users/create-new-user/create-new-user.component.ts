@@ -122,7 +122,7 @@ export class CreateNewUserComponent implements OnInit {
   create(): void {
     this.loading = true;
     // this.http.post(`https://us-central1-crclajoya.cloudfunctions.net/msCreateUser/?email=${this.newUserFormGroup.value['email']}&displayName=${this.newUserFormGroup.value['name'].split(" ",1)[0] + ', ' + this.newUserFormGroup.value['lastname'].split(" ",1)[0]}&phoneNumber=${this.newUserFormGroup.value['phone']}&password=${this.newUserFormGroup.value['email'].split("@",1)[0] + this.now.getFullYear()}`
-    this.http.post(`https://us-central1-crclajoya.cloudfunctions.net/msCreateUser/?email=${this.personalDataFormGroup.value['email']}&displayName=${this.personalDataFormGroup.value['name'].split(" ", 1)[0] + ', ' + this.personalDataFormGroup.value['lastname'].split(" ", 1)[0]}&password=${this.personalDataFormGroup.value['password']}`
+    this.http.post(`https://us-central1-ms-soft-rest.cloudfunctions.net/msCreateUser/?email=${this.personalDataFormGroup.value['email']}&displayName=${this.personalDataFormGroup.value['name'].split(" ", 1)[0] + ', ' + this.personalDataFormGroup.value['lastname'].split(" ", 1)[0]}&password=${this.personalDataFormGroup.value['password']}`
       , this.data
       , this.httpOptions)
       .pipe(
@@ -154,9 +154,11 @@ export class CreateNewUserComponent implements OnInit {
             dni: this.personalDataFormGroup.get('dni').value,
             password: this.personalDataFormGroup.get('password').value,
             jobTitle: this.jobDataFormGroup.get('jobTitle').value,
-            role: this.jobDataFormGroup.get('permit').value,
+            role: {name: this.jobDataFormGroup.get('permit').value['name']},
+            roleId: this.jobDataFormGroup.get('permit').value['id'],
             uid: res['uid'],
             regDate: Date.now(),
+            createdAt: new Date(),
           }
 
           this.dbs.addUser(updateData)

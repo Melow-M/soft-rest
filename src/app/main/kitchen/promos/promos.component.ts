@@ -8,6 +8,7 @@ import { tap } from 'rxjs/operators';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import * as XLSX from 'xlsx';
+import { AuthService } from 'src/app/core/auth.service';
 
 @Component({
   selector: 'app-promos',
@@ -46,7 +47,8 @@ export class PromosComponent implements OnInit {
     private dialog: MatDialog,
     private dbs: DatabaseService,
     private snackBar: MatSnackBar,
-    public datePipe: DatePipe
+    public datePipe: DatePipe,
+    public auth: AuthService
 
   ) { }
 

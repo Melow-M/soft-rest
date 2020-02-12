@@ -8,6 +8,7 @@ import { tap } from 'rxjs/operators';
 import { CreateNewComboDialogComponent } from './create-new-combo-dialog/create-new-combo-dialog.component';
 import * as XLSX from 'xlsx';
 import { DatePipe } from '@angular/common';
+import { AuthService } from 'src/app/core/auth.service';
 
 @Component({
   selector: 'app-combos',
@@ -46,7 +47,8 @@ export class CombosComponent implements OnInit {
     private dialog: MatDialog,
     private dbs: DatabaseService,
     private snackBar: MatSnackBar,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    public auth: AuthService
   ) { }
 
   @ViewChild('comboTablePaginator', {static: false}) set matPaginator(mp: MatPaginator){

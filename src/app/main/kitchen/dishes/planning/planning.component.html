@@ -2,8 +2,8 @@
     <div>
         <mat-form-field appearance="outline" style="width: 280px;">
             <mat-label>Tipo de Menú</mat-label>
-            <mat-select>
-                <mat-option *ngFor="let type of menuTypes" value="type" (click)="selectMenu=type">
+            <mat-select [formControl]="selectMenuForm">
+                <mat-option *ngFor="let type of menuTypes" [value]="type">
                     {{type.name}}
                 </mat-option>
             </mat-select>
@@ -15,8 +15,8 @@
         Publicar
     </button>
 </div>
-<div *ngIf="selectMenu">
-    <div>
+<div *ngIf="selectMenu$ | async">
+    <div *ngIf="selectMenu">
         <h2 style="font-size:1.5em; color: #2B2B2B; font-family: Raleway; font-weight: bolder; padding-bottom: 16px;">
             {{selectMenu['name']}}</h2>
         <form [formGroup]="menuForm" style="display: flex; flex-wrap: wrap; align-items: center;">
@@ -53,7 +53,7 @@
             </button>
         </form>
     </div>
-    <div class="mat-elevation-z8 w3-margin-top w3-round" *ngIf="menuList.length"
+    <div class="mat-elevation-z8 w3-margin-top w3-round" *ngIf="dataSource.data.length"
         style="border-radius: 10px 10px 0 0; margin-top: 2vh;">
         <div class="w3-round-large" style="overflow:auto; border-radius: 10px 10px 0 0;">
             <table mat-table [dataSource]="dataSource" style="width: 100%; font-family: Raleway;">
@@ -106,11 +106,9 @@
                         Insumos Disponibles </th>
                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b;"
                         class="w3-center w3-border-left off w3-border-bottom':'w3-border-bottom w3-center w3-border-left">
-                        <mat-icon *ngIf="!element['missing']"
-                            style="vertical-align: middle;color: #039300">check_circle
+                        <mat-icon *ngIf="!element['missing']" style="vertical-align: middle;color: #039300">check_circle
                         </mat-icon>
-                        <mat-icon *ngIf="element['missing']"
-                            style="vertical-align: middle;color: #B70705;">cancel
+                        <mat-icon *ngIf="element['missing']" style="vertical-align: middle;color: #B70705;">cancel
                         </mat-icon>
                     </td>
                 </ng-container>
@@ -120,14 +118,14 @@
                     <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
                         style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9;">
                         Acciones</th>
-                    <td mat-cell *matCellDef="let element"
+                    <td mat-cell *matCellDef="let element; let i = index"
                         [className]="element['orderStatus']=='ANULADO'?'w3-center off w3-border-bottom':'w3-border-bottom w3-center'"
                         style="color:#2b2b2b; padding:0px 1em; border-left:1px solid #B9B9B9">
                         <mat-menu #requestsMenu="matMenu">
                             <button mat-menu-item>
                                 <mat-icon style="vertical-align: middle;">create</mat-icon> Editar
                             </button>
-                            <button mat-menu-item>
+                            <button mat-menu-item (click)="deleteItem(i)">
                                 <mat-icon style="vertical-align: middle;">delete</mat-icon> Borrar
                             </button>
                         </mat-menu>
@@ -140,8 +138,6 @@
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
         </div>
-        <mat-paginator class="w3-round-large" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
-        </mat-paginator>
     </div>
     <div style="text-align: right;" class="w3-margin-top">
         <button mat-raised-button class="w3-margin-right"

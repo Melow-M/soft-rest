@@ -97,12 +97,12 @@
 }
 
 .box img, .box .mat-icon {
-    width: 3vw;
-    font-size: 3vw;
+    width: 5vh;
+    font-size: 5vh;
 }
 
 .box p {
-    margin: 1.5vh 0;
+    margin: 0;
 }
 
 .box .stock {

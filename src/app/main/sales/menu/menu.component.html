@@ -144,7 +144,7 @@
                                 <div class="box" *ngFor="let plate of entry" (click)="selectedDish(plate)">
                                     <span class="stock">{{plate['stock']}} / 80</span>
                                     <img src="../../../../assets/images/almuerzo.png" alt="">
-                                    <p>{{plate['name']}}</p>
+                                    <p>{{plate['name'] | titlecase}}</p>
                                 </div>
                             </div>
                         </div>
@@ -154,7 +154,7 @@
                                 <div class="box" *ngFor="let plate of soup" (click)="selectedDish(plate)">
                                     <span class="stock">{{plate['stock']}} / 80</span>
                                     <img src="../../../../assets/images/almuerzo.png" alt="">
-                                    <p>{{plate['name']}}</p>
+                                    <p>{{plate['name'] | titlecase}}</p>
                                 </div>
                             </div>
                         </div>
@@ -164,7 +164,7 @@
                                 <div class="box" *ngFor="let plate of dessert" (click)="selectedDish(plate)">
                                     <span class="stock">{{plate['stock']}} / 80</span>
                                     <img src="../../../../assets/images/almuerzo.png" alt="">
-                                    <p>{{plate['name']}}</p>
+                                    <p>{{plate['name'] | titlecase}}</p>
                                 </div>
                             </div>
                         </div>
@@ -174,7 +174,7 @@
                                 <div class="box" *ngFor="let plate of second" (click)="selectedDish(plate)">
                                     <span class="stock">{{plate['stock']}} / 80</span>
                                     <img src="../../../../assets/images/almuerzo.png" alt="">
-                                    <p>{{plate['name']}}</p>
+                                    <p>{{plate['name'] | titlecase}}</p>
                                 </div>
                             </div>
                         </div>

@@ -1,152 +1,161 @@
-<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2">
+<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2" *ngIf="auth.userAndRole$ | async as user">
   <div class="w3-row">
-    <div class="w3-col s0 m1 l1">
-      <p></p>
-    </div>
-    <div class="w3-col s12 m10 l10" style="min-height:86vh; font-family: Raleway;">
-      <h1 style="font-size:1.8em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
-        <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">document
-        </mat-icon> Pedidos
-      </h1>
-      <mat-divider></mat-divider>
+      <div class="w3-col s0 m1 l1">
+          <p></p>
+      </div>
+      <div class="w3-col s12 m10 l10" style="min-height:86vh; font-family: Raleway;">
+          <h1 style="font-size:1.8em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
+              <mat-icon style="vertical-align: middle; margin-right:0.2em;margin-left:1.5em">description
+              </mat-icon> Pedidos
+          </h1>
+          <mat-divider></mat-divider>
 
-      <mat-progress-bar mode="indeterminate" *ngIf="loadingOrders$ | async"></mat-progress-bar>
-      <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
-        <ng-container *ngIf="orders$ | async as orders">
+          <!-- Search Form -->
+          <form [formGroup]="searchForm">
+              <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; flex-wrap: wrap ;
+                  margin-right:0.2em;margin-left:1.5em">  
 
-          <div style="display: flex; flex-wrap: wrap; align-items: baseline; margin: 12px 0px;">
-            <!-- Date Range -->
-            <mat-form-field style="margin-right: 16px" color="accent">
-              <input matInput placeholder="Seleccione un rango de fechas" [satDatepicker]="picker"
-                [formControl]="dateFormControl">
-              <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
-              <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
-            </mat-form-field>
+                  <!-- dateRange -->
+                  <mat-form-field style="margin-right: 16px" color="accent" appearance="outline">
+                      <input matInput placeholder="Seleccione un rango de fechas" [satDatepicker]="picker"
+                          formControlName="dateRange">
+                      <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+                      <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+                  </mat-form-field>
 
-            <!-- filter table -->
-            <mat-form-field style="margin-right: 16px" color="accent">
-              <mat-label>Filtro</mat-label>
-              <mat-icon matPrefix class="w3-margin-right">filter_list</mat-icon>
-              <input matInput type="text" [formControl]="filterFormControl" placeholder="Escriba..." autocomplete="off">
-            </mat-form-field>
+                  <mat-form-field appearance="outline">
+                      <mat-label>Filtrar</mat-label>
+                      <input formControlName="filterControl" (keyup)="filter()"
+                          type="text" placeholder="Filtrar por nombre" matInput>
+                      <span matPrefix><mat-icon>filter_list</mat-icon></span>
+                  </mat-form-field>
 
-            <span style="flex: auto 1 1"></span>
-
-            <button type="button" style="margin-right: 16px" color="secondary" mat-raised-button>
-              <mat-icon style="margin-right: 8px; vertical-align: middle;">cloud_download
-              </mat-icon>
-              <span style="vertical-align: middle;">Descargar</span>
-            </button>
-          </div>
-
-          <ng-container *ngIf="orders.length; else default">
-            <div class="mat-elevation-z8 w3-margin-top" style="border-radius: 10px 10px 10px 10px">
-              <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
-                <table mat-table [dataSource]="dataSource" matSort style="width:100%">
-
-                  <ng-container matColumnDef="index" sticky>
-                    <th mat-header-cell style="padding:0px 25px; border-right: 1px solid gainsboro;" *matHeaderCellDef>N°
-                    </th>
-                    <td mat-cell style="padding:0px 25px; border-right: 1px solid gainsboro;"
-                      *matCellDef="let raw; let i = index">
-                      {{i+1}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="createdAt">
-                    <th mat-header-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matHeaderCellDef>Fecha registro
-                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
-                      {{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="orderCorrelative">
-                    <th mat-header-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matHeaderCellDef>SKU
-                    </th>
-                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
-                      Pe - {{raw.orderCorrelative}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="document">
-                    <th mat-header-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matHeaderCellDef>Comprobante de referencia</th>
-                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
-                      {{raw.documentType}} N°{{raw.documentSerial}} - {{raw.documentCorrelative}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="customer">
-                    <th mat-header-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matHeaderCellDef>
-                      Cliente
-                    </th>
-                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
-                      {{raw.customerName}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="orderDetails">
-                    <th mat-header-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matHeaderCellDef>
-                      Detalle del pedido
-                    </th>
-                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
-                      <button mat-raised-button class="mat-secondary" (click)="showOrderDetails(raw)">
-                        <mat-icon>restaurant</mat-icon> Pedido
+                  <div>
+                      <button mat-raised-button color="secondary" type="button" (click)="onGetOrdersKitchen()">
+                          <mat-icon>search</mat-icon>
+                          Buscar
                       </button>
-                    </td>
-                  </ng-container>
+                  </div>
 
-                  <ng-container matColumnDef="orderInputs">
-                    <th mat-header-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matHeaderCellDef>
-                      Insumos
-                    </th>
-                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
-                      <button mat-raised-button class="mat-secondary" (click)="showInputs(raw)">
-                        <mat-icon>format_list_bulleted</mat-icon> Insumos
+                  <div>
+                      <button *ngIf="user['role']['kitchenOrdersDownloadAction']"
+                        mat-raised-button color="secondary" type="button" (click)="downloadXls()">
+                          <mat-icon>cloud_download</mat-icon>
+                          Descargar
                       </button>
-                    </td>
-                  </ng-container>
+                  </div>
 
-                  <ng-container matColumnDef="createdBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
-                      matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
-                      Creado por</th>
-                    <td mat-cell class="w3-small" style="padding:0px 8px" *matCellDef="let raw">
-                      <span>{{raw.createdBy ? raw.createdBy.displayName : '---' }}</span><br>
-                      <span *ngIf="raw.createdAt">{{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}</span><br>
-                      <span *ngIf="raw.createdAt"><b>
-                          ({{raw.createdAt.seconds * 1000 | date : 'hh:mm a'}})</b></span>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-                </table>
               </div>
-              <mat-paginator style="border-radius: 0px 0px 10px 10px" [pageSizeOptions]="[5, 10, 20]"
-                showFirstLastButtons></mat-paginator>
-            </div>
-          </ng-container>
+              
+          </form>
+          <!-- Table -->
+          <div>
+              <!-- Table -->
+              <div class="w3-padding" *ngIf="ordersData$ | async">
+                        
+                  <div style="height: auto; width: 100%; overflow: auto; border-radius: 20px 20px 0 0" class="mat-elevation-z8">
+                      <table mat-table [dataSource]="ordersTableDataSource" 
+                          style="width: 100%; text-align: center !important; width: 100%; font-family: Raleway;">
 
-        </ng-container>
+                          <!-- index -->
+                          <ng-container matColumnDef="index" class="w3-border-bottom w3-border-indigo">
+                              <th mat-header-cell *matHeaderCellDef style="text-align: center; 
+                                  background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9;"
+                                  class="w3-center w3-padding w3-border-right">
+                                  N°</th>
+                              <td mat-cell *matCellDef="let element; let i=index" style="color:#2b2b2b; padding-left: 0">{{i+1}}</td>
+                          </ng-container>
 
-        <ng-template #default>
-          <div class="w3-container w3-center  w3-round-large mat-elevation-z8 w3-margin-top w3-margin-bottom">
-            <h2 style="font-family: Raleway; color: gainsboro">
-              No hay resultados
-            </h2>
+                          <!-- createdAt -->
+                          <ng-container matColumnDef="createdAt" class="w3-border-bottom w3-border-indigo">
+                              <th mat-header-cell *matHeaderCellDef
+                                  class="w3-center w3-padding w3-border-right" style="text-align: center; 
+                                      background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; padding-left: 8px">
+                                  Fecha de Creación</th>
+                              <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">{{formatDate(element.createdAt) | date:'dd/MM/yyyy'}}</td>
+                          </ng-container>
+
+                          <!-- orderCorrelative -->
+                          <ng-container matColumnDef="orderCorrelative" sticky class="w3-border-bottom w3-border-indigo">
+                              <th mat-header-cell *matHeaderCellDef style="text-align: center; 
+                                  background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; padding-left: 8px"
+                                  class="w3-center w3-padding w3-border-right">
+                                  Nro de Pedido</th>
+                              <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">{{element.orderCorrelative}}</td>
+                          </ng-container>
+
+                          <!-- documentSerialdocumentCorrelative -->
+                          <ng-container matColumnDef="documentSerialdocumentCorrelative" sticky class="w3-border-bottom w3-border-indigo">
+                              <th mat-header-cell *matHeaderCellDef style="text-align: center; 
+                                  background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; padding-left: 8px"
+                                  class="w3-center w3-padding w3-border-right">
+                                  Comprobante de Referencia</th>
+                              <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">{{element.documentSerial+" - "+element.documentCorrelative}}</td>
+                          </ng-container>
+
+                          <!-- customerId -->
+                          <ng-container matColumnDef="customerId" class="w3-border-bottom w3-border-indigo">
+                              <th mat-header-cell *matHeaderCellDef style="text-align: center; 
+                                  background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; padding-left: 8px"
+                                  class="w3-center w3-padding w3-border-right">
+                                  Cliente</th>
+                              <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">Necesito cambiar</td>
+                          </ng-container>
+
+                          <!-- orderListButton -->
+                          <ng-container matColumnDef="orderListButton" class="w3-border-bottom w3-border-indigo">
+                              <th mat-header-cell *matHeaderCellDef style="text-align: center; 
+                                  background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; padding-left: 8px"
+                                  class="w3-center w3-padding w3-border-right">
+                                  Detalle de Pedido</th>
+                              <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">
+                                  <button  *ngIf="user['role']['kitchenOrdersDetailsAction']"
+                                    (click)="onGetOrderDetails(element)" mat-raised-button color="secondary" type="button">
+                                      <mat-icon style="margin-right: 8px">restaurant</mat-icon>Pedido</button>
+                              </td>
+                          </ng-container>
+
+                          <!-- inputsButton -->
+                          <ng-container matColumnDef="inputsButton" class="w3-border-bottom w3-border-indigo">
+                              <th mat-header-cell *matHeaderCellDef style="text-align: center; 
+                                  background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; padding-left: 8px"
+                                  class="w3-center w3-padding w3-border-right">
+                                  Insumos</th>
+                              <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">
+                                  <button (click)="onGetOrderInputs(element)"
+                                      mat-raised-button color="secondary" type="button"><mat-icon style="margin-right: 8px">format_list_bulleted</mat-icon>Insumos</button>
+                              </td>
+                          </ng-container>
+
+                          <!-- createdBy -->
+                          <ng-container matColumnDef="createdBy" class="w3-border-bottom w3-border-indigo">
+                              <th mat-header-cell *matHeaderCellDef style="text-align: center; 
+                                  background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; padding-left: 8px"
+                                  class="w3-center w3-padding w3-border-right">
+                                  Creado por: </th>
+                              <td mat-cell *matCellDef="let element" style="color:#2b2b2b;">{{element.createdBy.displayName}}</td>
+                          </ng-container>
+
+              
+                      <tr mat-header-row *matHeaderRowDef="ordersTableDisplayedColumns" style="text-align-last: center;"></tr>
+                      <tr mat-row *matRowDef="let row; columns: ordersTableDisplayedColumns;"></tr>
+              
+              
+                      </table>
+                  </div>
+
+                  <mat-paginator #ordersTablePaginator [pageSizeOptions]="[5,10,25]" 
+                      fixed class="mat-elevation-z8" style="border-radius: 0 0 20px 20px;">
+                  </mat-paginator>
+                      
+
+              </div>
+
           </div>
-        </ng-template>
 
-      </ng-container>
-
-      <ng-template #defaultUser>
-        <p class="mat-h2" style="font-family: Raleway; color: #2b2b2b">Cargando credenciales ...</p>
-      </ng-template>
-
-    </div>
-    <div class="w3-col s0 m1 l1">
-      <p></p>
-    </div>
+      </div>
+      <div class="w3-col s0 m1 l1">
+          <p></p>
+      </div>
   </div>
 </div>

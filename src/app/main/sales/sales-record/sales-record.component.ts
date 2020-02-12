@@ -10,6 +10,7 @@ import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
 import { Order } from 'src/app/core/models/sales/menu/order.model';
 import { DatePipe } from '@angular/common';
 import * as XLSX from 'xlsx';
+import { AuthService } from 'src/app/core/auth.service';
 
 @Component({
   selector: 'app-sales-record',
@@ -45,7 +46,8 @@ export class SalesRecordComponent implements OnInit {
     private fb: FormBuilder,
     private dialog: MatDialog,
     public dbs: DatabaseService,
-    public datePipe: DatePipe
+    public datePipe: DatePipe,
+    public auth: AuthService
   ) { }
 
   ngOnInit() {

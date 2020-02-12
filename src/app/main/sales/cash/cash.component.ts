@@ -64,7 +64,7 @@ export class CashComponent implements OnInit {
     public dbs: DatabaseService,
     private fb: FormBuilder,
     public auth: AuthService,
-    public datePipe: DatePipe
+    public datePipe: DatePipe,
   ) { }
 
   ngOnInit() {

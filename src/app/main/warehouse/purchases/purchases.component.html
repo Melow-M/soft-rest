@@ -1,4 +1,4 @@
-<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2">
+<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2"  *ngIf="auth.userAndRole$ | async as user">
     <div class="w3-row">
         <div class="w3-col s0 m1 l1">
             <p></p>
@@ -37,7 +37,8 @@
                                 </mat-select>
                             </mat-form-field>
 
-                            <button type="button" (click)="onRegistering()" style="margin-right: 16px" color="secondary"
+                            <button *ngIf="user['role']['warehousePurchasesRegisterAction']"
+                                type="button" (click)="onRegistering()" style="margin-right: 16px" color="secondary"
                                 mat-raised-button>
                                 <mat-icon style="margin-right: 8px; vertical-align: middle;">add_circle</mat-icon>
                                 <span style="vertical-align: middle;">Registrar</span>
@@ -45,7 +46,8 @@
 
                             <span style="flex: auto 1 1"></span>
 
-                            <button type="button" style="margin-right: 16px" color="secondary" mat-raised-button>
+                            <button *ngIf="user['role']['warehousePurchasesDownloadAction']"
+                                type="button" style="margin-right: 16px" color="secondary" mat-raised-button>
                                 <mat-icon style="margin-right: 8px; vertical-align: middle;">cloud_download
                                 </mat-icon>
                                 <span style="vertical-align: middle;">Descargar</span>
@@ -270,7 +272,8 @@
                                         <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Acciones</th>
                                         <td mat-cell class="mat-elevation-z4" style="padding:0px 24px" *matCellDef="let raw">
                                             <mat-menu #rawMenu="matMenu">
-                                                <button mat-menu-item (click)="cancelPurchase(raw)">
+                                                <button *ngIf="user['role']['warehousePurchasesCancelAction']"
+                                                    mat-menu-item (click)="cancelPurchase(raw)">
                                                     <mat-icon class="ms-icons-color">cancel</mat-icon> Anular
                                                 </button>
                                             </mat-menu>

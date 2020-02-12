@@ -1,4 +1,4 @@
-<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2">
+<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2" *ngIf="auth.userAndRole$ | async as user">
     <div class="w3-row">
         <div class="w3-col s0 m1 l1">
             <p></p>
@@ -23,14 +23,16 @@
                     </mat-form-field>
 
                     <div>
-                        <button mat-raised-button color="secondary" type="button" (click)="onCreateNewPromo()">
+                        <button *ngIf="user['role']['kitchenPromosCreateAction']"
+                            mat-raised-button color="secondary" type="button" (click)="onCreateNewPromo()">
                             <mat-icon>add_circle</mat-icon>
                             Crear Nuevo
                         </button>
                     </div>
 
                     <div>
-                        <button mat-raised-button color="secondary" type="button">
+                        <button *ngIf="user['role']['kitchenPromosDownloadAction']"
+                            mat-raised-button color="secondary" type="button" (click)="downloadXls()">
                             <mat-icon>cloud_download</mat-icon>
                             Descargar
                         </button>
@@ -178,7 +180,8 @@
                                         <mat-icon>more_vert</mat-icon>
                                     </button>
                                     <mat-menu #menu="matMenu">
-                                        <button mat-menu-item *ngIf="element.state == 'Inactivo'" (click)="changeOfferState(element, 'Activar')">Activar</button>
+                                        <button *ngIf="user['role']['kitchenPromosActions']"
+                                            mat-menu-item *ngIf="element.state == 'Inactivo'" (click)="changeOfferState(element, 'Activar')">Activar</button>
                                         <button mat-menu-item *ngIf="element.state == 'Publicado'" (click)="changeOfferState(element, 'Inactivar')">Inactivar</button>
                                     </mat-menu>
                                 </td>

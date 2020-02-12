@@ -24,6 +24,7 @@ import { Recipe } from './models/kitchen/recipe.model';
 import * as jsPDF from 'jspdf';
 import { Promo } from './models/sales/menu/promo.model';
 import { Combo } from './models/sales/menu/combo.model';
+import { Role } from './models/general/role.model';
 
 @Injectable({
   providedIn: 'root'
@@ -93,10 +94,45 @@ export class DatabaseService {
   ordersCollection: AngularFirestoreCollection<Order>;
   orders$: Observable<Order[]>;
 
+
+  // -------------------------- USERS --------------------------------------
+  public permitsCollection: AngularFirestoreCollection<Role>;
   constructor(
     public af: AngularFirestore,
     private auth: AuthService
-  ) { }
+  ) {
+      //SYSTEM
+      this.getPermits();
+      this.getUsers();
+      this.getCustomers();
+
+   }
+
+
+  //PErmits
+  permitsList$: Observable<Role[]>;
+
+
+
+   // *************** USERS
+  addUser(data): Promise<any> {
+    return this.usersCollection.doc(data['uid']).set(data);
+  }
+
+  getPermits(): void {
+    this.permitsCollection = this.af.collection<Role>(`/db/deliciasTete/roles`, ref => ref.orderBy('createdAt', 'asc'));
+    this.permitsList$ =
+      this.permitsCollection.valueChanges()
+        .pipe(
+          map(res => {
+            res.forEach((element, index) => {
+              element['index'] = index;
+            })
+            return res;
+          }),
+          shareReplay(1)
+        );
+  }
 
   /********** GENERAL METHODS *********************** */
 
@@ -168,7 +204,7 @@ export class DatabaseService {
   }
 
   onGetInputs(): Observable<Input[]> {
-    return this.af.collection<Input>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
+    return this.af.collection<Input>(`/db/deliciasTete/warehouseInputs/`).valueChanges()
   }
 
   //To get available elements
@@ -603,6 +639,203 @@ export class DatabaseService {
     return transactionsCollection.valueChanges().pipe(shareReplay(1));
   }
 
+  printCash(cash, income, expenses){
+    var doc = new jsPDF({
+      unit: 'pt',
+      orientation: 'l',
+      format: 'A4'
+    });
+    
+    //Imagen
+    let actualDate = this.getDate();
+    //Importando Plantilla
+    let img = new Image()
+    img.src = '../../assets/images/cashPDF.jpg';
+
+    doc.addImage(img, 'JPEG', 0, 0, 841, 594);
+    
+    //Efectivo
+    doc.setFontStyle("normal");
+    doc.setFontSize(18),
+    doc.text("S/. "+cash[0]['amount'].toFixed(2), 268, 244, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +cash[1]['amount'].toFixed(2), 268, 280, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +cash[2]['amount'].toFixed(2), 268, 314, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +
+      (cash[0]['amount']*cash[0]['value']+
+      cash[1]['amount']*cash[1]['value']+
+      cash[2]['amount']*cash[2]['value']).toFixed(2)
+      , 268, 363, {
+        align: "right",
+        baseline: "bottom"
+      });
+      
+    //Ingresos por TIpo
+    doc.setFontSize(18),
+    doc.text("S/. " + income[0]['amount'].toFixed(2), 519, 244, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " + income[1]['amount'].toFixed(2), 519, 280, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " + income[2]['amount'].toFixed(2), 519, 314, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " + 
+      (income[0]['amount']*income[0]['value']+
+      income[1]['amount']*income[1]['value']+
+      income[2]['amount']*income[2]['value']).toFixed(2)
+      , 519, 363, {
+        align: "right",
+        baseline: "bottom"
+      });
+      
+    // doc.text("S/. " + "TITULO".toUpperCase(), 519, 401, {
+    //     align: "right",
+    //     baseline: "bottom"
+    //   });
+      
+    //Egresos por tipo
+    doc.setFontSize(18),
+    doc.text("S/. " +expenses[0]['amount'].toFixed(), 768, 244, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +expenses[1]['amount'].toFixed(), 768, 280, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    doc.text("S/. " +
+      (expenses[0]['amount']*expenses[0]['value']+
+      expenses[1]['amount']*expenses[1]['value']).toFixed(2)
+      , 768, 327, {
+        align: "right",
+        baseline: "bottom"
+      });
+    
+    //Footer
+    doc.text(actualDate[2]+"/"+actualDate[1]+"/"+actualDate[0]+" "+actualDate[3]+":"+actualDate[4], 676, 541, {
+        align: "left",
+        baseline: "bottom"
+      });
+      
+      doc.autoPrint({ variant: 'non-conform' });
+      doc.save(`Caja.pdf`);
+  }
+
+    //Funcion para obtener valores de fechas
+    getDate(){
+      let date = new Date();
+        let month = '' + (date.getMonth() + 1);
+        let day = '' + date.getDate();
+        let year = date.getFullYear();
+        let hours = date.getHours();
+        let minutes = '' + date.getMinutes();
+  
+        if (minutes.length < 2) 
+            minutes = '0' + minutes;
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+    
+        return [year, month, day, hours, minutes]
+    }
+
+  //SE tiene que enviar contenido como en el ejemplo (titulo y content comentados). El numero máximo de columnas es 4,
+  //pero se pueden incluir menos. El numero maximo de filas es 24
+  printAnything4Column(titulo: Array<string>, content: Array<Array<string>>){
+
+    var doc = new jsPDF({
+      unit: 'pt',
+      format: 'A4'
+    });
+
+
+
+    // let titulo = [
+    //   'titulo1', 'titulo2', 'titulo3', 'titulo4',
+    // ]
+
+    // let content = [
+    //   ['Contenido11', 'Contenido12', 'Contenido13', 'Contenido14'],
+    //   ['Contenido21', 'Contenido22', 'Contenido23', 'Contenido24'],
+    //   ['Contenido11', 'Contenido12', 'Contenido13', 'Contenido14'],
+    //   ['Contenido11', 'Contenido12', 'Contenido13', 'Contenido14']
+    // ]
+
+    //Title
+    doc.setFontStyle("bold");
+    doc.setFontSize(18),
+    doc.text("TITULO".toUpperCase(), 237+67, 59, {
+      align: "center",
+      baseline: "middle"
+    });
+
+    // Empty square
+    doc.rect(67, 89, 474, 676);
+
+    //Lines
+    for(let i = 1; i<24; i++){
+      doc.line(67, 89+i*28, 541, 89+i*28);
+    }
+
+    for(let i=1; i<4; i++){
+      doc.line(67+118.5*i, 89, 67+118.5*i, 89+676);    
+    }
+
+    //Header
+    doc.setFontStyle("bold");
+    doc.setFontSize(12);
+    for(let i=0; i<4; i++){
+      doc.text(titulo[i], 67+59.25+118.5*i, 103, {
+      align: "center",
+      baseline: "middle"
+    });
+    }
+
+    //Content
+    let descriptionSliced = "ERROR";
+      doc.setFontStyle("normal");
+      doc.setFontSize(12);
+      for(let j=0; j<content[0].length; j++){
+              for(let i=0; i<titulo.length; i++){
+                  //Text delimiter
+                  for (let k = content[j][i].length; k > 0; k--) {
+                    if (doc.getTextWidth(content[j][i].slice(0, k)) < 116) {
+                      descriptionSliced = content[j][i].slice(0, k);
+                      k = 0;
+                      doc.text(descriptionSliced,67+59.25+118.5*i, 103+28*(j+1), {
+                        align: "center",
+                        baseline: "middle",
+                      });
+                    };
+                  };
+          }
+      }
+      
+    doc.autoPrint({ variant: 'non-conform' });
+    doc.save(`${titulo}.pdf`);
+  }
 
   printTicket(elements: { quantity: number, description: string, vUnit: number, import: number }[], ticketNumber: string) {
     //Ejemplo: 
@@ -856,5 +1089,13 @@ export class DatabaseService {
 
         return batch;
       }))
+  }
+
+  //Kitchen
+  getOrdersKitchen(from: Date, to: Date): Observable<Order[]> {
+
+    let orderRef= this.af.collection<Order>(`db/deliciasTete/orders`, ref => ref.where('createdAt', '>=', from).where('createdAt', '<=', to));
+    
+    return orderRef.valueChanges();
   }
 }

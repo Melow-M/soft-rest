@@ -636,6 +636,82 @@ export class DatabaseService {
   }
 
 
+  //SE tiene que enviar contenido como en el ejemplo (titulo y content comentados). El numero máximo de columnas es 4,
+  //pero se pueden incluir menos. El numero maximo de filas es 24
+  printAnything4Column(titulo: Array<string>, content: Array<Array<string>>){
+
+    var doc = new jsPDF({
+      unit: 'pt',
+      format: 'A4'
+    });
+
+
+
+    // let titulo = [
+    //   'titulo1', 'titulo2', 'titulo3', 'titulo4',
+    // ]
+
+    // let content = [
+    //   ['Contenido11', 'Contenido12', 'Contenido13', 'Contenido14'],
+    //   ['Contenido21', 'Contenido22', 'Contenido23', 'Contenido24'],
+    //   ['Contenido11', 'Contenido12', 'Contenido13', 'Contenido14'],
+    //   ['Contenido11', 'Contenido12', 'Contenido13', 'Contenido14']
+    // ]
+
+    //Title
+    doc.setFontStyle("bold");
+    doc.setFontSize(18),
+    doc.text("TITULO".toUpperCase(), 237+67, 59, {
+      align: "center",
+      baseline: "middle"
+    });
+
+    // Empty square
+    doc.rect(67, 89, 474, 676);
+
+    //Lines
+    for(let i = 1; i<24; i++){
+      doc.line(67, 89+i*28, 541, 89+i*28);
+    }
+
+    for(let i=1; i<4; i++){
+      doc.line(67+118.5*i, 89, 67+118.5*i, 89+676);    
+    }
+
+    //Header
+    doc.setFontStyle("bold");
+    doc.setFontSize(12);
+    for(let i=0; i<4; i++){
+      doc.text(titulo[i], 67+59.25+118.5*i, 103, {
+      align: "center",
+      baseline: "middle"
+    });
+    }
+
+    //Content
+    let descriptionSliced = "ERROR";
+      doc.setFontStyle("normal");
+      doc.setFontSize(12);
+      for(let j=0; j<content[0].length; j++){
+              for(let i=0; i<titulo.length; i++){
+                  //Text delimiter
+                  for (let k = content[j][i].length; k > 0; k--) {
+                    if (doc.getTextWidth(content[j][i].slice(0, k)) < 116) {
+                      descriptionSliced = content[j][i].slice(0, k);
+                      k = 0;
+                      doc.text(descriptionSliced,67+59.25+118.5*i, 103+28*(j+1), {
+                        align: "center",
+                        baseline: "middle",
+                      });
+                    };
+                  };
+          }
+      }
+      
+    doc.autoPrint({ variant: 'non-conform' });
+    doc.save(`${titulo}.pdf`);
+  }
+
   printTicket(elements: { quantity: number, description: string, vUnit: number, import: number }[], ticketNumber: string) {
     //Ejemplo: 
     // let elements = [{

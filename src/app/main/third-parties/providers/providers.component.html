@@ -29,7 +29,8 @@
       <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
         <ng-container *ngIf="providers$ | async as providers">
           <div>
-            <button mat-raised-button class="ms-icons-color mat-PRIMARY
+            <button *ngIf="user['role']['thirdPartiesProvidersCreateAction']"
+              mat-raised-button class="ms-icons-color mat-PRIMARY
             " style="margin:0em 0.2em 1em 0.2em" (click)="createProvider()">
               <mat-icon>add_circle</mat-icon> Crear
             </button>
@@ -104,7 +105,8 @@
                   <ng-container matColumnDef="bankAccounts">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Cuentas de deposito</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <button mat-raised-button color="primary" (click)="openBankAccounts(raw)"
+                      <button *ngIf="user['role']['thirdPartiesProvidersAccountsAction']"
+                        mat-raised-button color="primary" (click)="openBankAccounts(raw)"
                         [disabled]="raw.bankAccounts ? !raw.bankAccounts.length : true">
                         <mat-icon>credit_card</mat-icon> Cuentas
                       </button>
@@ -114,7 +116,8 @@
                   <ng-container matColumnDef="contact">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Contactos</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <button mat-raised-button color="primary" (click)="openContactList(raw)"
+                      <button *ngIf="user['role']['thirdPartiesProvidersContactsAction']"
+                        mat-raised-button color="primary" (click)="openContactList(raw)"
                         [disabled]="raw.contacts ? !raw.contacts.length : true">
                         <mat-icon>contacts</mat-icon> Contactos
                       </button>
@@ -147,10 +150,12 @@
                     <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
                     <td mat-cell class="w3-center mat-elevation-z4" style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
-                        <button mat-menu-item (click)="editProvider(raw)" >
+                        <button *ngIf="user['role']['thirdPartiesProvidersEditAction']"
+                          mat-menu-item (click)="editProvider(raw)" >
                           <mat-icon class="ms-icons-color">edit</mat-icon> Editar
                         </button>
-                        <button mat-menu-item (click)="deleteProvider(raw)" >
+                        <button *ngIf="user['role']['thirdPartiesProvidersDeleteAction']"
+                          mat-menu-item (click)="deleteProvider(raw)" >
                           <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
                       </mat-menu>

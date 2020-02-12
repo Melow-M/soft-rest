@@ -1,4 +1,4 @@
-<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2">
+<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2" *ngIf="auth.userAndRole$ | async as user">
     <div class="w3-row">
         <div class="w3-col s0 m1 l1">
             <p></p>
@@ -40,7 +40,8 @@
                     </form>
                     <span style="flex: 1 1 auto;"></span>
                     <div>
-                        <button mat-raised-button style="background: #EE8434; color: white" (click)="downloadXls()">
+                        <button  *ngIf="user['role']['salesRecordDownloadAction']"
+                            mat-raised-button style="background: #EE8434; color: white" (click)="downloadXls()">
                             <mat-icon style="vertical-align: middle;">cloud_download</mat-icon>
                             Descargar
                         </button>
@@ -155,7 +156,8 @@
                                         [className]="element['orderStatus']=='ANULADO'?'w3-center off w3-border-bottom':'w3-border-bottom w3-center'"
                                         style="color:#2b2b2b; padding:0px 1em; border-left:1px solid #B9B9B9">
                                         <mat-menu #requestsMenu="matMenu">
-                                            <button mat-menu-item (click)="cancelOrder(element)"
+                                            <button *ngIf="user['role']['salesRecordCancelAction']"
+                                                mat-menu-item (click)="cancelOrder(element)"
                                                 [disabled]="element['orderStatus']=='ANULADO'">
                                                 <mat-icon>cancel</mat-icon> Anular
                                             </button>

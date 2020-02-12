@@ -29,7 +29,8 @@
       <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
         <ng-container *ngIf="customers$ | async as customers">
           <div>
-            <button mat-raised-button class="ms-icons-color mat-PRIMARY
+            <button *ngIf="user['role']['thirdPartiesCustomersCreateAction']"
+              mat-raised-button class="ms-icons-color mat-PRIMARY
             " style="margin:0em 0.2em 1em 0.2em" (click)="createCustomer()">
               <mat-icon>add_circle</mat-icon> Crear
             </button>
@@ -103,7 +104,8 @@
                   <ng-container matColumnDef="contact">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Contactos</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <button mat-raised-button color="primary" (click)="openContactList(raw)"
+                      <button *ngIf="user['role']['thirdPartiesCustomersContactsAction']"
+                        mat-raised-button color="primary" (click)="openContactList(raw)"
                         [disabled]="raw.type === 'NATURAL' || (raw.contacts ? (!raw.contacts.length) : true)">
                         <mat-icon>contacts</mat-icon> Contactos
                       </button>
@@ -136,10 +138,12 @@
                     <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
                     <td mat-cell class="w3-center mat-elevation-z4" style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
-                        <button mat-menu-item (click)="editCustomer(raw)" >
+                        <button *ngIf="user['role']['thirdPartiesCustomersEditAction']"
+                          mat-menu-item (click)="editCustomer(raw)" >
                           <mat-icon class="ms-icons-color">edit</mat-icon> Editar
                         </button>
-                        <button mat-menu-item (click)="deleteCustomer(raw)">
+                        <button *ngIf="user['role']['thirdPartiesCustomersDeleteAction']"
+                          mat-menu-item (click)="deleteCustomer(raw)">
                           <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
                       </mat-menu>

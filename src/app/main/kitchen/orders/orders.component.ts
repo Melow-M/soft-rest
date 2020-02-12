@@ -9,6 +9,7 @@ import { OrderDetailsDialogComponent } from './order-details-dialog/order-detail
 import { InputDetailsDialogComponent } from './input-details-dialog/input-details-dialog.component';
 import { DatePipe } from '@angular/common';
 import * as XLSX from 'xlsx';
+import { AuthService } from 'src/app/core/auth.service';
 
 @Component({
   selector: 'app-orders',
@@ -41,7 +42,8 @@ export class OrdersComponent implements OnInit {
     private fb: FormBuilder,
     private dbs: DatabaseService,
     private dialog: MatDialog,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    public auth: AuthService
   ) { }
 
   

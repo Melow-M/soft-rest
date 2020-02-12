@@ -1,4 +1,4 @@
-<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2">
+<div class="w3-section w3-margin-left w3-margin-right animated fadeInUp delay-2" *ngIf="auth.userAndRole$ | async as user">
     <div class="w3-row">
         <div class="w3-col s0 m1 l1">
             <p></p>
@@ -57,27 +57,33 @@
 
             <div *ngIf="isOpening$ | async; else openView" style="margin-top: 3vh;">
                 <div style="display: flex; justify-content: space-around;">
-                    <button mat-raised-button style="background: #EE8434; color: white" (click)="closeCash()">
+                    <button *ngIf="user['role']['salesCashCloseAction']"
+                        mat-raised-button style="background: #EE8434; color: white" (click)="closeCash()">
                         <mat-icon style="vertical-align: middle;">vpn_key</mat-icon>
                         Cerrar Caja
                     </button>
-                    <button mat-raised-button style="background: #C8C8C8" (click)="totals()">
+                    <button *ngIf="user['role']['salesCashTotalAction']"
+                        mat-raised-button style="background: #C8C8C8" (click)="totals()">
                         <mat-icon style="vertical-align: middle;">attach_money</mat-icon>
                         Total Venta
                     </button>
-                    <button mat-raised-button style="background: #C8C8C8" (click)="record()">
+                    <button *ngIf="user['role']['salesCashHistoryAction']"
+                        mat-raised-button style="background: #C8C8C8" (click)="record()">
                         <mat-icon style="vertical-align: middle;">restore</mat-icon>
                         Historial
                     </button>
-                    <button mat-raised-button style="background: #C8C8C8" (click)="addMoney()">
+                    <button *ngIf="user['role']['salesCashAddMoneyAction']"
+                        mat-raised-button style="background: #C8C8C8" (click)="addMoney()">
                         <mat-icon style="vertical-align: middle;">add_circle</mat-icon>
                         Agregar Dinero
                     </button>
-                    <button mat-raised-button style="background: #C8C8C8" (click)="removeMoney()">
+                    <button *ngIf="user['role']['salesCashRetrieveMoneyAction']"
+                        mat-raised-button style="background: #C8C8C8" (click)="removeMoney()">
                         <mat-icon style="vertical-align: middle;">remove_circle</mat-icon>
                         Retirar Dinero
                     </button>
-                    <button mat-raised-button style="background: #C8C8C8">
+                    <button *ngIf="user['role']['salesCashConfigurationAction']"
+                        mat-raised-button style="background: #C8C8C8">
                         <mat-icon style="vertical-align: middle;">settings</mat-icon>
                     </button>
                 </div>
@@ -96,7 +102,8 @@
                                 </span>
                             </mat-form-field>
 
-                            <button mat-raised-button (click)="downloadXls()" class="w3-margin-left selected">
+                            <button *ngIf="user['role']['salesCashDownloadAction']"
+                                mat-raised-button (click)="downloadXls()" class="w3-margin-left selected">
                                 <mat-icon style="vertical-align: middle;">cloud_download</mat-icon>
                                 Descargar
                             </button>

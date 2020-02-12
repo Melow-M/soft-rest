@@ -29,7 +29,8 @@
       <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
         <ng-container *ngIf="cashes$ | async as cashes">
           <div>
-            <button mat-raised-button class="ms-icons-color mat-PRIMARY
+            <button *ngIf="user['role']['adminManageCashCreateAction']"
+              mat-raised-button class="ms-icons-color mat-PRIMARY
             " style="margin:0em 0.2em 1em 0.2em" (click)="createCash()">
               <mat-icon>add_circle</mat-icon> Crear
             </button>
@@ -130,10 +131,12 @@
                     <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
                     <td mat-cell style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
-                        <button mat-menu-item (click)="editCash(raw)" >
+                        <button *ngIf="user['role']['adminManageCashEditAction']"
+                          mat-menu-item (click)="editCash(raw)" >
                           <mat-icon class="ms-icons-color">edit</mat-icon> Editar
                         </button>
-                        <button mat-menu-item (click)="deleteCash(raw)">
+                        <button *ngIf="user['role']['adminManageCashDeleteAction']"
+                          mat-menu-item (click)="deleteCash(raw)">
                           <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
                       </mat-menu>

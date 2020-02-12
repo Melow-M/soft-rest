@@ -29,7 +29,7 @@ export class ConfigDeleteUserComponent implements OnInit {
   delete(): void {
     this.uploading = true;
 
-    this.http.post(`https://us-central1-crclajoya.cloudfunctions.net/msDeleteUser/?uid=${this.data['uid']}`
+    this.http.post(`https://us-central1-ms-soft-rest.cloudfunctions.net/msDeleteUser/?uid=${this.data['uid']}`
       , this._data
       , this.httpOptions)
       .subscribe(res => {

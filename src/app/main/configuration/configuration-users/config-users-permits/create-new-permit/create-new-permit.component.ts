@@ -25,196 +25,92 @@ export class CreateNewPermitComponent implements OnInit {
   kitchenSelection = new SelectionModel<any>(true, []);
   kitchenKeys: Array<any> = [
     { name: 'Combos', value: 'kitchenCombos' },
-    { name: 'Crear Combo', value: 'kitchenCombosCreate' },
-    { name: 'Descargar Combo', value: 'kitchenCombosDownload' },
+    { name: 'Crear Combo', value: 'kitchenCombosCreateAction' },
+    { name: 'Descargar Combo', value: 'kitchenCombosDownloadAction' },
     { name: 'Cambio de estado de Combo', value: 'kitchenCombosActions' },
     { name: 'Recetas', value: 'kitchenRecipes' },
-    { name: 'Crear Receta', value: 'kitchenRecipesCreate' },
-    { name: 'Descargar Receta', value: 'kitchenRecipesDownload' },
-    { name: 'Editar Receta', value: 'kitchenRecipesEdit' },
-    { name: 'Eliminar Receta', value: 'kitchenRecipesDelete' },
+    { name: 'Crear Receta', value: 'kitchenRecipesCreateAction' },
+    { name: 'Descargar Receta', value: 'kitchenRecipesDownloadAction' },
+    { name: 'Editar Receta', value: 'kitchenRecipesEditAction' },
+    { name: 'Eliminar Receta', value: 'kitchenRecipesDeleteAction' },
     { name: 'Pedidos', value: 'kitchenOrders' },
-    { name: 'Descargar Pedido', value: 'kitchenOrdersDownload' },
-    { name: 'Detalles de Pedido', value: 'kitchenOrdersDetails' },
+    { name: 'Descargar Pedido', value: 'kitchenOrdersDownloadAction' },
+    { name: 'Detalles de Pedido', value: 'kitchenOrdersDetailsAction' },
     { name: 'Promociones', value: 'kitchenPromos' },
-    { name: 'Crear Promoción', value: 'kitchenPromosCreate' },
-    { name: 'Descargar Promoción', value: 'kitchenPromosDownload' },
+    { name: 'Crear Promoción', value: 'kitchenPromosCreateAction' },
+    { name: 'Descargar Promoción', value: 'kitchenPromosDownloadAction' },
     { name: 'Cambio de estado de Promoción', value: 'kitchenPromosActions' },
   ]
 
   warehouseSelection = new SelectionModel<any>(true, []);
   warehouseKeys: Array<any> = [
     { name: 'Compras', value: 'warehousePurchases' },
-    { name: 'Registrar Compra', value: 'warehousePurchasesRegister' },
-    { name: 'Descargar Compra', value: 'warehousePurchasesDownload' },
-    { name: 'Cancelar Compra', value: 'warehousePurchasesCancel' },
+    { name: 'Registrar Compra', value: 'warehousePurchasesRegisterAction' },
+    { name: 'Descargar Compra', value: 'warehousePurchasesDownloadAction' },
+    { name: 'Cancelar Compra', value: 'warehousePurchasesCancelAction' },
     { name: 'Inventario', value: 'warehouseStocktaking' },
-    { name: 'Crear Nuevo', value: 'warehouseStocktakingCreate' },
-    { name: 'Retirar Menaje', value: 'warehouseStocktakingRemove' },
-    { name: 'Descargar inventario', value: 'warehouseStocktakingDownload' },
-    { name: 'Kardex', value: 'warehouseStocktakingKardex' },
-    { name: 'Editar Item', value: 'warehouseStocktakingEdit' },
-    { name: 'Borrar item', value: 'warehouseStocktakingDelete' },
+    { name: 'Crear Nuevo', value: 'warehouseStocktakingCreateAction' },
+    { name: 'Retirar Menaje', value: 'warehouseStocktakingRemoveAction' },
+    { name: 'Descargar inventario', value: 'warehouseStocktakingDownloadAction' },
+    { name: 'Kardex', value: 'warehouseStocktakingKardexAction' },
+    { name: 'Editar Item', value: 'warehouseStocktakingEditAction' },
+    { name: 'Borrar item', value: 'warehouseStocktakingDeleteAction' },
   ]
 
   salesSelection = new SelectionModel<any>(true, []);
   salesKeys: Array<any> = [
     { name: 'Menu', value: 'salesMenu' },
     { name: 'Historial', value: 'salesRecord' },
-    { name: 'Descargar Historial', value: 'salesRecordDownload' },
-    { name: 'Anular Registro de Historial', value: 'salesRecordCancel' },
+    { name: 'Descargar Historial', value: 'salesRecordDownloadAction' },
+    { name: 'Anular Registro de Historial', value: 'salesRecordCancelAction' },
     { name: 'Caja', value: 'salesCash' },
-    { name: 'Cerrar Caja', value: 'salesCashClose' },
-    { name: 'Total Ventas', value: 'salesCashTotal' },
-    { name: 'Historial', value: 'salesCashHistory' },
-    { name: 'Agregar Dinero', value: 'salesCashAddMoney' },
-    { name: 'Retirar Dinero', value: 'salesCashRetrieveMoney' },
-    { name: 'Configuración', value: 'salesCashConfiguration' },
-    { name: 'Descargar Caja', value: 'salesCashDownload' },
+    { name: 'Cerrar Caja', value: 'salesCashCloseAction' },
+    { name: 'Total Ventas', value: 'salesCashTotalAction' },
+    { name: 'Historial', value: 'salesCashHistoryAction' },
+    { name: 'Agregar Dinero', value: 'salesCashAddMoneyAction' },
+    { name: 'Retirar Dinero', value: 'salesCashRetrieveMoneyAction' },
+    { name: 'Configuración', value: 'salesCashConfigurationAction' },
+    { name: 'Descargar Caja', value: 'salesCashDownloadAction' },
   ]
 
-  adminSection = new SelectionModel<any>(true, []);
+  adminSelection = new SelectionModel<any>(true, []);
   adminKeys: Array<any> = [
     { name: 'Cuentas por Pagar', value: 'adminAccountsPayable' },
-    { name: 'Lista de Items', value: 'adminAccountsPayableList' },
-    { name: 'Pagos a cuenta', value: 'adminAccountsPayablePays' },
-    { name: 'Pago total', value: 'adminAccountsPayableTotalPay' },
-    { name: 'Pago parcial', value: 'adminAccountsPayablePartialPay' },
+    { name: 'Lista de Items', value: 'adminAccountsPayableListAction' },
+    { name: 'Pagos a cuenta', value: 'adminAccountsPayablePaysAction' },
+    { name: 'Pago total', value: 'adminAccountsPayableTotalPayAction' },
+    { name: 'Pago parcial', value: 'adminAccountsPayablePartialPayAction' },
 
     { name: 'Cuentas por Cobrar', value: 'adminAccountsReceivable' },
 
     { name: 'Admin. Cajas', value: 'adminManageCash' },
-    { name: 'Crear', value: 'adminManageCashCreate' },
-    { name: 'Editar', value: 'adminManageCashEdit' },
-    { name: 'Borrar', value: 'adminManageCashDelete' },
+    { name: 'Crear', value: 'adminManageCashCreateAction' },
+    { name: 'Editar', value: 'adminManageCashEditAction' },
+    { name: 'Borrar', value: 'adminManageCashDeleteAction' },
 
   ]
 
-  thirdPartiesSection = new SelectionModel<any>(true, []);
+  thirdPartiesSelection = new SelectionModel<any>(true, []);
   thirdPartiesKeys: Array<any> = [
     { name: 'Clientes', value: 'thirdPartiesCustomers' },
-    { name: 'Crear', value: 'thirdPartiesCustomersCreate' },
-    { name: 'Editar', value: 'thirdPartiesCustomersEdit' },
-    { name: 'Borrar', value: 'thirdPartiesCustomersDelete' },
-    { name: 'Cuentas', value: 'thirdPartiesCustomersContacts' },
+    { name: 'Crear', value: 'thirdPartiesCustomersCreateAction' },
+    { name: 'Editar', value: 'thirdPartiesCustomersEditAction' },
+    { name: 'Borrar', value: 'thirdPartiesCustomersDeleteAction' },
+    { name: 'Cuentas', value: 'thirdPartiesCustomersContactsAction' },
 
 
     { name: 'Proveedores', value: 'thirdPartiesProviders' },
-    { name: 'Crear', value: 'thirdPartiesProvidersCreate' },
-    { name: 'Editar', value: 'thirdPartiesProvidersEdit' },
-    { name: 'Borrar', value: 'thirdPartiesProvidersDelete' },
-    { name: 'Cuentas', value: 'thirdPartiesProvidersAccounts' },
-    { name: 'Contactos', value: 'thirdPartiesProvidersContacts' },
+    { name: 'Crear', value: 'thirdPartiesProvidersCreateAction' },
+    { name: 'Editar', value: 'thirdPartiesProvidersEditAction' },
+    { name: 'Borrar', value: 'thirdPartiesProvidersDeleteAction' },
+    { name: 'Cuentas', value: 'thirdPartiesProvidersAccountsAction' },
+    { name: 'Contactos', value: 'thirdPartiesProvidersContactsAction' },
   ]
 
   configurationSelection = new SelectionModel<any>(true, []);
   configurationKeys: Array<any> = [
     { name: 'Usuarios', value: 'configurationUsers' },
   ];
-
-  securitySelection = new SelectionModel<any>(true, []);
-  securityKeys: Array<any> = [
-    { name: 'FRED', value: 'securityFred' },
-    { name: 'Formulario FRED', value: 'securityFredForm' },
-    { name: 'Lista general FRED', value: 'securityFredGeneralList' },
-    { name: 'Lista personal FRED', value: 'securityFredPersonalList' },
-    { name: 'Descargar FRED', value: 'securityFredDownload' },
-    { name: 'Editar FRED', value: 'securityFredEdit' },
-    { name: 'Eliminar FRED', value: 'securityFredDelete' },
-    { name: 'Inspecciones', value: 'securityInspections' },
-    { name: 'Cronograma de Inspecciones', value: 'securityInspectionsCrono' },
-    { name: 'Lista general de Inspecciones', value: 'securityInspectionsGeneralList' },
-    { name: 'Lista personal de Inspecciones', value: 'securityInspectionsPersonalList' },
-    { name: 'Descargar Inspecciones', value: 'securityInspectionsDownload' },
-    { name: 'Editar Inspecciones', value: 'securityInspectionsEdit' },
-    { name: 'Eliminar Inspecciones', value: 'securityInspectionsDelete' },
-    { name: 'Tareas', value: 'securityTasks' },
-    { name: 'Lista general de Tareas', value: 'securityTasksGeneralList' },
-    { name: 'Lista personal de Tareas', value: 'securityTasksPersonalList' },
-    { name: 'Editar Tareas', value: 'securityTasksEdit' },
-    { name: 'Eliminar Tareas', value: 'securityTasksDelete' },
-  ];
-
-  qualitySelection = new SelectionModel<any>(true, []);
-  qualityKeys: Array<any> = [
-    { name: 'Rehaceres', value: 'qualityRedos' },
-    { name: 'Lista general de Rehaceres', value: 'qualityRedosGeneralList' },
-    { name: 'Lista personal de Rehaceres', value: 'qualityRedosPersonalList' },
-    { name: 'Descargar Rehaceres', value: 'qualityRedosDownload' },
-    { name: 'Editar Rehaceres', value: 'qualityRedosEdit' },
-    { name: 'Eliminar Rehaceres', value: 'qualityRedosDelete' },
-    { name: 'Inspecciones', value: 'qualityInspections' },
-    { name: 'Cronograma de Inspecciones', value: 'qualityInspectionsCrono' },
-    {
-      name: 'Lista general de Inspecciones',
-      value: 'qualityInspectionsGeneralList'
-    },
-    { name: 'Lista personal de Inspecciones', value: 'qualityInspectionsPersonalList' },
-    { name: 'Descargar Inspecciones', value: 'qualityInspectionsDownload' },
-    { name: 'Editar Inspecciones', value: 'qualityInspectionsEdit' },
-    { name: 'Eliminar Inspecciones', value: 'qualityInspectionsDelete' },
-    { name: 'Observaciones personales', value: 'qualityInspectionsSingleObservations' },
-    { name: 'Eliminar Observaciones', value: 'qualityInspectionsSingleObservationsDelete' },
-    { name: 'Lista general de Observaciones', value: 'qualityInspectionsSingleObservationsGeneralList' },
-    { name: 'Lista personal de Observaciones', value: 'qualityInspectionsSingleObservationsPersonalList' },
-    { name: 'Tareas', value: 'qualityTasks' },
-    { name: 'Formulario de Tareas', value: 'qualityTasksForm' },
-    { name: 'Lista general de Tareas', value: 'qualityTasksGeneralList' },
-    { name: 'Lista personal de Tareas', value: 'qualityTasksPersonalList' },
-    { name: 'Editar Tareas', value: 'qualityTasksEdit' },
-    { name: 'Eliminar Tareas', value: 'qualityTasksDelete' },
-  ];
-
-  maintenanceSelection = new SelectionModel<any>(true, []);
-  maintenanceKeys: Array<any> = [
-    { name: 'Solicitudes', value: 'maintenanceRequests' },
-    { name: 'Formulario de Solicitudes', value: 'maintenanceRequestsForm' },
-    {
-      name: 'Lista general de Solicitudes',
-      value: 'maintenanceRequestsGeneralList'
-    },
-    { name: 'Lista personal de Solicitudes', value: 'maintenanceRequestsPersonalList' },
-    { name: 'Descargar Solicitudes', value: 'maintenanceRequestsDownload' },
-    { name: 'Editar Solicitudes', value: 'maintenanceRequestsEdit' },
-    { name: 'Eliminar Solicitudes', value: 'maintenanceRequestsDelete' },
-  ];
-
-  ssggSelection = new SelectionModel<any>(true, []);
-  ssggKeys: Array<any> = [
-    { name: 'Solicitudes', value: 'ssggRequests' },
-    { name: 'Formulario de Solicitudes', value: 'ssggRequestsForm' },
-    { name: 'Lista general de Solicitudes', value: 'ssggRequestsGeneralList' },
-    { name: 'Lista personal de Solicitudes', value: 'ssggRequestsPersonalList' },
-    { name: 'Descargar Solicitudes', value: 'ssggRequestsDownload' },
-    { name: 'Editar Solicitudes', value: 'ssggRequestsEdit' },
-    { name: 'Eliminar Solicitudes', value: 'ssggRequestsDelete' },
-  ];
-
-  logisticsSelection = new SelectionModel<any>(true, []);
-  logisticsKeys: Array<any> = [
-    { name: 'Fuera de servicio', value: 'logisticsOutOfService' },
-    { name: 'Configuración', value: 'logisticsOutOfServiceConfiguration' },
-    { name: 'Busqueda', value: 'logisticsOutOfServiceSearch' },
-    { name: 'Inventario', value: 'logisticsOutOfServiceStocktaking' },
-    { name: 'Editar Inventario', value: 'logisticsOutOfServiceStocktakingEditAction' },
-    { name: 'Borrar Inventario', value: 'logisticsOutOfServiceStocktakingDeleteAction' },
-    { name: 'Runner', value: 'logisticsRunner' }
-  ];
-
-  utilizationSelection = new SelectionModel<any>(true, []);
-  utilizationKeys: Array<any> = [
-    { name: 'Registros', value: 'utilizationRegisters' },
-    { name: 'Horómetros', value: 'utilizationHorometers' },
-    { name: 'Tendencias', value: 'utilizationTrends' }
-  ];
-
-  rtdSelection = new SelectionModel<any>(true, []);
-  rtdKeys: Array<any> = [
-    { name: 'TAGs', value: 'rtdTags' },
-    { name: 'Master', value: 'rtdMaster' }
-  ];
-
-
 
   constructor(
     private fb: FormBuilder,
@@ -231,186 +127,120 @@ export class CreateNewPermitComponent implements OnInit {
     this.nameExist$ = combineLatest(
       this.dbs.permitsList$,
       this.detailsFormGroup.get('name').valueChanges.pipe(
-        startWith<any>(''),
-        filter(input => input !== null),
-        map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase()))
-    ).pipe(
-      map(([permits, name]) => {
-        this.permitsResults = permits.filter(option =>
-          option['name'] === name);
-        if (this.permitsResults.length > 0) {
-          return true
-        } else {
-          return false;
-        }
-      })
-    );
+          startWith<any>(''),
+          filter(input => input !== null),
+          map(value => typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase()))
+      ).pipe(
+        map(([permits, name]) => {
+          this.permitsResults = permits.filter(option =>
+            option['name'] === name);
+          if (this.permitsResults.length > 0) {
+            return true
+          } else {
+            return false;
+          }
+        })
+      );
 
     this.permitsConfigurationFormGroup = this.fb.group({
 
-      kitchenCombosSection: false,
-      kitchenCombosCreate: false,
-      kitchenCombosDownload: false,
+      kitchenSection: false,
+      kitchenCombos: false,
+      kitchenCombosCreateAction: false,
+      kitchenCombosDownloadAction: false,
       kitchenCombosActions: false,
 
-      kitchenRecipesSection: false,
-      kitchenRecipesCreate: false,
-      kitchenRecipesDownload: false,
-      kitchenRecipesEdit: false,
-      kitchenRecipesDelete: false,
+      
+      kitchenRecipes: false,
+      kitchenRecipesCreateAction: false,
+      kitchenRecipesDownloadAction: false,
+      kitchenRecipesEditAction: false,
+      kitchenRecipesDeleteAction: false,
 
-      kitchenOrdersSection: false,
-      kitchenOrdersDownload: false,
-      kitchenOrdersDetails: false,
+      
+      kitchenOrders: false,
+      kitchenOrdersDownloadAction: false,
+      kitchenOrdersDetailsAction: false,
 
-      kitchenPromosSection: false,
-      kitchenPromosCreate: false,
-      kitchenPromosDownload: false,
+      
+      kitchenPromos: false,
+      kitchenPromosCreateAction: false,
+      kitchenPromosDownloadAction: false,
       kitchenPromosActions: false,
 
 
-      warehousePurchasesSection: false,
-      warehousePurchasesRegister: false,
-      warehousePurchasesDownload: false,
-      warehousePurchasesCancel: false,
+      warehouseSection: false,
+      warehousePurchases: false,
+      warehousePurchasesRegisterAction: false,
+      warehousePurchasesDownloadAction: false,
+      warehousePurchasesCancelAction: false,
 
-      warehouseStocktakingSection: false,
-      warehouseStocktakingCreate: false,
-      warehouseStocktakingRemove: false,
-      warehouseStocktakingDownload: false,
-      warehouseStocktakingKardex: false,
-      warehouseStocktakingEdit: false,
-      warehouseStocktakingDelete: false,
+      
+      warehouseStocktaking: false,
+      warehouseStocktakingCreateAction: false,
+      warehouseStocktakingRemoveAction: false,
+      warehouseStocktakingDownloadAction: false,
+      warehouseStocktakingKardexAction: false,
+      warehouseStocktakingEditAction: false,
+      warehouseStocktakingDeleteAction: false,
 
 
-      salesMenuSection: false,
+      
+      salesSection: false,
+      salesMenu: false,
 
-      salesRecordSection: false,
-      salesRecordDownload: false,
-      salesRecordCancel: false,
+      
+      salesRecord: false,
+      salesRecordDownloadAction: false,
+      salesRecordCancelAction: false,
 
-      salesCashSection: false,
-      salesCashClose: false,
-      salesCashTotal: false,
-      salesCashHistory: false,
-      salesCashAddMoney: false,
-      salesCashRetrieveMoney: false,
-      salesCashConfiguration: false,
-      salesCashDownload: false,
+      
+      salesCash: false,
+      salesCashCloseAction: false,
+      salesCashTotalAction: false,
+      salesCashHistoryAction: false,
+      salesCashAddMoneyAction: false,
+      salesCashRetrieveMoneyAction: false,
+      salesCashConfigurationAction: false,
+      salesCashDownloadAction: false,
 
-      adminAccountsPayableSection: false,
-      adminAccountsPayableList: false,
-      adminAccountsPayablePays: false,
-      adminAccountsPayableTotalPay: false,
-      adminAccountsPayablePartialPay: false,
+      
+      adminSection: false,
+      adminAccountsPayable: false,
+      adminAccountsPayableListAction: false,
+      adminAccountsPayablePaysAction: false,
+      adminAccountsPayableTotalPayAction: false,
+      adminAccountsPayablePartialPayAction: false,
 
-      adminAccountsReceivableSection: false,
+      
+      adminAccountsReceivable: false,
 
-      adminManageCashSection: false,
-      adminManageCashCreate: false,
-      adminManageCashEdit: false,
-      adminManageCashDelete: false,
+      
+      adminManageCash: false,
+      adminManageCashCreateAction: false,
+      adminManageCashEditAction: false,
+      adminManageCashDeleteAction: false,
 
-      thirdPartiesCustomersSection: false,
-      thirdPartiesCustomersCreate: false,
-      thirdPartiesCustomersEdit: false,
-      thirdPartiesCustomersDelete: false,
-      thirdPartiesCustomersContacts: false,
+      
+      thirdPartiesSection: false,
+      thirdPartiesCustomers: false,
+      thirdPartiesCustomersCreateAction: false,
+      thirdPartiesCustomersEditAction: false,
+      thirdPartiesCustomersDeleteAction: false,
+      thirdPartiesCustomersContactsAction: false,
 
-      thirdPartiesProvidersSection: false,
-      thirdPartiesProvidersCreate: false,
-      thirdPartiesProvidersEdit: false,
-      thirdPartiesProvidersDelete: false,
-      thirdPartiesProvidersAccounts: false,
-      thirdPartiesProvidersContacts: false,
+      
+      thirdPartiesProviders: false,
+      thirdPartiesProvidersCreateAction: false,
+      thirdPartiesProvidersEditAction: false,
+      thirdPartiesProvidersDeleteAction: false,
+      thirdPartiesProvidersAccountsAction: false,
+      thirdPartiesProvidersContactsAction: false,
 
+      
       configurationSection: false,
       configurationUsers: false,
 
-
-      //
-
-      // securitySection: false,
-      // securityFred: false,
-      // securityFredForm: false,
-      // securityFredGeneralList: false,
-      // securityFredPersonalList: false,
-      // securityFredDownload: false,
-      // securityFredEdit: false,
-      // securityFredDelete: false,
-      // securityInspections: false,
-      // securityInspectionsCrono: false,
-      // securityInspectionsGeneralList: false,
-      // securityInspectionsPersonalList: false,
-      // securityInspectionsDownload: false,
-      // securityInspectionsEdit: false,
-      // securityInspectionsDelete: false,
-      // securityTasks: false,
-      // securityTasksGeneralList: false,
-      // securityTasksPersonalList: false,
-      // securityTasksEdit: false,
-      // securityTasksDelete: false,
-
-      // qualitySection: false,
-      // qualityRedos: false,
-      // qualityRedosGeneralList: false,
-      // qualityRedosPersonalList: false,
-      // qualityRedosDownload: false,
-      // qualityRedosEdit: false,
-      // qualityRedosDelete: false,
-      // qualityInspections: false,
-      // qualityInspectionsCrono: false,
-      // qualityInspectionsGeneralList: false,
-      // qualityInspectionsPersonalList: false,
-      // qualityInspectionsDownload: false,
-      // qualityInspectionsEdit: false,
-      // qualityInspectionsDelete: false,
-      // qualityInspectionsSingleObservations: false,
-      // qualityInspectionsSingleObservationsDelete: false,
-      // qualityInspectionsSingleObservationsGeneralList: false,
-      // qualityInspectionsSingleObservationsPersonalList: false,
-      // qualityTasks: false,
-      // qualityTasksForm: false,
-      // qualityTasksGeneralList: false,
-      // qualityTasksPersonalList: false,
-      // qualityTasksEdit: false,
-      // qualityTasksDelete: false,
-
-      // maintenanceSection: false,
-      // maintenanceRequests: false,
-      // maintenanceRequestsForm: false,
-      // maintenanceRequestsGeneralList: false,
-      // maintenanceRequestsPersonalList: false,
-      // maintenanceRequestsDownload: false,
-      // maintenanceRequestsEdit: false,
-      // maintenanceRequestsDelete: false,
-
-      // ssggSection: false,
-      // ssggRequests: false,
-      // ssggRequestsForm: false,
-      // ssggRequestsGeneralList: false,
-      // ssggRequestsPersonalList: false,
-      // ssggRequestsDownload: false,
-      // ssggRequestsEdit: false,
-      // ssggRequestsDelete: false,
-
-      // logisticsSection: false,
-      // logisticsOutOfService: false,
-      // logisticsOutOfServiceConfiguration: false,
-      // logisticsOutOfServiceSearch: false,
-      // logisticsOutOfServiceStocktaking: false,
-      // logisticsOutOfServiceStocktakingEditAction: false,
-      // logisticsOutOfServiceStocktakingDeleteAction: false,
-      // logisticsRunner: false,
-
-      // utilizationSection: false,
-      // utilizationRegisters: false,
-      // utilizationHorometers: false,
-      // utilizationTrends: false,
-
-      // rtdSection: false,
-      // rtdTags: false,
-      // rtdMaster: false,
 
     })
     
@@ -420,9 +250,9 @@ export class CreateNewPermitComponent implements OnInit {
         debounceTime(1000)
         ).subscribe(res => {
           if(!this.kitchenSelection.hasValue()){
-            this.permitsConfigurationFormGroup.get('kitchenSelection').setValue(false);
+            this.permitsConfigurationFormGroup.get('kitchenSection').setValue(false);
           } else {
-            this.permitsConfigurationFormGroup.get('kitchenSelection').setValue(true);
+            this.permitsConfigurationFormGroup.get('kitchenSection').setValue(true);
           }
         });
 
@@ -431,9 +261,9 @@ export class CreateNewPermitComponent implements OnInit {
         debounceTime(1000)
         ).subscribe(res => {
           if(!this.warehouseSelection.hasValue()){
-            this.permitsConfigurationFormGroup.get('warehouseSelection').setValue(false);
+            this.permitsConfigurationFormGroup.get('warehouseSection').setValue(false);
           } else {
-            this.permitsConfigurationFormGroup.get('warehouseSelection').setValue(true);
+            this.permitsConfigurationFormGroup.get('warehouseSection').setValue(true);
           }
         });
 
@@ -442,28 +272,28 @@ export class CreateNewPermitComponent implements OnInit {
         debounceTime(1000)
         ).subscribe(res => {
           if(!this.salesSelection.hasValue()){
-            this.permitsConfigurationFormGroup.get('salesSelection').setValue(false);
+            this.permitsConfigurationFormGroup.get('salesSection').setValue(false);
           } else {
-            this.permitsConfigurationFormGroup.get('salesSelection').setValue(true);
+            this.permitsConfigurationFormGroup.get('salesSection').setValue(true);
           }
         });
 
-    this.adminSection.onChange
+    this.adminSelection.onChange
       .pipe(
         debounceTime(1000)
         ).subscribe(res => {
-          if(!this.adminSection.hasValue()){
+          if(!this.adminSelection.hasValue()){
             this.permitsConfigurationFormGroup.get('adminSection').setValue(false);
           } else {
             this.permitsConfigurationFormGroup.get('adminSection').setValue(true);
           }
         });
 
-    this.thirdPartiesSection.onChange
+    this.thirdPartiesSelection.onChange
       .pipe(
         debounceTime(1000)
         ).subscribe(res => {
-          if(!this.thirdPartiesSection.hasValue()){
+          if(!this.thirdPartiesSelection.hasValue()){
             this.permitsConfigurationFormGroup.get('thirdPartiesSection').setValue(false);
           } else {
             this.permitsConfigurationFormGroup.get('thirdPartiesSection').setValue(true);
@@ -475,242 +305,112 @@ export class CreateNewPermitComponent implements OnInit {
         debounceTime(1000)
         ).subscribe(res => {
           if(!this.configurationSelection.hasValue()){
-            this.permitsConfigurationFormGroup.get('configurationSelection').setValue(false);
+            this.permitsConfigurationFormGroup.get('configurationSection').setValue(false);
           } else {
-            this.permitsConfigurationFormGroup.get('configurationSelection').setValue(true);
+            this.permitsConfigurationFormGroup.get('configurationSection').setValue(true);
           }
         });
 
-
-    //
-    // this.securitySelection.onChange
-    //   .pipe(
-    //     debounceTime(1000)
-    //   )
-    //   .subscribe(res => {
-
-    //     if (!this.securitySelection.hasValue()) {
-    //       this.permitsConfigurationFormGroup.get('securitySection').setValue(false);
-    //     } else {
-    //       this.permitsConfigurationFormGroup.get('securitySection').setValue(true);
-    //     }
-    //   })
-
-    // this.qualitySelection.onChange
-    //   .pipe(
-    //     debounceTime(1000)
-    //   )
-    //   .subscribe(res => {
-    //     if (!this.qualitySelection.hasValue()) {
-    //       this.permitsConfigurationFormGroup.get('qualitySection').setValue(false);
-    //     } else {
-    //       this.permitsConfigurationFormGroup.get('qualitySection').setValue(true);
-    //     }
-    //   })
-
-    // this.maintenanceSelection.onChange
-    //   .pipe(
-    //     debounceTime(1000)
-    //   )
-    //   .subscribe(res => {
-    //     if (!this.maintenanceSelection.hasValue()) {
-    //       this.permitsConfigurationFormGroup.get('maintenanceSection').setValue(false);
-    //     } else {
-    //       this.permitsConfigurationFormGroup.get('maintenanceSection').setValue(true);
-    //     }
-    //   })
-
-    // this.ssggSelection.onChange
-    //   .pipe(
-    //     debounceTime(1000)
-    //   )
-    //   .subscribe(res => {
-    //     if (!this.ssggSelection.hasValue()) {
-    //       this.permitsConfigurationFormGroup.get('ssggSection').setValue(false);
-    //     } else {
-    //       this.permitsConfigurationFormGroup.get('ssggSection').setValue(true);
-    //     }
-    //   })
-
-    // this.logisticsSelection.onChange
-    //   .pipe(
-    //     debounceTime(1000)
-    //   )
-    //   .subscribe(res => {
-    //     if (!this.logisticsSelection.hasValue()) {
-    //       this.permitsConfigurationFormGroup.get('logisticsSection').setValue(false);
-    //     } else {
-    //       this.permitsConfigurationFormGroup.get('logisticsSection').setValue(true);
-    //     }
-    //   })
-
-    // this.utilizationSelection.onChange
-    //   .pipe(
-    //     debounceTime(1000)
-    //   )
-    //   .subscribe(res => {
-    //     if (!this.utilizationSelection.hasValue()) {
-    //       this.permitsConfigurationFormGroup.get('utilizationSection').setValue(false);
-    //     } else {
-    //       this.permitsConfigurationFormGroup.get('utilizationSection').setValue(true);
-    //     }
-    //   })
-
-    // this.rtdSelection.onChange
-    //   .pipe(
-    //     debounceTime(1000)
-    //   )
-    //   .subscribe(res => {
-    //     if (!this.rtdSelection.hasValue()) {
-    //       this.permitsConfigurationFormGroup.get('rtdSection').setValue(false);
-    //     } else {
-    //       this.permitsConfigurationFormGroup.get('rtdSection').setValue(true);
-    //     }
-    //   })
-
-    // this.configurationSelection.onChange
-    //   .pipe(
-    //     debounceTime(1000)
-    //   )
-    //   .subscribe(res => {
-    //     if (!this.configurationSelection.hasValue()) {
-    //       this.permitsConfigurationFormGroup.get('configurationSection').setValue(false);
-    //     } else {
-    //       this.permitsConfigurationFormGroup.get('configurationSection').setValue(true);
-    //     }
-    //   })
   }
 
-  // SECURITY METHODS
+  //Kitchen METHODS
+  isAllKitchenSelected() {
 
-  isAllSecuritySelected() {
+    const numSelected = this.kitchenSelection.selected.length;
 
-    const numSelected = this.securitySelection.selected.length;
-
-    return numSelected === this.securityKeys.length;
+    return numSelected === this.kitchenKeys.length;
   }
 
-  masterSecurityToggle() {
-    if (this.isAllSecuritySelected()) {
-      this.securitySelection.clear();
-      this.securityKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
-      this.permitsConfigurationFormGroup.get('securitySection').setValue(false)
+  masterKitchenToggle() {
+    if (this.isAllKitchenSelected()) {
+      this.kitchenSelection.clear();
+      this.kitchenKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
+      this.permitsConfigurationFormGroup.get('kitchenSection').setValue(false)
     } else {
-      this.securityKeys.forEach(key => this.securitySelection.select(key['value']));
-      this.securityKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
+      this.kitchenKeys.forEach(key => this.kitchenSelection.select(key['value']));
+      this.kitchenKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
     }
   }
 
-  // QUALITY METHODS
-  isAllQualitySelected() {
-    const numSelected = this.qualitySelection.selected.length;
+  //Warehouse METHODS
+  isAllWarehouseSelected() {
 
-    return numSelected === this.qualityKeys.length;
+    const numSelected = this.warehouseSelection.selected.length;
+
+    return numSelected === this.warehouseKeys.length;
   }
 
-  masterQualityToggle() {
-    if (this.isAllQualitySelected()) {
-      this.qualitySelection.clear();
-      this.qualityKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
-      this.permitsConfigurationFormGroup.get('qualitySection').setValue(false)
+  masterWarehouseToggle() {
+    if (this.isAllWarehouseSelected()) {
+      this.warehouseSelection.clear();
+      this.warehouseKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
+      this.permitsConfigurationFormGroup.get('warehouseSection').setValue(false)
     } else {
-      this.qualityKeys.forEach(key => this.qualitySelection.select(key['value']));
-      this.qualityKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
+      this.warehouseKeys.forEach(key => this.warehouseSelection.select(key['value']));
+      this.warehouseKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
     }
   }
 
-  // MAINTENANCE METHODS
-  isAllMaintenanceSelected() {
-    const numSelected = this.maintenanceSelection.selected.length;
+  //Sales METHODS
+  isAllSalesSelected() {
 
-    return numSelected === this.maintenanceKeys.length;
+    const numSelected = this.salesSelection.selected.length;
+
+    return numSelected === this.salesKeys.length;
   }
 
-  masterMaintenanceToggle() {
-    if (this.isAllMaintenanceSelected()) {
-      this.maintenanceSelection.clear();
-      this.maintenanceKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
-      this.permitsConfigurationFormGroup.get('maintenanceSection').setValue(false)
+  masterSalesToggle() {
+    if (this.isAllSalesSelected()) {
+      this.salesSelection.clear();
+      this.salesKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
+      this.permitsConfigurationFormGroup.get('salesSection').setValue(false)
     } else {
-      this.maintenanceKeys.forEach(key => this.maintenanceSelection.select(key['value']));
-      this.maintenanceKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
+      this.salesKeys.forEach(key => this.salesSelection.select(key['value']));
+      this.salesKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
     }
   }
 
-  // SSGG METHODS
-  isAllSsggSelected() {
-    const numSelected = this.ssggSelection.selected.length;
+  //Admin METHODS
+  isAllAdminSelected() {
 
-    return numSelected === this.ssggKeys.length;
+    const numSelected = this.adminSelection.selected.length;
+
+    return numSelected === this.adminKeys.length;
   }
 
-  masterSsggToggle() {
-    if (this.isAllSsggSelected()) {
-      this.ssggSelection.clear();
-      this.ssggKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
-      this.permitsConfigurationFormGroup.get('ssggSection').setValue(false)
+  masterAdminToggle() {
+    if (this.isAllAdminSelected()) {
+      this.adminSelection.clear();
+      this.adminKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
+      this.permitsConfigurationFormGroup.get('adminSection').setValue(false)
     } else {
-      this.ssggKeys.forEach(key => this.ssggSelection.select(key['value']));
-      this.ssggKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
+      this.adminKeys.forEach(key => this.adminSelection.select(key['value']));
+      this.adminKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
     }
   }
 
-  // LOGISTICS METHODS
-  isAllLogisticsSelected() {
-    const numSelected = this.logisticsSelection.selected.length;
+  //ThirdParties METHODS
+  isAllThirdPartiesSelected() {
 
-    return numSelected === this.logisticsKeys.length;
+    const numSelected = this.thirdPartiesSelection.selected.length;
+
+    return numSelected === this.thirdPartiesKeys.length;
   }
 
-  masterLogisticsToggle() {
-    if (this.isAllLogisticsSelected()) {
-      this.logisticsSelection.clear();
-      this.logisticsKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
-      this.permitsConfigurationFormGroup.get('logisticsSection').setValue(false)
+  masterThirdPartiesToggle() {
+    if (this.isAllThirdPartiesSelected()) {
+      this.thirdPartiesSelection.clear();
+      this.thirdPartiesKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
+      this.permitsConfigurationFormGroup.get('thirdPartiesSection').setValue(false)
     } else {
-      this.logisticsKeys.forEach(key => this.logisticsSelection.select(key['value']));
-      this.logisticsKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
+      this.thirdPartiesKeys.forEach(key => this.thirdPartiesSelection.select(key['value']));
+      this.thirdPartiesKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
     }
   }
 
-  // UTILIZATION METHODS
-  isAllUtilizationSelected() {
-    const numSelected = this.utilizationSelection.selected.length;
-
-    return numSelected === this.utilizationKeys.length;
-  }
-
-  masterUtilizationToggle() {
-    if (this.isAllUtilizationSelected()) {
-      this.utilizationSelection.clear();
-      this.utilizationKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
-      this.permitsConfigurationFormGroup.get('utilizationSection').setValue(false)
-    } else {
-      this.utilizationKeys.forEach(key => this.utilizationSelection.select(key['value']));
-      this.utilizationKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
-    }
-  }
-
-  // RTD METHODS
-  isAllRtdSelected() {
-    const numSelected = this.rtdSelection.selected.length;
-
-    return numSelected === this.rtdKeys.length;
-  }
-
-  masterRtdToggle() {
-    if (this.isAllRtdSelected()) {
-      this.rtdSelection.clear();
-      this.rtdKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(false));
-      this.permitsConfigurationFormGroup.get('rtdSection').setValue(false)
-    } else {
-      this.rtdKeys.forEach(key => this.rtdSelection.select(key['value']));
-      this.rtdKeys.forEach(key => this.permitsConfigurationFormGroup.get(key['value']).setValue(true));
-    }
-  }
-
-  // CONFIGURATION METHODS
+  //Configuration METHODS
   isAllConfigurationSelected() {
+
     const numSelected = this.configurationSelection.selected.length;
 
     return numSelected === this.configurationKeys.length;
@@ -731,16 +431,15 @@ export class CreateNewPermitComponent implements OnInit {
     let _permits: Role = this.permitsConfigurationFormGroup.value;
 
     _permits['name'] = this.detailsFormGroup.value['name'];
-    _permits['regDate'] = Date.now();
-    _permits['securitySection'] = this.securitySelection.selected.length > 0 ? true : false;
-    _permits['qualitySection'] = this.qualitySelection.selected.length > 0 ? true : false;
-    _permits['maintenanceSection'] = this.maintenanceSelection.selected.length > 0 ? true : false;
-    _permits['ssggSection'] = this.ssggSelection.selected.length > 0 ? true : false;
-    _permits['logisticsSection'] = this.logisticsSelection.selected.length > 0 ? true : false;
-    _permits['utilizationSection'] = this.utilizationSelection.selected.length > 0 ? true : false;
-    _permits['rtdSection'] = this.rtdSelection.selected.length > 0 ? true : false;
-    _permits['configurationSection'] = this.configurationSelection.selected.length > 0 ? true : false;
+    _permits['createdAt'] = Date.now();
 
+    _permits['kitchenSection'] = this.kitchenSelection.selected.length > 0 ? true : false;
+    _permits['warehouseSection'] = this.warehouseSelection.selected.length > 0 ? true : false;
+    _permits['salesSection'] = this.salesSelection.selected.length > 0 ? true : false;
+    _permits['adminSection'] = this.adminSelection.selected.length > 0 ? true : false;
+    _permits['thirdPartiesSection'] = this.thirdPartiesSelection.selected.length > 0 ? true : false;
+    _permits['configurationSection'] = this.configurationSelection.selected.length > 0 ? true : false;
+    
     this.dbs.permitsCollection
       .add(_permits)
       .then(ref => {

@@ -204,7 +204,7 @@ export class DatabaseService {
   }
 
   onGetInputs(): Observable<Input[]> {
-    return this.af.collection<Input>(`/db/deliciasTete/kitchenInputs/`).valueChanges()
+    return this.af.collection<Input>(`/db/deliciasTete/warehouseInputs/`).valueChanges()
   }
 
   //To get available elements

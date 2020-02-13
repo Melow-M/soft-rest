@@ -146,6 +146,10 @@
                           mat-menu-item (click)="deleteCustomer(raw)">
                           <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
+                        <button *ngIf="user['role']['thirdPartiesCustomersEditAction'] && (!raw.receivableAccount);"
+                          mat-menu-item (click)="onAddReceivableAccount(raw)">
+                          <mat-icon class="ms-icons-color">card_membership</mat-icon> Asignar cuenta
+                        </button>
                       </mat-menu>
                       <button mat-icon-button [matMenuTriggerFor]="rawMenu">
                         <mat-icon>more_vert</mat-icon>

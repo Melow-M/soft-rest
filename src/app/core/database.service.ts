@@ -25,6 +25,7 @@ import * as jsPDF from 'jspdf';
 import { Promo } from './models/sales/menu/promo.model';
 import { Combo } from './models/sales/menu/combo.model';
 import { Role } from './models/general/role.model';
+import { ReceivableUser } from './models/admin/receivableUser.model';
 
 @Injectable({
   providedIn: 'root'
@@ -1098,4 +1099,45 @@ export class DatabaseService {
 
     return orderRef.valueChanges();
   }
+
+  //Receivable account
+  onAddReceivableAccount(customer: Customer){
+    let customerReceivableRef= this.af.firestore.collection(`/db/deliciasTete/receivableUsers`).doc(customer.id);
+    let customerReceivableData: ReceivableUser = {
+      ...customer,
+      balance: 0,
+      negativeValue: false,
+      dni: customer.dni
+    };
+
+    let customerRef=this.af.firestore.collection(`/db/deliciasTete/thirdPartiesCustomers`).doc(customer.id);
+    let customerData: Customer = customer;
+
+    
+
+    let batch = this.af.firestore.batch();
+    let date = new Date();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        customerReceivableData.createdAt= date;
+        customerReceivableData.createdBy = user;
+        customerReceivableData.negativeValue = false;
+        batch.set(customerReceivableRef, customerReceivableData);
+
+        customerData.receivableAccount = true;
+        customerData.editedAt = date;
+        customerData.editedBy = user;
+        batch.update(customerRef, customerData);
+
+        return batch;
+      }))
+  }
+
+  getReceivableUsers(): Observable<ReceivableUser[]> {
+    let customersCollection = this.af.collection<ReceivableUser>('db/deliciasTete/receivableUsers', ref => ref.orderBy('createdAt', 'desc'));
+    let customers$ = customersCollection.valueChanges();
+    return customers$;
+  }
+
 }

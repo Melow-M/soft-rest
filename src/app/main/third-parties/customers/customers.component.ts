@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatTableDataSource, MatPaginator, MatSort, MatDialog } from '@angular/material';
+import { MatTableDataSource, MatPaginator, MatSort, MatDialog, MatSnackBar } from '@angular/material';
 import { Subscription, Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
@@ -37,7 +37,8 @@ export class CustomersComponent implements OnInit {
   constructor(
     public dbs: DatabaseService,
     public auth: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit() {
@@ -99,6 +100,19 @@ export class CustomersComponent implements OnInit {
       data: {
         customer: customer
       }
+    });
+  }
+
+  onAddReceivableAccount(customer: Customer): void{
+    this.dbs.onAddReceivableAccount(customer).subscribe(batch =>{
+      batch.commit().then(()=> {
+        this.snackBar.open('Se creo la cuenta por cobrar', 'Aceptar');
+      })
+      .catch((err)=> {
+        console.log(err);
+        this.snackBar.open('No se pudo crear la cuenta por cobrar. Por favor, vuelva a intentarlo', 'Aceptar');
+
+      })
     });
   }
 

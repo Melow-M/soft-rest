@@ -8,7 +8,7 @@ import { Customer } from '../../third-parties/customer.model';
 
 export interface Order {
   id: string;
-  orderCorrelative: number;
+  orderCorrelative: string;
   orderList: Array<Menu | Meal | Combo | Promo | Grocery>;
   orderStatus: string // SELECCIONANDO, PAGADO, ANULADO
   price: number;

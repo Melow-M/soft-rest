@@ -80,6 +80,10 @@ export class PlanningComponent implements OnInit {
   menuList: Array<any> = []
   inputs: Array<any> = null
   inputsRequired: Array<any> = null
+  inputsMissing: Array<any> = []
+
+  numberOrder:string
+  numberOrder$:Observable<number>
 
   constructor(
     private fb: FormBuilder,
@@ -121,6 +125,14 @@ export class PlanningComponent implements OnInit {
       })
     )
 
+    this.numberOrder$ = this.dbs.onGetKitchenOrders().pipe(
+      map(orders=>{
+        let number = orders.length+1
+        this.numberOrder = ("000" + number).slice(-4)
+        return number
+      })
+    )
+
   }
 
   showDish(dish): string | undefined {
@@ -128,18 +140,27 @@ export class PlanningComponent implements OnInit {
   }
 
   deleteItem(i) {
-    console.log('what');
-
     this.menuList.splice(i, 1);
     this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
   }
 
   add() {
 
+    let cost = this.inputs.map(el => {
+      let costT = 0
+      this.menuForm.get('dish').value['inputs'].forEach(al => {
+        if (el['id'] == al['id']) {
+          costT += el['averageCost'] * al['quantity']
+        }
+      })
+      return costT
+    }).reduce((a, b) => a + b, 0)
+
     this.menuList.push({
       ...this.menuForm.value,
       missing: true,
-      menuType: this.selectMenu.value
+      menuType: this.selectMenu.value,
+      cost: cost
     })
 
     let required = this.menuList.map(el => {
@@ -168,6 +189,11 @@ export class PlanningComponent implements OnInit {
       }
     }).filter(el => el['required'] > 0)
 
+    this.inputsMissing = this.inputsRequired.filter(al => al['missing'] < 0)
+
+    console.log(this.inputsMissing);
+    
+
     this.menuList[this.menuList.length - 1]['missing'] = this.inputsRequired.filter(al => al['missing'] < 0).length > 0
     this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
     this.menuForm.reset()
@@ -175,7 +201,9 @@ export class PlanningComponent implements OnInit {
   }
 
   missingInputs() {
-    this.dialog.open(MissingInputsComponent)
+    this.dialog.open(MissingInputsComponent,{
+      data: this.inputsMissing
+    })
   }
 
   save() {
@@ -191,32 +219,29 @@ export class PlanningComponent implements OnInit {
           recipeId: el['dish']['id']
         },
         amount: el['amount'],
-        menuType: el['menuType']
+        menuType: el['menuType'],
+        cost: el['cost']
       }
     })
-
-    console.log(menuL);
 
 
     let inputsR = this.inputsRequired.map(el => {
       return {
         cost: el['averageCost'],
         name: el['name'],
-        unit: 'KG',
+        unit: el['unit'],
         id: el['id'],
         required: el['required'],
         stock: el['stock']
       }
     })
 
-    console.log(inputsR);
-
     this.auth.user$.pipe(
       take(1))
       .subscribe(user => {
         let inputData = {
           id: inputRef.id,
-          sku: 'ORC-0001',
+          sku: 'ORC-'+this.numberOrder,
           menu: menuL,
           inputs: inputsR,
           status: 'en proceso',
@@ -226,9 +251,7 @@ export class PlanningComponent implements OnInit {
           editedBy: user
         }
 
-
         batch.set(inputRef, inputData);
-
 
         batch.commit().then(() => {
           console.log('orden guardada');

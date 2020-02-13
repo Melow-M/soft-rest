@@ -87,11 +87,19 @@
                         <td mat-cell *matCellDef="let element" class="w3-border-bottom w3-center"
                             style="color:#2b2b2b; padding:0px 1em; border-left:1px solid #B9B9B9">
                             <mat-menu #requestsMenu="matMenu">
-                                <button mat-menu-item (click)="approve(element)">
+                                <button mat-menu-item (click)="approve(element)"
+                                    *ngIf="element['status']=='en proceso'">
                                     <mat-icon>check_circle</mat-icon> Aprobar
                                 </button>
-                                <button mat-menu-item>
+                                <button mat-menu-item *ngIf="element['status']=='en proceso'">
                                     <mat-icon>cancel</mat-icon> Cancelar
+                                </button>
+                                <button mat-menu-item (click)="publicOrder(element)"
+                                    *ngIf="element['status']=='aprobado'">
+                                    <mat-icon>save_alt</mat-icon> Publicar
+                                </button>
+                                <button mat-menu-item *ngIf="element['status']=='publicado'">
+                                    <mat-icon>attachment</mat-icon> Finalizar
                                 </button>
                             </mat-menu>
                             <button mat-icon-button [matMenuTriggerFor]="requestsMenu">
@@ -118,7 +126,7 @@
             </div>
             <span style="flex: 1 1 auto;"></span>
             <div>
-                <button mat-raised-button style="background: #EE8434; color: white">
+                <button mat-raised-button style="background: #EE8434; color: white" (click)="downloadMenu()">
                     <mat-icon style="vertical-align: middle;">cloud_download</mat-icon>
                     Descargar
                 </button>
@@ -179,10 +187,10 @@
                             matColumnDef="sold">
                             <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
                                 style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9;">
-                                Cantidad Preparados </th>
+                                Cantidad Vendidos </th>
                             <td mat-cell *matCellDef="let element" style="color:#2b2b2b;"
                                 class="w3-center w3-border-left off w3-border-bottom':'w3-border-bottom w3-center w3-border-left">
-                                {{element['amount']}} </td>
+                                {{element['sold']}} </td>
                         </ng-container>
 
                         <tr mat-header-row *matHeaderRowDef="displayedMenuColumns"></tr>
@@ -206,7 +214,7 @@
                 <span>Costo Total: S/. {{currentOrder['total'] | number: '.2'}}</span>
             </div>
             <div>
-                <button mat-raised-button style="background: #EE8434; color: white">
+                <button mat-raised-button style="background: #EE8434; color: white" (click)="print()">
                     <mat-icon style="vertical-align: middle;">cloud_download</mat-icon>
                     Descargar
                 </button>

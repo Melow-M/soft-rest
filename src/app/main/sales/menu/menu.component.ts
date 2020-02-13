@@ -47,7 +47,7 @@ export class MenuComponent implements OnInit {
   selectablePlate: any = null
   selectIndex: number = null
 
-  others$: Observable<Grocery[]>
+  others$: Observable<any>
   other: Array<Grocery> = []
 
   plate$: Observable<Meal[]>
@@ -62,6 +62,7 @@ export class MenuComponent implements OnInit {
   //favorites = this.other.sort((a, b) => b['sold'] - a['sold']).slice(0, 5)
   //others = this.other.filter(el => !this.favorites.includes(el))
   numberOrder$: Observable<number>
+  number: number
   order: Array<any> = []
 
   total: number = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
@@ -152,7 +153,8 @@ export class MenuComponent implements OnInit {
     );
 
     this.plate$ = this.dbs.onGetDishes().pipe(
-      tap(plates => {
+      tap(dishes => {
+        let plates = dishes.filter(el => el['status'] == 'DISPONIBLE')
         this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
         this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
         this.second = plates.filter(el => el['type'] == 'FONDO')
@@ -160,7 +162,7 @@ export class MenuComponent implements OnInit {
         this.plates = plates.map(el => {
           return {
             ...el,
-            sold: 0
+            sold: el['initialStock'] - el['stock']
           }
         })
       })
@@ -169,6 +171,7 @@ export class MenuComponent implements OnInit {
     this.numberOrder$ = this.dbs.getOrders().pipe(
       map(orders => {
         this.cancelOrder()
+        this.number = orders.length + 1
         return orders.length + 1
       })
     )
@@ -216,6 +219,8 @@ export class MenuComponent implements OnInit {
     this.others$ =
       combineLatest(
         this.dbs.onGetOthers(),
+        this.dbs.onGetOffer(),
+        this.dbs.onGetCombo(),
         this.searchProduct.valueChanges.pipe(
           startWith(''),
           distinctUntilChanged(),
@@ -226,8 +231,12 @@ export class MenuComponent implements OnInit {
         )
       )
         .pipe(
-          map(([product, search]) => {
-            return product.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true)
+          map(([product, offer, combo, search]) => {
+            return {
+              otros: product.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true),
+              promociones: offer.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true),
+              combos: combo.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true)
+            }
           })
         )
 
@@ -413,7 +422,7 @@ export class MenuComponent implements OnInit {
 
     let payOrder: Order = {
       id: '',
-      orderCorrelative: 0,
+      orderCorrelative: ("0000" + this.number).slice(-5),
       orderList: this.order,
       orderStatus: 'SELECCIONADO',
       price: 0,

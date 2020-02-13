@@ -1,11 +1,13 @@
+import { element } from 'protractor';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { AuthService } from './../../../../core/auth.service';
-import { tap, filter, take } from 'rxjs/operators';
+import { tap, filter, take, map } from 'rxjs/operators';
 import { MatTableDataSource, MatPaginator } from '@angular/material';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
-
+import * as XLSX from 'xlsx';
+import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-orders',
   templateUrl: './orders.component.html',
@@ -20,6 +22,9 @@ export class OrdersComponent implements OnInit {
 
   orders$: Observable<any>
 
+  dishes$: Observable<any>
+  dishes: Array<any>
+
   displayedOrderColumns: string[] = ['index', 'date', 'document', 'menu', 'inputs', 'user', 'actions'];
   dataOrderSource = new MatTableDataSource();
 
@@ -33,24 +38,67 @@ export class OrdersComponent implements OnInit {
   displayedInputsColumns: string[] = ['index', 'input', 'unit', 'amount', 'cost', 'costTotal'];
   dataInputsSource = new MatTableDataSource();
 
+  data_xls: any
+  headersXlsx: string[] = [
+    'Fecha',
+    'Categoría',
+    'Plato',
+    'Cantidad Preparada',
+    'Cantidad vendida'
+  ]
+
   constructor(
     public dbs: DatabaseService,
     public auth: AuthService,
-    private af: AngularFirestore
+    private af: AngularFirestore,
+    public datePipe: DatePipe
   ) { }
 
   ngOnInit() {
 
-    this.orders$ = this.dbs.onGetKitchenOrders().pipe(
-      tap(res => {
-        this.dataOrderSource.data = res
-      })
-    )
+    this.orders$ =
+      combineLatest(
+        this.dbs.onGetKitchenOrders(),
+        this.dbs.onGetDishes()
+      )
+        .pipe(
+          map(([orders, dishes]) => {
+            this.dishes = dishes
+            let array = orders.map(order => {
+              order['menu'] = order['menu'].map(menu => {
+                let exist = false
+                let sold = 0
+                let dishId = ''
+                dishes.forEach(dish => {
+                  if (dish['name'] == menu['dish']['name']) {
+                    exist = true
+                    sold = menu['amount'] - dish['stock']
+                    dishId = dish['id']
+                    menu['amount'] += dish['stock']
+                  }
+                })
+                return {
+                  ...menu,
+                  exist: exist,
+                  sold: sold,
+                  dishId: dishId
+                }
+              })
+              return order
+            })
+            return array
+          }),
+          tap(res => {
+            this.dataOrderSource.data = res
+          })
+        )
+
   }
 
   viewMenu(menu) {
     this.ordersView = false
     this.menuView = true
+    this.data_xls = menu['menu']
     this.currentOrder = {
       name: menu['sku'],
       date: menu['createdAt'],
@@ -82,44 +130,137 @@ export class OrdersComponent implements OnInit {
     }
   }
 
+  print() {
+    const title = ['Nro', 'Insumo', 'Medida', 'Cantidad']
+
+    let array = this.currentOrder['inputs'].map((el, index) => {
+      return [String(index + 1), el['name'], el['unit'], String(el['required'])]
+    })
+
+    this.dbs.printAnything4Column(title, array)
+  }
+
+  downloadMenu() {
+    let table_xlsx: any[] = [];
+
+    table_xlsx.push(this.headersXlsx);
+
+    this.data_xls.forEach(element => {
+      const temp = [
+        this.datePipe.transform(this.currentOrder['date'].toMillis(), 'dd/MM/yyyy'),
+        element['category']['name'],
+        element['dish']['name'],
+        element['amount'],
+        element['sold']
+      ];
+      table_xlsx.push(temp);
+    })
+
+    let date = this.datePipe.transform(this.currentOrder['date'].toMillis(), 'dd/MM/yyyy')
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Menú del día');
+
+    const name = 'Menú_del_día' + date + '.xlsx'
+    XLSX.writeFile(wb, name);
+  }
+
   approve(element) {
     const batch = this.af.firestore.batch();
     this.auth.user$.pipe(
       take(1)
     ).subscribe(user => {
-      element['menu'].forEach(el => {
-        let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc();
-        let menuData = {
-          id: menuRef.id,
-          name: el['dish']['name'], // Lomo Saltado
-          sku: '',//AP102001
-          description: '',
-          picture: ' ',
-          unit: 'UND.',// UND., KG., GR., L., M., PULG. ...
-          stock: el['amount'],
-          emergencyStock: 0,
-          type: el['category']['value'], // ENTRADA, FONDO, POSTRE, PIQUEO, BEBIDA
-          recipeId: el['dish']['recipeId'],
-          status: 'DISPONIBLE', // DISPONIBLE, COCINANDO, INACTIVO
-          price: 0,
-          createdAt: new Date,
-          createdBy: user,
-          editedAt: new Date,
-          editedBy: user,
+      element['menu'].forEach((el, index) => {
+        if (el['exist']) {
+          let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(el['dishId']);
+          let menuDataUpdate = {
+            stock: el['amount'],
+            initialStock: el['amount'],
+            type: el['category']['value'], // ENTRADA, FONDO, POSTRE, PIQUEO, BEBIDA
+            recipeId: el['dish']['recipeId'],
+            status: 'COCINANDO', // DISPONIBLE, COCINANDO, INACTIVO
+            price: 0,
+            editedAt: new Date,
+            editedBy: user,
+          }
+          let costRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/${el['dishId']}/costTrend`).doc();
+          let costData = {
+            id: costRef.id,
+            cost: el['cost'],
+            price: 0,
+            kitchenOrder: element['id'],
+            createdAt: new Date()
+          }
+
+          batch.update(menuRef, menuDataUpdate)
+          batch.set(costRef, costData)
+        } else {
+          let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc();
+          let menuData = {
+            id: menuRef.id,
+            name: el['dish']['name'], // Lomo Saltado
+            sku: 'AP' + ('000' + this.dishes.length).slice(-3) + ('000' + index).slice(-3),//AP102001
+            description: '',
+            picture: ' ',
+            unit: 'UND.',// UND., KG., GR., L., M., PULG. ...
+            stock: el['amount'],
+            initialStock: el['amount'],
+            emergencyStock: 0,
+            type: el['category']['value'], // ENTRADA, FONDO, POSTRE, PIQUEO, BEBIDA
+            recipeId: el['dish']['recipeId'],
+            status: 'COCINANDO', // DISPONIBLE, COCINANDO, INACTIVO
+            price: 0,
+            createdAt: new Date,
+            createdBy: user,
+            editedAt: new Date,
+            editedBy: user,
+          }
+          let costRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/${menuRef.id}/costTrend`).doc();
+          let costData = {
+            id: costRef.id,
+            cost: el['cost'],
+            price: 0,
+            kitchenOrder: element['id'],
+            createdAt: new Date()
+          }
+
+          batch.set(menuRef, menuData)
+          batch.set(costRef, costData)
         }
 
-        batch.set(menuRef, menuData)
+
+
       })
 
       element['inputs'].forEach(el => {
-        console.log(el['id']);
-        
+
         let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/warehouseInputs/`).doc(el['id']);
-        console.log(el['stock']);
+
         let data = {
           stock: el['stock'] - el['required']
         }
         batch.update(inputRef, data)
+        let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseInputs/${el['id']}/kardex`).doc(inputRef.id)
+
+        let inputKardex = {
+          id: inputRef.id,
+          details: 'Preparación de menú, orden de cocina: ' + element['sku'],
+          insQuantity: 0,
+          insPrice: 0,
+          insTotal: 0,
+          outsQuantity: el['required'],
+          outsPrice: el['cost'],
+          outsTotal: el['required'] * el['cost'],
+          balanceQuantity: 0,
+          balancePrice: 0,
+          balanceTotal: 0,
+          type: 'SALIDA',
+          createdAt: new Date(),
+          createdBy: user
+        }
+
+        batch.set(kardexRef, inputKardex)
       })
 
       let orderRef = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders`).doc(element['id']);
@@ -134,8 +275,35 @@ export class OrdersComponent implements OnInit {
       })
     })
 
+  }
 
+  publicOrder(element) {
+    const batch = this.af.firestore.batch();
+    this.auth.user$.pipe(
+      take(1)
+    ).subscribe(user => {
+      element['menu'].forEach(el => {
+        let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(el['dishId']);
+        let menuDataUpdate = {
+          status: 'DISPONIBLE', // DISPONIBLE, COCINANDO, INACTIVO
+          editedAt: new Date,
+          editedBy: user,
+        }
 
+        batch.update(menuRef, menuDataUpdate)
+      })
+
+      let orderRef = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders`).doc(element['id']);
+
+      batch.update(orderRef, {
+        status: 'publicado'
+      })
+
+      batch.commit().then(() => {
+        console.log('publicado');
+
+      })
+    })
   }
 
 }

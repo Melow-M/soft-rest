@@ -67,12 +67,9 @@ export class AccountsReceivableComponent implements OnInit {
       )
   }
 
-  onPartialPay(raw: ReceivableUser){
+  onChangeBalance(raw: ReceivableUser){
 
   }
 
-  onTotalPay(raw: ReceivableUser){
-
-  }
 
 }

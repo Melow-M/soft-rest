@@ -4,6 +4,8 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
 import { AngularFirestoreCollection, AngularFirestore, DocumentReference } from '@angular/fire/firestore';
+import * as firebase from 'firebase/app';
+
 import { shareReplay, tap, combineLatest } from 'rxjs/operators';
 import { Provider } from './models/third-parties/provider.model';
 import { Payable } from './models/admin/payable.model';
@@ -1142,6 +1144,27 @@ export class DatabaseService {
     let customersCollection = this.af.collection<ReceivableUser>('db/deliciasTete/receivableUsers', ref => ref.orderBy('createdAt', 'desc'));
     let customers$ = customersCollection.valueChanges();
     return customers$;
+  }
+
+  changeBalance(user: ReceivableUser, amount: number): Observable<firebase.firestore.WriteBatch> {
+    let receivableUserRef = this.af.firestore.collection('db/deliciasTete/receivableUsers').doc(user.id);
+    let receivableUserData;
+    let batch = this.af.firestore.batch();
+
+    this.auth.user$
+    batch.update(receivableUserRef, receivableUserData)
+    
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        receivableUserData = {
+          editedAt: new Date(),
+          editedBy: user,
+          balance: firebase.firestore.FieldValue.increment(amount),
+        }
+
+        batch.update(receivableUserRef, receivableUserData)
+        return batch;
+      }))
   }
 
 }

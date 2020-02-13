@@ -120,12 +120,8 @@
                       <td mat-cell class="w3-center mat-elevation-z4" style="padding:0px 15px" *matCellDef="let raw">
                         <mat-menu #rawMenu="matMenu">
                           <button *ngIf="user['role']['thirdPartiesCustomersEditAction']"
-                            mat-menu-item (click)="onPartialPay(raw)" >
-                            <mat-icon class="ms-icons-color">payment</mat-icon> Pago Total
-                          </button>
-                          <button *ngIf="user['role']['thirdPartiesCustomersDeleteAction']"
-                            mat-menu-item (click)="onTotalPay(raw)">
-                            <mat-icon class="ms-icons-color">payment</mat-icon> Pago Parcial
+                            mat-menu-item (click)="onChangeBalance(raw)" >
+                            <mat-icon class="ms-icons-color">payment</mat-icon> Aumentar Saldo
                           </button>
                         </mat-menu>
                         <button mat-icon-button [matMenuTriggerFor]="rawMenu">

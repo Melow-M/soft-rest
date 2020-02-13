@@ -131,9 +131,9 @@ export class CreateNewComboDialogComponent implements OnInit {
     console.log(item);
   }
 
-  getTotal(){
+  getTotal(): number{
     if(this.inputTableDataSource.data.length){
-      return this.inputTableDataSource.data.reduce((acc, curr)=> {
+      return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
         return <number>acc + <number>(curr['product']['price']*curr['quantity'])
       }, 0);
 
@@ -198,6 +198,14 @@ export class CreateNewComboDialogComponent implements OnInit {
     return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }
 
+
+  getTotalPrice(){
+    return (this.getTotal()).toFixed(2)
+  }
+
+  getPercentage(){
+    return ((this.getTotal()-this.comboForm.get('price').value)/this.getTotal()).toFixed(2)
+  }
 }
 
 

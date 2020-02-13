@@ -136,10 +136,10 @@ export class CreateNewPromoDialogComponent implements OnInit {
     console.log(item);
   }
 
-  getTotal(){
+  getTotal(): number{
     if(this.inputTableDataSource.data.length){
-      return this.inputTableDataSource.data.reduce((acc, curr)=> {
-        return <number>acc + <number>(curr['product']['price']*curr['quantity'])
+      return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
+        return <number>acc + (curr['product']['price']*curr['quantity'])
       }, 0);
 
     }
@@ -205,6 +205,13 @@ export class CreateNewPromoDialogComponent implements OnInit {
     return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }
 
+  getRealPrice(){
+    return this.getTotal().toFixed(2);
+  }
+
+  getPercentage(){
+    return ((this.getTotal()-this.promoForm.get('promoPrice').value)/this.getTotal()).toFixed(2)
+  }
 }
 
 

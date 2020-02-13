@@ -114,26 +114,19 @@
                 <div class="type">
                     <span class="header">Tipo</span>
                     <div class="flex-div">
-                        <div class="category" style="background: rgba(183, 7, 5, 0.2);"
-                            (click)="firstOrder('executive',10,'Menú Ejecutivo')">
+                        <div class="category" *ngFor="let menu of menus$|async"
+                            [ngStyle]="{'background': menu['value']=='executive'?'rgba(183, 7, 5, 0.2)':menu['value']=='simple'?'rgba(237, 172, 47, 0.4)':''}"
+                            (click)="firstOrder(menu['value'],menu['price'],menu['name'])">
                             <div class="w3-center">
-                                <img class="icon" src="../../../../assets/images/comida.png" alt="">
-                                <p>Ejecutivo</p>
+                                <img *ngIf="menu['value']=='executive'" class="icon"
+                                    src="../../../../assets/images/comida.png" alt="">
+                                <mat-icon *ngIf="menu['value']=='simple'" class="icon">restaurant</mat-icon>
+                                <img *ngIf="menu['value']=='second'" class="icon"
+                                    src="../../../../assets/images/almuerzo.png" alt="">
+                                <p>{{menu['shortName']}}</p>
                             </div>
                         </div>
-                        <div class="category" style="background: rgba(237, 172, 47, 0.4);"
-                            (click)="firstOrder('simple',8,'Menú Básico')">
-                            <div class="w3-center">
-                                <mat-icon class="icon">restaurant</mat-icon>
-                                <p>Básico</p>
-                            </div>
-                        </div>
-                        <div class="category" (click)="firstOrder('second',6,'Segundo')">
-                            <div class="w3-center">
-                                <img class="icon" src="../../../../assets/images/almuerzo.png" alt="">
-                                <p>Segundo</p>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
                 <div class="plates" *ngIf="plate$ | async">

@@ -11,7 +11,7 @@
 
     </div>
     <button mat-raised-button style="background: #EE8434; color: white" (click)="missingInputs()"
-        [disabled]="!inputsMissing.length">
+        *ngIf="inputsMissing.length">
         Insumos Faltantes
     </button>
 </div>
@@ -126,7 +126,7 @@
                         [className]="element['orderStatus']=='ANULADO'?'w3-center off w3-border-bottom':'w3-border-bottom w3-center'"
                         style="color:#2b2b2b; padding:0px 1em; border-left:1px solid #B9B9B9">
                         <mat-menu #requestsMenu="matMenu">
-                            <button mat-menu-item>
+                            <button mat-menu-item (click)="editItem(element,i)">
                                 <mat-icon style="vertical-align: middle;">create</mat-icon> Editar
                             </button>
                             <button mat-menu-item (click)="deleteItem(i)">

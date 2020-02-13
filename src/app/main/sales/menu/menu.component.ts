@@ -81,6 +81,8 @@ export class MenuComponent implements OnInit {
   ticketForm: FormGroup
   billForm: FormGroup
 
+  menus$: Observable<any>
+
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
@@ -92,6 +94,8 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() {
     this.createForm()
+
+    this.menus$ = this.dbs.getMenu()
 
     this.isOpening$ = combineLatest(
       this.dbs.getCashes(),

@@ -1,3 +1,4 @@
+import { element } from 'protractor';
 import { AuthService } from './../../../../core/auth.service';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { MissingInputsComponent } from './../missing-inputs/missing-inputs.component';
@@ -141,6 +142,14 @@ export class PlanningComponent implements OnInit {
 
   deleteItem(i) {
     this.menuList.splice(i, 1);
+    this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
+  }
+  editItem(element,index){
+    this.menuForm.get('dish').setValue(element['dish'])
+    this.menuForm.get('category').setValue(element['category'])
+    this.menuForm.get('amount').setValue(element['amount'])
+
+    this.menuList.splice(index, 1);
     this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
   }
 

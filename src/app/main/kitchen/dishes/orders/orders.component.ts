@@ -306,4 +306,37 @@ export class OrdersComponent implements OnInit {
     })
   }
 
+
+
+  finish(element) {
+    const batch = this.af.firestore.batch();
+    this.auth.user$.pipe(
+      take(1)
+    ).subscribe(user => {
+      element['menu'].forEach(el => {
+        let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(el['dishId']);
+        let menuDataUpdate = {
+          stock: 0,
+          initialStock: 0,
+          status: 'INACTIVO', // DISPONIBLE, COCINANDO, INACTIVO
+          editedAt: new Date,
+          editedBy: user,
+        }
+
+        batch.update(menuRef, menuDataUpdate)
+      })
+
+      let orderRef = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders`).doc(element['id']);
+
+      batch.update(orderRef, {
+        status: 'finalizado'
+      })
+
+      batch.commit().then(() => {
+        console.log('publicado');
+
+      })
+    })
+  }
+
 }

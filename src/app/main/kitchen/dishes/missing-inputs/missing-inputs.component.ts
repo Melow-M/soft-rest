@@ -1,5 +1,6 @@
-import { MatTableDataSource, MatPaginator } from '@angular/material';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { DatabaseService } from './../../../../core/database.service';
+import { MatTableDataSource, MatPaginator, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 
 @Component({
   selector: 'app-missing-inputs',
@@ -39,10 +40,25 @@ export class MissingInputsComponent implements OnInit {
   }
 
 
-  constructor() { }
+  constructor(
+    public dbs: DatabaseService,
+    private dialog: MatDialogRef<MissingInputsComponent>,
+    @Inject(MAT_DIALOG_DATA) public data
+  ) { }
 
   ngOnInit() {
-    this.dataSource.data = this.example
+    this.dataSource.data = this.data
+  }
+
+  print() {
+    const title = ['Nro', 'Insumo', 'Medida', 'Cantidad']
+
+    let array = this.data.map((el, index) => {
+      return [String(index + 1), el['name'], el['unit'], String(el['missing'] * -1)]
+    })
+
+    
+    this.dbs.printAnything4Column(title, array)
   }
 
 }

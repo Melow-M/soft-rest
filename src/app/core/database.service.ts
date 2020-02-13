@@ -101,12 +101,12 @@ export class DatabaseService {
     public af: AngularFirestore,
     private auth: AuthService
   ) {
-      //SYSTEM
-      this.getPermits();
-      this.getUsers();
-      this.getCustomers();
+    //SYSTEM
+    this.getPermits();
+    this.getUsers();
+    this.getCustomers();
 
-   }
+  }
 
 
   //PErmits
@@ -114,7 +114,7 @@ export class DatabaseService {
 
 
 
-   // *************** USERS
+  // *************** USERS
   addUser(data): Promise<any> {
     return this.usersCollection.doc(data['uid']).set(data);
   }
@@ -476,7 +476,7 @@ export class DatabaseService {
   }
 
   //Kitchen
-  onGetKitchenOrders(){
+  onGetKitchenOrders() {
     return this.af.collection(`/db/deliciasTete/kitchenOrders`, ref => ref.orderBy('createdAt')).valueChanges().pipe(shareReplay(1))
   }
 
@@ -639,13 +639,13 @@ export class DatabaseService {
     return transactionsCollection.valueChanges().pipe(shareReplay(1));
   }
 
-  printCash(cash, income, expenses){
+  printCash(cash, income, expenses) {
     var doc = new jsPDF({
       unit: 'pt',
       orientation: 'l',
       format: 'A4'
     });
-    
+
     //Imagen
     let actualDate = this.getDate();
     //Importando Plantilla
@@ -653,117 +653,117 @@ export class DatabaseService {
     img.src = '../../assets/images/cashPDF.jpg';
 
     doc.addImage(img, 'JPEG', 0, 0, 841, 594);
-    
+
     //Efectivo
     doc.setFontStyle("normal");
     doc.setFontSize(18),
-    doc.text("S/. "+cash[0]['amount'].toFixed(2), 268, 244, {
+      doc.text("S/. " + cash[0]['amount'].toFixed(2), 268, 244, {
         align: "right",
         baseline: "bottom"
       });
-    
-    doc.text("S/. " +cash[1]['amount'].toFixed(2), 268, 280, {
-        align: "right",
-        baseline: "bottom"
-      });
-    
-    doc.text("S/. " +cash[2]['amount'].toFixed(2), 268, 314, {
-        align: "right",
-        baseline: "bottom"
-      });
-    
+
+    doc.text("S/. " + cash[1]['amount'].toFixed(2), 268, 280, {
+      align: "right",
+      baseline: "bottom"
+    });
+
+    doc.text("S/. " + cash[2]['amount'].toFixed(2), 268, 314, {
+      align: "right",
+      baseline: "bottom"
+    });
+
     doc.text("S/. " +
-      (cash[0]['amount']*cash[0]['value']+
-      cash[1]['amount']*cash[1]['value']+
-      cash[2]['amount']*cash[2]['value']).toFixed(2)
+      (cash[0]['amount'] * cash[0]['value'] +
+        cash[1]['amount'] * cash[1]['value'] +
+        cash[2]['amount'] * cash[2]['value']).toFixed(2)
       , 268, 363, {
-        align: "right",
-        baseline: "bottom"
-      });
-      
+      align: "right",
+      baseline: "bottom"
+    });
+
     //Ingresos por TIpo
     doc.setFontSize(18),
-    doc.text("S/. " + income[0]['amount'].toFixed(2), 519, 244, {
+      doc.text("S/. " + income[0]['amount'].toFixed(2), 519, 244, {
         align: "right",
         baseline: "bottom"
       });
-    
+
     doc.text("S/. " + income[1]['amount'].toFixed(2), 519, 280, {
-        align: "right",
-        baseline: "bottom"
-      });
-    
+      align: "right",
+      baseline: "bottom"
+    });
+
     doc.text("S/. " + income[2]['amount'].toFixed(2), 519, 314, {
-        align: "right",
-        baseline: "bottom"
-      });
-    
-    doc.text("S/. " + 
-      (income[0]['amount']*income[0]['value']+
-      income[1]['amount']*income[1]['value']+
-      income[2]['amount']*income[2]['value']).toFixed(2)
+      align: "right",
+      baseline: "bottom"
+    });
+
+    doc.text("S/. " +
+      (income[0]['amount'] * income[0]['value'] +
+        income[1]['amount'] * income[1]['value'] +
+        income[2]['amount'] * income[2]['value']).toFixed(2)
       , 519, 363, {
-        align: "right",
-        baseline: "bottom"
-      });
-      
+      align: "right",
+      baseline: "bottom"
+    });
+
     // doc.text("S/. " + "TITULO".toUpperCase(), 519, 401, {
     //     align: "right",
     //     baseline: "bottom"
     //   });
-      
+
     //Egresos por tipo
     doc.setFontSize(18),
-    doc.text("S/. " +expenses[0]['amount'].toFixed(), 768, 244, {
+      doc.text("S/. " + expenses[0]['amount'].toFixed(), 768, 244, {
         align: "right",
         baseline: "bottom"
       });
-    
-    doc.text("S/. " +expenses[1]['amount'].toFixed(), 768, 280, {
-        align: "right",
-        baseline: "bottom"
-      });
-    
+
+    doc.text("S/. " + expenses[1]['amount'].toFixed(), 768, 280, {
+      align: "right",
+      baseline: "bottom"
+    });
+
     doc.text("S/. " +
-      (expenses[0]['amount']*expenses[0]['value']+
-      expenses[1]['amount']*expenses[1]['value']).toFixed(2)
+      (expenses[0]['amount'] * expenses[0]['value'] +
+        expenses[1]['amount'] * expenses[1]['value']).toFixed(2)
       , 768, 327, {
-        align: "right",
-        baseline: "bottom"
-      });
-    
+      align: "right",
+      baseline: "bottom"
+    });
+
     //Footer
-    doc.text(actualDate[2]+"/"+actualDate[1]+"/"+actualDate[0]+" "+actualDate[3]+":"+actualDate[4], 676, 541, {
-        align: "left",
-        baseline: "bottom"
-      });
-      
-      doc.autoPrint({ variant: 'non-conform' });
-      doc.save(`Caja.pdf`);
+    doc.text(actualDate[2] + "/" + actualDate[1] + "/" + actualDate[0] + " " + actualDate[3] + ":" + actualDate[4], 676, 541, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.autoPrint({ variant: 'non-conform' });
+    doc.save(`Caja.pdf`);
   }
 
-    //Funcion para obtener valores de fechas
-    getDate(){
-      let date = new Date();
-        let month = '' + (date.getMonth() + 1);
-        let day = '' + date.getDate();
-        let year = date.getFullYear();
-        let hours = date.getHours();
-        let minutes = '' + date.getMinutes();
-  
-        if (minutes.length < 2) 
-            minutes = '0' + minutes;
-        if (month.length < 2) 
-            month = '0' + month;
-        if (day.length < 2) 
-            day = '0' + day;
-    
-        return [year, month, day, hours, minutes]
-    }
+  //Funcion para obtener valores de fechas
+  getDate() {
+    let date = new Date();
+    let month = '' + (date.getMonth() + 1);
+    let day = '' + date.getDate();
+    let year = date.getFullYear();
+    let hours = date.getHours();
+    let minutes = '' + date.getMinutes();
+
+    if (minutes.length < 2)
+      minutes = '0' + minutes;
+    if (month.length < 2)
+      month = '0' + month;
+    if (day.length < 2)
+      day = '0' + day;
+
+    return [year, month, day, hours, minutes]
+  }
 
   //SE tiene que enviar contenido como en el ejemplo (titulo y content comentados). El numero máximo de columnas es 4,
   //pero se pueden incluir menos. El numero maximo de filas es 24
-  printAnything4Column(titulo: Array<string>, content: Array<Array<string>>){
+  printAnything4Column(titulo: Array<string>, content: Array<Array<string>>) {
 
     var doc = new jsPDF({
       unit: 'pt',
@@ -786,55 +786,55 @@ export class DatabaseService {
     //Title
     doc.setFontStyle("bold");
     doc.setFontSize(18),
-    doc.text("TITULO".toUpperCase(), 237+67, 59, {
-      align: "center",
-      baseline: "middle"
-    });
+      doc.text("Lista de insumos".toUpperCase(), 237 + 67, 59, {
+        align: "center",
+        baseline: "middle"
+      });
 
     // Empty square
     doc.rect(67, 89, 474, 676);
 
     //Lines
-    for(let i = 1; i<24; i++){
-      doc.line(67, 89+i*28, 541, 89+i*28);
+    for (let i = 1; i < 24; i++) {
+      doc.line(67, 89 + i * 28, 541, 89 + i * 28);
     }
 
-    for(let i=1; i<4; i++){
-      doc.line(67+118.5*i, 89, 67+118.5*i, 89+676);    
+    for (let i = 1; i < 4; i++) {
+      doc.line(67 + 118.5 * i, 89, 67 + 118.5 * i, 89 + 676);
     }
 
     //Header
     doc.setFontStyle("bold");
     doc.setFontSize(12);
-    for(let i=0; i<4; i++){
-      doc.text(titulo[i], 67+59.25+118.5*i, 103, {
-      align: "center",
-      baseline: "middle"
-    });
+    for (let i = 0; i < 4; i++) {
+      doc.text(titulo[i], 67 + 59.25 + 118.5 * i, 103, {
+        align: "center",
+        baseline: "middle"
+      });
     }
 
     //Content
     let descriptionSliced = "ERROR";
-      doc.setFontStyle("normal");
-      doc.setFontSize(12);
-      for(let j=0; j<content[0].length; j++){
-              for(let i=0; i<titulo.length; i++){
-                  //Text delimiter
-                  for (let k = content[j][i].length; k > 0; k--) {
-                    if (doc.getTextWidth(content[j][i].slice(0, k)) < 116) {
-                      descriptionSliced = content[j][i].slice(0, k);
-                      k = 0;
-                      doc.text(descriptionSliced,67+59.25+118.5*i, 103+28*(j+1), {
-                        align: "center",
-                        baseline: "middle",
-                      });
-                    };
-                  };
-          }
+    doc.setFontStyle("normal");
+    doc.setFontSize(12);
+    for (let j = 0; j < content.length; j++) {
+      for (let i = 0; i < titulo.length; i++) {
+        //Text delimiter
+        for (let k = content[j][i].length; k > 0; k--) {
+          if (doc.getTextWidth(content[j][i].slice(0, k)) < 116) {
+            descriptionSliced = content[j][i].slice(0, k);
+            k = 0;
+            doc.text(descriptionSliced, 67 + 59.25 + 118.5 * i, 103 + 28 * (j + 1), {
+              align: "center",
+              baseline: "middle",
+            });
+          };
+        };
       }
-      
+    }
+
     doc.autoPrint({ variant: 'non-conform' });
-    doc.save(`${titulo}.pdf`);
+    doc.save(`Lista_de_insumos.pdf`);
   }
 
   printTicket(elements: { quantity: number, description: string, vUnit: number, import: number }[], ticketNumber: string) {
@@ -858,14 +858,14 @@ export class DatabaseService {
     }, 0);
 
     var doc = new jsPDF({
-        unit: 'pt',
-        format: [414, 353+21*(elements.length-1)],
-        orientation: 'l'
+      unit: 'pt',
+      format: [414, 353 + 21 * (elements.length - 1)],
+      orientation: 'l'
     });
 
     doc.setFontStyle("bold");
     doc.setFontSize(15),
-    doc.text("TICKET", 207, 59, {
+      doc.text("TICKET", 207, 59, {
         align: "center",
         baseline: "middle"
       });
@@ -883,10 +883,10 @@ export class DatabaseService {
       doc.text("Comedor SENATI", 207, 143, {
         align: "center",
         baseline: "middle"
-    });
-    
+      });
+
     doc.setFontSize(14),
-    doc.line(22,168,392,168);
+      doc.line(22, 168, 392, 168);
     doc.setFontStyle('bold');
 
     doc.text("Cant.", 39, 188, {
@@ -1029,7 +1029,7 @@ export class DatabaseService {
   }
 
   onGetOffer(): Observable<Promo[]> {
-    return this.af.collection<Promo>(`/db/deliciasTete/offers`).valueChanges();
+    return this.af.collection<Promo>(`/db/deliciasTete/offers`).valueChanges().pipe(shareReplay(1));
   }
 
   changeOfferState(promo: Promo, newState: string): Observable<firebase.firestore.WriteBatch> {
@@ -1050,14 +1050,14 @@ export class DatabaseService {
       }))
   }
 
-  onGetCombo(): Observable<Combo[]>{
-    return this.af.collection<Combo>(`/db/deliciasTete/combos`).valueChanges();
+  onGetCombo(): Observable<Combo[]> {
+    return this.af.collection<Combo>(`/db/deliciasTete/combos`).valueChanges().pipe(shareReplay(1));
   }
 
-  onCreateCombo(combo: Combo): Observable<firebase.firestore.WriteBatch>{
+  onCreateCombo(combo: Combo): Observable<firebase.firestore.WriteBatch> {
     let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc();
     let comboData: Combo = combo;
-    let date= new Date();
+    let date = new Date();
     let batch = this.af.firestore.batch();
 
     return this.auth.user$.pipe(take(1),
@@ -1073,17 +1073,17 @@ export class DatabaseService {
         return batch;
       }))
   }
-  changeComboState(combo: Combo, newState: string): Observable<firebase.firestore.WriteBatch>{
+  changeComboState(combo: Combo, newState: string): Observable<firebase.firestore.WriteBatch> {
     let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc(combo.id);
     let comboData: Combo = combo;
-    let date= new Date();
+    let date = new Date();
     let batch = this.af.firestore.batch();
 
     return this.auth.user$.pipe(take(1),
       map(user => {
         comboData.editedAt = date;
         comboData.editedBy = user;
-        comboData.state = newState == 'Activar' ? 'Publicado':'Inactivo';
+        comboData.state = newState == 'Activar' ? 'Publicado' : 'Inactivo';
 
         batch.update(comboRef, comboData);
 
@@ -1094,8 +1094,8 @@ export class DatabaseService {
   //Kitchen
   getOrdersKitchen(from: Date, to: Date): Observable<Order[]> {
 
-    let orderRef= this.af.collection<Order>(`db/deliciasTete/orders`, ref => ref.where('createdAt', '>=', from).where('createdAt', '<=', to));
-    
+    let orderRef = this.af.collection<Order>(`db/deliciasTete/orders`, ref => ref.where('createdAt', '>=', from).where('createdAt', '<=', to));
+
     return orderRef.valueChanges();
   }
 }

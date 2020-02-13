@@ -198,7 +198,7 @@ export class VoucherComponent implements OnInit {
       .subscribe(user => {
         inputData = {
           id: inputRef.id,
-          orderCorrelative: 0,
+          orderCorrelative: this.data['orderCorrelative'],
           orderList: this.data['orderList'],
           orderStatus: 'PAGADO',
           price: 0,

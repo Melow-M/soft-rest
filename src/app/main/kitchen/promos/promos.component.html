@@ -180,9 +180,9 @@
                                         <mat-icon>more_vert</mat-icon>
                                     </button>
                                     <mat-menu #menu="matMenu">
-                                        <button *ngIf="user['role']['kitchenPromosActions']"
-                                            mat-menu-item *ngIf="element.state == 'Inactivo'" (click)="changeOfferState(element, 'Activar')">Activar</button>
-                                        <button mat-menu-item *ngIf="element.state == 'Publicado'" (click)="changeOfferState(element, 'Inactivar')">Inactivar</button>
+                                        <button *ngIf="user['role']['kitchenPromosActions'] && element.state == 'Inactivo'"
+                                            mat-menu-item (click)="changeOfferState(element, 'Activar')">Activar</button>
+                                        <button mat-menu-item *ngIf="user['role']['kitchenPromosActions'] && element.state == 'Publicado'" (click)="changeOfferState(element, 'Inactivar')">Inactivar</button>
                                     </mat-menu>
                                 </td>
                             </ng-container>

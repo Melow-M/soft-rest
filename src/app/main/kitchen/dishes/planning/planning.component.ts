@@ -16,18 +16,28 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 })
 export class PlanningComponent implements OnInit {
 
+  verifiedCheck = {
+    executive: false,
+    simple: false,
+    second: false
+  }
+
+
   menuTypes = [
     {
       name: 'Menú Ejecutivo',
-      value: 'executive'
+      value: 'executive',
+      verified: false
     },
     {
       name: 'Menú Básico',
-      value: 'simple'
+      value: 'simple',
+      verified: false
     },
     {
       name: 'Segundo',
-      value: 'second'
+      value: 'second',
+      verified: false
     }
   ]
 
@@ -83,8 +93,8 @@ export class PlanningComponent implements OnInit {
   inputsRequired: Array<any> = null
   inputsMissing: Array<any> = []
 
-  numberOrder:string
-  numberOrder$:Observable<number>
+  numberOrder: string
+  numberOrder$: Observable<number>
 
   constructor(
     private fb: FormBuilder,
@@ -127,8 +137,8 @@ export class PlanningComponent implements OnInit {
     )
 
     this.numberOrder$ = this.dbs.onGetKitchenOrders().pipe(
-      map(orders=>{
-        let number = orders.length+1
+      map(orders => {
+        let number = orders.length + 1
         this.numberOrder = ("000" + number).slice(-4)
         return number
       })
@@ -144,7 +154,7 @@ export class PlanningComponent implements OnInit {
     this.menuList.splice(i, 1);
     this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
   }
-  editItem(element,index){
+  editItem(element, index) {
     this.menuForm.get('dish').setValue(element['dish'])
     this.menuForm.get('category').setValue(element['category'])
     this.menuForm.get('amount').setValue(element['amount'])
@@ -200,19 +210,52 @@ export class PlanningComponent implements OnInit {
 
     this.inputsMissing = this.inputsRequired.filter(al => al['missing'] < 0)
 
-    console.log(this.inputsMissing);
-    
-
     this.menuList[this.menuList.length - 1]['missing'] = this.inputsRequired.filter(al => al['missing'] < 0).length > 0
     this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
     this.menuForm.reset()
-
+    this.selectMenu['verified'] = true
+    this.verified()
   }
 
   missingInputs() {
-    this.dialog.open(MissingInputsComponent,{
+    this.dialog.open(MissingInputsComponent, {
       data: this.inputsMissing
     })
+  }
+
+  verified() {
+    let executive = this.menuList.filter(el => el['menuType'] == 'executive')
+    let simple = this.menuList.filter(el => el['menuType'] == 'simple')
+    let second = this.menuList.filter(el => el['menuType'] == 'second')
+
+    let entryExecutive = executive.filter(el => el['category']['value'] == 'ENTRADA')
+    let secondExecutive = executive.filter(el => el['category']['value'] == 'FONDO')
+    let dessertExecutive = executive.filter(el => el['category']['value'] == 'POSTRE')
+
+    let entrySimple = simple.filter(el => el['category']['value'] == 'ENTRADA')
+    let secondSimple = simple.filter(el => el['category']['value'] == 'FONDO')
+
+    let vExe = entryExecutive.length > 0 && secondExecutive.length > 0 && dessertExecutive.length > 0
+    let vSim = entrySimple.length > 0 && secondSimple.length > 0
+
+    this.verifiedCheck = {
+      executive: vExe,
+      simple: vSim,
+      second: second.length > 0
+    }
+
+  }
+
+  cancel(){
+    this.menuList = []
+    this.dataSource.data = []
+    this.verifiedCheck = {
+      executive: false,
+      simple: false,
+      second: false
+    }
+    this.selectMenu = null
+    this.selectMenuForm.reset()
   }
 
   save() {
@@ -250,7 +293,7 @@ export class PlanningComponent implements OnInit {
       .subscribe(user => {
         let inputData = {
           id: inputRef.id,
-          sku: 'ORC-'+this.numberOrder,
+          sku: 'ORC-' + this.numberOrder,
           menu: menuL,
           inputs: inputsR,
           status: 'en proceso',

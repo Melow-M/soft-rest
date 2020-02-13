@@ -22,7 +22,17 @@
 <div *ngIf="selectMenu$ | async">
     <div *ngIf="selectMenu">
         <h2 style="font-size:1.2em; color: #2B2B2B; font-family: Raleway; font-weight: bolder; padding-bottom: 16px;">
-            {{selectMenu['name']}}</h2>
+            {{selectMenu['name']}}
+            <span class="w3-margin-left" *ngIf="selectMenu['verified']">
+                <mat-icon *ngIf="verifiedCheck[selectMenu['value']]" style="vertical-align: middle;color: #039300">
+                    check_circle
+                </mat-icon>
+                <mat-icon *ngIf="!verifiedCheck[selectMenu['value']]" style="vertical-align: middle;color: #B70705;">
+                    cancel
+                </mat-icon>
+            </span>
+        </h2>
+        
         <form [formGroup]="menuForm" style="display: flex; flex-wrap: wrap; align-items: center;">
             <mat-form-field appearance="outline" style="width: 280px;" class="w3-margin-right"
                 *ngIf="selectMenu['value']!='second'">
@@ -144,9 +154,10 @@
         </div>
     </div>
     <div style="text-align: right;" class="w3-margin-top">
-        <button mat-raised-button class="w3-margin-right"
+        <button mat-raised-button class="w3-margin-right" (click)="cancel()"
             style="background: #B70705; color: white; font-family: Raleway;">Cancelar</button>
         <button mat-raised-button class="w3-margin-right" (click)="save()"
+            [disabled]="!(verifiedCheck['executive'] && verifiedCheck['simple']&&verifiedCheck['second'])"
             style="background: #EE8434; color: white; font-family: Raleway;">Generar Orden</button>
     </div>
 </div>

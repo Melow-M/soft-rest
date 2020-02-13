@@ -70,7 +70,8 @@ export class OrdersComponent implements OnInit {
                 let sold = 0
                 let dishId = ''
                 dishes.forEach(dish => {
-                  if (dish['name'] == menu['dish']['name']) {
+                  let sku = dish['sku'].split('-')[1]
+                  if (sku == order['sku'].split('-')[1]) {
                     exist = true
                     menu['amount'] += dish['stock']
                     sold = menu['amount'] - dish['stock']
@@ -201,7 +202,7 @@ export class OrdersComponent implements OnInit {
           let menuData = {
             id: menuRef.id,
             name: el['dish']['name'], // Lomo Saltado
-            sku: 'AP' + ('000' + this.dishes.length).slice(-3) + ('000' + index).slice(-3),//AP102001
+            sku: 'AP-' + element['sku'].split('-')[1] +'-'+ ('000' + (this.dishes.length+1)).slice(-3),//AP102001
             description: '',
             picture: ' ',
             unit: 'UND.',// UND., KG., GR., L., M., PULG. ...

@@ -72,9 +72,10 @@ export class OrdersComponent implements OnInit {
                 dishes.forEach(dish => {
                   if (dish['name'] == menu['dish']['name']) {
                     exist = true
+                    menu['amount'] += dish['stock']
                     sold = menu['amount'] - dish['stock']
                     dishId = dish['id']
-                    menu['amount'] += dish['stock']
+                    
                   }
                 })
                 return {
@@ -275,6 +276,22 @@ export class OrdersComponent implements OnInit {
       })
     })
 
+  }
+
+  cancelOrder(element){
+    const batch = this.af.firestore.batch();
+
+    let orderRef = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders`).doc(element['id']);
+
+      batch.update(orderRef, {
+        status: 'cancelado'
+      })
+
+      batch.commit().then(() => {
+        console.log('cancelado');
+
+      })
+    
   }
 
   publicOrder(element) {

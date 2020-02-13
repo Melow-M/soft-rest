@@ -1,3 +1,4 @@
+import { AuthService } from './../../../../core/auth.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MatTableDataSource, MatPaginator } from '@angular/material';
@@ -28,7 +29,9 @@ export class OrdersShowInputsComponent implements OnInit {
     quantity: number;
   }[]>;
   
-  constructor() { }
+  constructor(
+    public auth: AuthService
+  ) { }
 
   ngOnInit() {
   }

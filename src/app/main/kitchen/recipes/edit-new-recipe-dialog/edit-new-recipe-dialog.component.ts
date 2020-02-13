@@ -116,9 +116,9 @@ export class EditNewRecipeDialogComponent implements OnInit {
     }
   }
 
-  onDeleteItem(item){
+  onDeleteItem(item,index){
     let table = this.inputTableDataSource.data;
-    table.splice(item.index, 1);
+    table.splice(index, 1);
     table.forEach((el, index) => {el['index'] = index})
     this.inputTableDataSource.data = table;
     this.inputTableDataSource.paginator = this.inputTablePaginator;

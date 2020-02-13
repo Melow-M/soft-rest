@@ -37,10 +37,10 @@
             </mat-form-field>
 
             <mat-menu #rawMenu="matMenu">
-              <button *ngIf="user['role']['warehouseStocktakingCreateAction']" mat-menu-item (click)="createItem(raw)" >
+              <button *ngIf="user['role']['warehouseStocktakingCreateAction']" mat-menu-item (click)="createItem()" >
                 <mat-icon class="ms-icons-color">add_circle</mat-icon> Crear nuevo
               </button>
-              <button *ngIf="user['role']['warehouseStocktakingRemoveAction']" mat-menu-item (click)="withdrawHousehold(raw)">
+              <button *ngIf="user['role']['warehouseStocktakingRemoveAction']" mat-menu-item (click)="withdrawHousehold()">
                 <mat-icon class="ms-icons-color">remove_circle</mat-icon> Retirar Menaje
               </button>
               <!-- <button mat-menu-item (click)="addHousehold(raw)" *ngIf="user.role.warehouseStocktakingAddHouseholdAction"

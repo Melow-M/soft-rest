@@ -113,7 +113,7 @@ export class StocktakingComponent implements OnInit {
       })
   }
 
-  withdrawHousehold(item: Household): void {
+  withdrawHousehold(): void {
     this.dialog.open(StocktakingRemoveHouseholdDialogComponent)
       .afterClosed()
       .pipe(take(1))

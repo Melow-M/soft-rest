@@ -21,4 +21,5 @@ export interface Customer {
   createdAt: Date;
   editedBy?: User;
   editedAt?: Date;
+  receivableAccount ?: boolean;
 }

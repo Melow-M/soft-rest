@@ -31,7 +31,7 @@
             <!-- Nombre de plato o bebida -->
                 <mat-form-field appearance="outline" style="display: block" >
                     <mat-label>Nombre de Plato/Bebida</mat-label>
-                    <input type="text" placeholder="Nombre de Plato/Bebida" matInput formControlName="productName">
+                    <input type="text" placeholder="Nombre de Plato/Bebida" matInput formControlName="productName" autocomplete="off">
                     <mat-hint *ngIf="this.productNameFormat$ | async">*Requerido</mat-hint>
                     <mat-error>
                         <span *ngIf="productForm.get('productName').errors?.repeatedName">Este nombre ya existe.</span>
@@ -55,7 +55,7 @@
                 <div class="w3-col s12 m6 l6 w3-padding">
                     <mat-form-field appearance="outline" style="display:block">
                         <mat-label>Seleccione Insumo</mat-label>
-                        <input 
+                        <input autocomplete="off"
                             type="text" placeholder="Seleccione Insumo" aria-label="Number" matInput formControlName="item" [matAutocomplete]="auto">
                         <mat-autocomplete [displayWith]="displayFn.bind(this)" #auto="matAutocomplete">
                         <mat-option *ngFor="let input of inputList | async" [value]="input">
@@ -72,7 +72,7 @@
                         <div style="padding-right:8px;">
                             <mat-form-field appearance="outline" style="width: 135px">
                                 <mat-label>Cantidad</mat-label>
-                                <input formControlName="quantity" matInput placeholder="Cantidad" type="number">
+                                <input formControlName="quantity" matInput placeholder="Cantidad" type="number" autocomplete="off">
                                 <mat-hint>*Requerido</mat-hint>
                             </mat-form-field>
                         </div>

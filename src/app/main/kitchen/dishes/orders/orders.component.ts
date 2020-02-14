@@ -1,3 +1,4 @@
+import { Meal } from 'src/app/core/models/sales/menu/meal.model';
 import { element } from 'protractor';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { AuthService } from './../../../../core/auth.service';
@@ -65,18 +66,16 @@ export class OrdersComponent implements OnInit {
           map(([orders, dishes]) => {
             this.dishes = dishes
             let array = orders.map(order => {
-              order['menu'] = order['menu'].map(menu => {
+              order['menu'] = order['menu'].map((menu, index) => {
                 let exist = false
                 let sold = 0
                 let dishId = ''
+                let sku = 'AP-' + order['sku'].split('-')[1] + '-' + ('00' + (index + 1)).slice(-3)
                 dishes.forEach(dish => {
-                  let sku = dish['sku'].split('-')[1]
-                  if (sku == order['sku'].split('-')[1]) {
+                  if (sku == dish['sku']) {
                     exist = true
-                    menu['amount'] += dish['stock']
                     sold = menu['amount'] - dish['stock']
                     dishId = dish['id']
-                    
                   }
                 })
                 return {
@@ -91,7 +90,7 @@ export class OrdersComponent implements OnInit {
             return array
           }),
           tap(res => {
-            this.dataOrderSource.data = res
+            this.dataOrderSource.data = res.filter(el => el['status'] != 'cancelado')
           })
         )
 
@@ -174,64 +173,38 @@ export class OrdersComponent implements OnInit {
       take(1)
     ).subscribe(user => {
       element['menu'].forEach((el, index) => {
-        if (el['exist']) {
-          let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(el['dishId']);
-          let menuDataUpdate = {
-            stock: el['amount'],
-            initialStock: el['amount'],
-            type: el['category']['value'], // ENTRADA, FONDO, POSTRE, PIQUEO, BEBIDA
-            recipeId: el['dish']['recipeId'],
-            status: 'COCINANDO', // DISPONIBLE, COCINANDO, INACTIVO
-            price: 0,
-            editedAt: new Date,
-            editedBy: user,
-          }
-          let costRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/${el['dishId']}/costTrend`).doc();
-          let costData = {
-            id: costRef.id,
-            cost: el['cost'],
-            price: 0,
-            kitchenOrder: element['id'],
-            createdAt: new Date()
-          }
-
-          batch.update(menuRef, menuDataUpdate)
-          batch.set(costRef, costData)
-        } else {
-          let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc();
-          let menuData = {
-            id: menuRef.id,
-            name: el['dish']['name'], // Lomo Saltado
-            sku: 'AP-' + element['sku'].split('-')[1] +'-'+ ('000' + (this.dishes.length+1)).slice(-3),//AP102001
-            description: '',
-            picture: ' ',
-            unit: 'UND.',// UND., KG., GR., L., M., PULG. ...
-            stock: el['amount'],
-            initialStock: el['amount'],
-            emergencyStock: 0,
-            type: el['category']['value'], // ENTRADA, FONDO, POSTRE, PIQUEO, BEBIDA
-            recipeId: el['dish']['recipeId'],
-            status: 'COCINANDO', // DISPONIBLE, COCINANDO, INACTIVO
-            price: 0,
-            createdAt: new Date,
-            createdBy: user,
-            editedAt: new Date,
-            editedBy: user,
-          }
-          let costRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/${menuRef.id}/costTrend`).doc();
-          let costData = {
-            id: costRef.id,
-            cost: el['cost'],
-            price: 0,
-            kitchenOrder: element['id'],
-            createdAt: new Date()
-          }
-
-          batch.set(menuRef, menuData)
-          batch.set(costRef, costData)
+        let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc();
+        let menuData:Meal = {
+          id: menuRef.id,
+          name: el['dish']['name'], // Lomo Saltado
+          sku: 'AP-' + element['sku'].split('-')[1] + '-' + ('00' + (index + 1)).slice(-3),//AP102001
+          description: '',
+          picture: ' ',
+          unit: 'UND.',// UND., KG., GR., L., M., PULG. ...
+          stock: el['amount'],
+          initialStock: el['amount'],
+          emergencyStock: 0,
+          menuType: el['menuType'],
+          type: el['category']['value'], // ENTRADA, FONDO, POSTRE, PIQUEO, BEBIDA
+          recipeId: el['dish']['recipeId'],
+          status: 'COCINANDO', // DISPONIBLE, COCINANDO, INACTIVO
+          price: 0,
+          createdAt: new Date,
+          createdBy: user,
+          editedAt: new Date,
+          editedBy: user,
+        }
+        let costRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/${menuRef.id}/costTrend`).doc();
+        let costData = {
+          id: costRef.id,
+          cost: el['cost'],
+          price: 0,
+          kitchenOrder: element['id'],
+          createdAt: new Date()
         }
 
-
+        batch.set(menuRef, menuData)
+        batch.set(costRef, costData)
 
       })
 
@@ -279,20 +252,20 @@ export class OrdersComponent implements OnInit {
 
   }
 
-  cancelOrder(element){
+  cancelOrder(element) {
     const batch = this.af.firestore.batch();
 
     let orderRef = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders`).doc(element['id']);
 
-      batch.update(orderRef, {
-        status: 'cancelado'
-      })
+    batch.update(orderRef, {
+      status: 'cancelado'
+    })
 
-      batch.commit().then(() => {
-        console.log('cancelado');
+    batch.commit().then(() => {
+      console.log('cancelado');
 
-      })
-    
+    })
+
   }
 
   publicOrder(element) {

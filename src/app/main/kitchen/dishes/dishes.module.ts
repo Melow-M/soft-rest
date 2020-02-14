@@ -24,6 +24,7 @@ import { OrdersComponent } from './orders/orders.component';
 import { PlanningComponent } from './planning/planning.component';
 import { ConfigurationComponent } from './configuration/configuration.component';
 import { RecipeComponent } from './configuration/recipe/recipe.component';
+import { OthersComponent } from './others/others.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { RecipeComponent } from './configuration/recipe/recipe.component';
     OrdersComponent,
     PlanningComponent,
     ConfigurationComponent,
-    RecipeComponent
+    RecipeComponent,
+    OthersComponent
   ],
   imports: [
     CommonModule,

@@ -37,6 +37,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
 
   inputList: Observable<string | Input[]>;
 
+  unit:string = 'KG'
   constructor(
     private fb: FormBuilder,
     private dbs: DatabaseService,
@@ -145,6 +146,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     })).subscribe();
 
   }
+
 
   formatInput(value: string){
     let aux = value;

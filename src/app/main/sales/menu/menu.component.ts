@@ -48,14 +48,20 @@ export class MenuComponent implements OnInit {
   selectIndex: number = null
 
   others$: Observable<any>
-  other: Array<Grocery> = []
+  extras$: Observable<any>
+  combo$: Observable<any>
+  drinks$: Observable<any>
+  dessert$: Observable<any>
+  offers$: Observable<any>
+  appetizer$: Observable<any>
+  //other: Array<Grocery> = []
 
   plate$: Observable<Meal[]>
-  plates: Array<Meal>
-  entry: Array<Meal>
-  soup: Array<Meal>
-  second: Array<Meal>
-  dessert: Array<Meal>
+  plates: Array<Meal> = []
+  entry: Array<Meal> = []
+  soup: Array<Meal> = []
+  second: Array<Meal> = []
+  dessert: Array<Meal> = []
 
 
   favorites: Array<any> = []
@@ -159,10 +165,6 @@ export class MenuComponent implements OnInit {
     this.plate$ = this.dbs.onGetDishes().pipe(
       tap(dishes => {
         let plates = dishes.filter(el => el['status'] == 'DISPONIBLE')
-        this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
-        this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
-        this.second = plates.filter(el => el['type'] == 'FONDO')
-        this.dessert = plates.filter(el => el['type'] == 'POSTRE')
         this.plates = plates.map(el => {
           return {
             ...el,
@@ -223,8 +225,6 @@ export class MenuComponent implements OnInit {
     this.others$ =
       combineLatest(
         this.dbs.onGetOthers(),
-        this.dbs.onGetOffer(),
-        this.dbs.onGetCombo(),
         this.searchProduct.valueChanges.pipe(
           startWith(''),
           distinctUntilChanged(),
@@ -235,14 +235,17 @@ export class MenuComponent implements OnInit {
         )
       )
         .pipe(
-          map(([product, offer, combo, search]) => {
-            return {
-              otros: product.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true),
-              promociones: offer.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true),
-              combos: combo.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true)
-            }
+          map(([product, search]) => {
+            return product.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true)
           })
         )
+
+    this.extras$ = this.dbs.getExtras()
+    this.combo$ = this.dbs.onGetCombo()
+    this.drinks$ = this.dbs.getDrinks()
+    this.dessert$ = this.dbs.getDesserts()
+    this.offers$ = this.dbs.onGetOffer()
+    this.appetizer$ = this.dbs.getAppetizers()
 
 
   }
@@ -314,20 +317,35 @@ export class MenuComponent implements OnInit {
     this.pay.reset()
   }
 
+  goToCategories(){
+    this.entry = []
+    this.soup = []
+    this.second = []
+    this.dessert = []
+    this.MenuList=false
+    this.categoriesList=true
+    this.selectablePlate = null
+  }
+  
   firstOrder(type: string, price: number, name: string) {
+    let plates = this.plates.filter(el => el['menuType'] == type)
+    this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
+    this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
+    this.second = plates.filter(el => el['type'] == 'FONDO')
+    this.dessert = plates.filter(el => el['type'] == 'POSTRE')
     this.selectMenu = type
-    let selectEntry = this.plates.filter(el => el['type'] == 'ENTRADA').map(el => el['stock'])
-    let selectSecond = this.second.map(el => el['stock'])
-    let selectDessert = this.dessert.map(el => el['stock'])
+    let selectEntry = this.plates.filter(el => el['type'] == 'ENTRADA').map(el => el['sold'])
+    let selectSecond = this.second.map(el => el['sold'])
+    let selectDessert = this.dessert.map(el => el['sold'])
 
 
     let newDish = {
       type: type,
       price: price,
       name: name,
-      appetizer: type != 'second' ? this.plates.filter(el => el['stock'] == Math.min(...selectEntry) && el['type'] == 'ENTRADA')[0] : '',
-      mainDish: this.plates.filter(el => el['stock'] == Math.min(...selectSecond) && el['type'] == 'FONDO')[0],
-      dessert: type == 'executive' ? this.plates.filter(el => el['stock'] == Math.min(...selectDessert) && el['type'] == 'POSTRE')[0] : '',
+      appetizer: type != 'second' ? plates.filter(el => el['sold'] == Math.max(...selectEntry) && el['type'] == 'ENTRADA')[0] : '',
+      mainDish: plates.filter(el => el['sold'] == Math.min(...selectSecond) && el['type'] == 'FONDO')[0],
+      dessert: type == 'executive' ? plates.filter(el => el['sold'] == Math.max(...selectDessert) && el['type'] == 'POSTRE')[0] : '',
       amount: 1
     }
     this.order.push(newDish)

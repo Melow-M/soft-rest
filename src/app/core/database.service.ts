@@ -1057,6 +1057,22 @@ export class DatabaseService {
     return this.af.collection<Combo>(`/db/deliciasTete/combos`).valueChanges().pipe(shareReplay(1));
   }
 
+  getDrinks(): Observable<any> {
+    return this.af.collection<Combo>(`/db/deliciasTete/kitchenDrinks`).valueChanges().pipe(shareReplay(1));
+  }
+
+  getDesserts(): Observable<any> {
+    return this.af.collection<Combo>(`/db/deliciasTete/kitchenDesserts`).valueChanges().pipe(shareReplay(1));
+  }
+
+  getAppetizers(): Observable<any> {
+    return this.af.collection<Combo>(`/db/deliciasTete/kitchenAppetizers`).valueChanges().pipe(shareReplay(1));
+  }
+
+  getExtras(): Observable<any> {
+    return this.af.collection<Combo>(`/db/deliciasTete/kitchenExtras`).valueChanges().pipe(shareReplay(1));
+  }
+
   onCreateCombo(combo: Combo): Observable<firebase.firestore.WriteBatch> {
     let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc();
     let comboData: Combo = combo;
@@ -1102,13 +1118,13 @@ export class DatabaseService {
     return orderRef.valueChanges();
   }
 
-  getMenu(){
+  getMenu() {
     return this.af.collection(`/db/deliciasTete/menuConfiguration`, ref => ref.orderBy('name', 'asc')).valueChanges().pipe(shareReplay(1));
   }
 
   //Receivable account
-  onAddReceivableAccount(customer: Customer){
-    let customerReceivableRef= this.af.firestore.collection(`/db/deliciasTete/receivableUsers`).doc(customer.id);
+  onAddReceivableAccount(customer: Customer) {
+    let customerReceivableRef = this.af.firestore.collection(`/db/deliciasTete/receivableUsers`).doc(customer.id);
     let customerReceivableData: ReceivableUser = {
       ...customer,
       balance: 0,
@@ -1116,17 +1132,17 @@ export class DatabaseService {
       dni: customer.dni
     };
 
-    let customerRef=this.af.firestore.collection(`/db/deliciasTete/thirdPartiesCustomers`).doc(customer.id);
+    let customerRef = this.af.firestore.collection(`/db/deliciasTete/thirdPartiesCustomers`).doc(customer.id);
     let customerData: Customer = customer;
 
-    
+
 
     let batch = this.af.firestore.batch();
     let date = new Date();
 
     return this.auth.user$.pipe(take(1),
       map(user => {
-        customerReceivableData.createdAt= date;
+        customerReceivableData.createdAt = date;
         customerReceivableData.createdBy = user;
         customerReceivableData.negativeValue = false;
         batch.set(customerReceivableRef, customerReceivableData);
@@ -1153,7 +1169,7 @@ export class DatabaseService {
 
     this.auth.user$
     batch.update(receivableUserRef, receivableUserData)
-    
+
     return this.auth.user$.pipe(take(1),
       map(user => {
         receivableUserData = {

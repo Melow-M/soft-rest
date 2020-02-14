@@ -8,8 +8,9 @@ export interface Meal {
   picture: string;
   unit: string; // UND., KG., GR., L., M., PULG. ...
   stock: number;
-  initialStock:number;
+  initialStock: number;
   emergencyStock: number;
+  menuType: string;
   type: string; // ENTRADA, FONDO, POSTRE, PIQUEO, BEBIDA
   recipeId: string;
   status: string; // DISPONIBLE, COCINANDO, INACTIVO

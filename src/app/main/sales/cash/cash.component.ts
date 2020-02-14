@@ -1,3 +1,4 @@
+import { EditImportComponent } from './edit-import/edit-import.component';
 import { DeleteTransactionComponent } from './delete-transaction/delete-transaction.component';
 import { AuthService } from './../../../core/auth.service';
 import { Cash } from './../../../core/models/sales/cash/cash.model';
@@ -187,6 +188,12 @@ export class CashComponent implements OnInit {
 
   addMoney() {
     this.dialog.open(AddComponent, {
+      data: this.currentCash
+    })
+  }
+
+  editImport(){
+    this.dialog.open(EditImportComponent, {
       data: this.currentCash
     })
   }

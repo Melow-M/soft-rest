@@ -113,10 +113,12 @@ export class PlanningComponent implements OnInit {
 
     this.selectMenu$ = this.selectMenuForm.valueChanges.pipe(
       tap(res => {
-        this.selectMenu = res
-        this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
-        if (res['value'] == 'second') {
-          this.menuForm.get('category').setValue(this.categories['simple'][2])
+        if (res) {
+          this.selectMenu = res
+          this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
+          if (res['value'] == 'second') {
+            this.menuForm.get('category').setValue(this.categories['simple'][2])
+          }
         }
       })
     )
@@ -131,8 +133,8 @@ export class PlanningComponent implements OnInit {
     ).pipe(
       map(([dishes, dish, inputs]) => {
         this.inputs = inputs
-
-        return dish ? dishes.filter(option => option['name'].toLowerCase().includes(dish.toLowerCase())) : dishes;
+        let dishC = dishes.filter(el => el['category'] == 'Platos')
+        return dish ? dishC.filter(option => option['name'].toLowerCase().includes(dish.toLowerCase())) : dishC;
       })
     )
 
@@ -213,6 +215,7 @@ export class PlanningComponent implements OnInit {
     this.menuList[this.menuList.length - 1]['missing'] = this.inputsRequired.filter(al => al['missing'] < 0).length > 0
     this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
     this.menuForm.reset()
+    this.menuForm.get('dish').setValue('')
     this.selectMenu['verified'] = true
     this.verified()
   }
@@ -246,7 +249,7 @@ export class PlanningComponent implements OnInit {
 
   }
 
-  cancel(){
+  cancel() {
     this.menuList = []
     this.dataSource.data = []
     this.verifiedCheck = {
@@ -302,6 +305,8 @@ export class PlanningComponent implements OnInit {
           editedAt: new Date(),
           editedBy: user
         }
+        console.log(inputData);
+
 
         batch.set(inputRef, inputData);
 

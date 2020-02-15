@@ -3,11 +3,11 @@ import { User } from '../general/user.model';
 export interface ReceivableUser {
     id: string;
     name?: string;
-    dni: number;
-    phone?: string;
-    mail?: string;
+    customerId:string;
     balance: number;
-    negativeValue: boolean;
+    debt:number;
+    paidAmount:number;
+    indebtAmount:number;
     createdBy: User;
     createdAt: Date;
     editedBy?: User;

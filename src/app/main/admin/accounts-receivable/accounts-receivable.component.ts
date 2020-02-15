@@ -1,3 +1,4 @@
+import { CreateComponent } from './create/create.component';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatTableDataSource, MatPaginator, MatSort, MatDialog } from '@angular/material';
@@ -21,7 +22,7 @@ export class AccountsReceivableComponent implements OnInit {
 
   filterFormControl = new FormControl();
 
-  displayedColumns: string[] = ['index', 'name', 'balance', 'dni', 'phone', 'createdBy', 'actions'];
+  displayedColumns: string[] = ['index', 'name', 'balance', 'debt', 'itemsList', 'paidAmount', 'indebtAmount', 'payments', 'actions'];
 
 
   dataSource = new MatTableDataSource();
@@ -67,9 +68,12 @@ export class AccountsReceivableComponent implements OnInit {
       )
   }
 
-  onChangeBalance(raw: ReceivableUser){
+  onChangeBalance(raw: ReceivableUser) {
 
   }
 
+  create(){
+    this.dialog.open(CreateComponent)
+  }
 
 }

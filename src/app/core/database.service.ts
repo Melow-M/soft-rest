@@ -29,6 +29,8 @@ import { Combo } from './models/sales/menu/combo.model';
 import { Role } from './models/general/role.model';
 import { ReceivableUser } from './models/admin/receivableUser.model';
 
+import { saveAs } from 'file-saver';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -741,8 +743,38 @@ export class DatabaseService {
       baseline: "bottom"
     });
 
-    doc.autoPrint({ variant: 'non-conform' });
-    doc.save(`Caja.pdf`);
+    //window.open(doc.output('bloburl'), '_blank');
+
+    //saveAs(doc.output('blob'));
+
+    let blob = doc.output('blob');
+
+    // doc.output('dataurlnewwindow');
+
+    saveAs(blob);
+
+    // console.log(navigator.userAgent);
+    // if (window.navigator.msSaveOrOpenBlob) { //IE 11+
+    //   console.log('IE 11');
+    //   window.navigator.msSaveOrOpenBlob(blob, "my.pdf");
+    // } else if (navigator.userAgent.match('FxiOS')) { //FF iOS
+    //   alert("Cannot display on FF iOS");
+    // } else if (navigator.userAgent.match('CriOS')) { //Chrome iOS
+    //   console.log('chrome iOS');
+    //   var reader = new FileReader();
+    //   reader.onloadend = function () { window.open(String(reader.result));};
+    //   reader.readAsDataURL(blob);
+    // } else if (navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPhone/i)) { //Safari & Opera iOS
+    //   console.log('Safari and Opera')
+    //   var url = window.URL.createObjectURL(blob);
+    //   window.location.href = url;
+    // }
+    // else{
+    //   alert('desktop');
+    //   saveAs(doc.output('blob'));
+    // }
+
+
   }
 
   //Funcion para obtener valores de fechas
@@ -991,8 +1023,10 @@ export class DatabaseService {
       }
     }
 
-    doc.autoPrint({ variant: 'non-conform' });
-    doc.save(`TICKET-${ticketNumber}.pdf`);
+    // doc.autoPrint({ variant: 'non-conform' });
+    // doc.save(`TICKET-${ticketNumber}.pdf`);
+    saveAs(doc.output('blob'));
+
   }
 
   //Offer

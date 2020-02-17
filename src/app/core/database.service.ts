@@ -867,9 +867,9 @@ export class DatabaseService {
         };
       }
     }
-
-    doc.autoPrint({ variant: 'non-conform' });
-    doc.save(`Lista_de_insumos.pdf`);
+    saveAs(doc.output('blob'));
+    // doc.autoPrint({ variant: 'non-conform' });
+    // doc.save(`Lista_de_insumos.pdf`);
   }
 
   printTicket(elements: { quantity: number, description: string, vUnit: number, import: number }[], ticketNumber: string) {

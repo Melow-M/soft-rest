@@ -16,6 +16,8 @@ import { RegDocumentsCreateGroceryDialogComponent } from './register-documents/r
 import { RegDocumentsCreateHouseholdDialogComponent } from './register-documents/reg-documents-create-household-dialog/reg-documents-create-household-dialog.component';
 import { RegDocumentsCreateDessertsDialogComponent } from './register-documents/reg-documents-create-desserts-dialog/reg-documents-create-desserts-dialog.component';
 import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
+import {LazyLoadImageModule, intersectionObserverPreset } from 'ng-lazyload-image';
+import { Ng2ImgMaxModule } from 'ng2-img-max';
 
 
 @NgModule({
@@ -52,7 +54,11 @@ import { CreateInputDialogComponent } from './create-input-dialog/create-input-d
     MatTableModule,
     MatPaginatorModule,
     MatProgressBarModule,
-    MatMenuModule
+    MatMenuModule,
+    LazyLoadImageModule.forRoot({
+      preset: intersectionObserverPreset
+    }),
+    Ng2ImgMaxModule
   ],
   entryComponents: [
     RegisterDocumentsComponent,

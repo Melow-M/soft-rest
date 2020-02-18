@@ -47,17 +47,22 @@
           <ng-container *ngIf="payables.length; else default">
             <div class="mat-elevation-z8" style="border-radius: 10px 10px 10px 10px">
               <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
-                <table mat-table [dataSource]="dataSource" matSort style="width:100%">
+                <table mat-table [dataSource]="dataSource" matSort 
+                  style="width: 100%; text-align: center !important; width: 100%; font-family: Raleway;">
 
                   <ng-container matColumnDef="index" sticky>
-                    <th mat-header-cell style="padding:0px 25px" *matHeaderCellDef>N°</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">N°</th>
                     <td mat-cell style="padding:0px 25px" *matCellDef="let raw; let i = index">
                       {{i+1}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="createdAt">
-                    <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>Fecha de
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 65px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Fecha de
                       registro</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}
@@ -65,7 +70,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="documentDate">
-                    <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>Fecha de
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width:65px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Fecha de
                       emisión</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.documentDate.seconds * 1000 | date : 'dd/MM/yyyy'}}
@@ -73,7 +80,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="itemsList">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">
                       Lista de items</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <button *ngIf="user['role']['adminAccountsPayableListAction']"
@@ -84,7 +93,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="documentType">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por tipo de documento" matTooltipPosition="above" mat-sort-header>Tipo
                       de documento</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -93,21 +104,27 @@
                   </ng-container>
 
                   <ng-container matColumnDef="documentSerial">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Doc. Serie</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Doc. Serie</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.documentSerial}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="documentCorrelative">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Doc. Correlativo</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Doc. Correlativo</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.documentCorrelative}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="provider">
-                    <th mat-header-cell style="padding:0px 8px; min-width:170px" *matHeaderCellDef>Proveedor
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 170px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Proveedor
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <span>{{raw.provider.name}}</span><br>
@@ -116,28 +133,36 @@
                   </ng-container>
 
                   <ng-container matColumnDef="totalAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>TOTAL</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">TOTAL</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.totalAmount | currency : 'S/.'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="subtotalAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>SUBTOTAL</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">SUBTOTAL</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.subtotalAmount ? (raw.subtotalAmount | currency : 'S/.') : '---'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="igvAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>IGV</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">IGV</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.igvAmount ? (raw.igvAmount | currency : 'S/.') : '---'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="paymentType">
-                    <th mat-header-cell style="padding:0px 8px; min-width:75px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 75px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por tipo de pago" matTooltipPosition="above" mat-sort-header>Tipo de
                       pago</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -146,7 +171,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="status">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef matTooltip="Ordenar tabla por estado"
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right" matTooltip="Ordenar tabla por estado"
                       matTooltipPosition="above" mat-sort-header>Estado
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -160,21 +187,27 @@
                   </ng-container>
 
                   <ng-container matColumnDef="paidAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Importe pagado</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Importe pagado</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.paidAmount ? (raw.paidAmount | currency : 'S/.') : '---'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="indebtAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Importe adeudado</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Importe adeudado</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.indebtAmount ? (raw.indebtAmount | currency : 'S/.') : '---'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="payments">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Pagos a cuenta</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Pagos a cuenta</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <ng-container *ngIf="raw.payments; else notPayments">
                         <button *ngIf="user['role']['adminAccountsPayablePaysAction']"
@@ -190,7 +223,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="creditDate">
-                    <th mat-header-cell style="padding:0px 8px; min-width:80px" *matHeaderCellDef>Fecha de
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 80px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Fecha de
                       vencimiento<br> <small>(CREDITO)</small></th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.creditDate ? (raw.creditDate.seconds * 1000 | date : 'dd/MM/yyyy') : '---'}}
@@ -198,7 +233,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="paymentDate">
-                    <th mat-header-cell style="padding:0px 8px; min-width:80px" *matHeaderCellDef>Fecha de pago<br>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 80px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Fecha de pago<br>
                       <small>(CREDITO)</small></th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.paymentDate ? (raw.paymentDate.seconds * 1000 | date : 'dd/MM/yyyy') : '---'}}
@@ -206,7 +243,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="createdBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
                       Creado por</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -218,7 +257,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="editedBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
                       Editado por</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -230,7 +271,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="approvedBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
                       Aprobado por</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -242,7 +285,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="actions" stickyEnd>
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Acciones</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;"
+                                    class="w3-center w3-padding w3-border-right">Acciones</th>
                     <td mat-cell class="mat-elevation-z4" style="padding:0px 24px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
                         <button *ngIf="user['role']['adminAccountsPayableTotalPayAction']"
@@ -260,7 +305,7 @@
                     </td>
                   </ng-container>
 
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" style="text-align-last: center;"></tr>
                   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
                 </table>

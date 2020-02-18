@@ -53,17 +53,22 @@
           <ng-container *ngIf="providers.length; else default">
             <div class="mat-elevation-z8" style="border-radius: 10px 10px 10px 10px">
               <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
-                <table mat-table [dataSource]="dataSource" style="width:100%">
+                <table mat-table [dataSource]="dataSource" 
+                    style="width: 100%; text-align: center !important; width: 100%; font-family: Raleway;">
 
                   <ng-container matColumnDef="index" sticky>
-                    <th mat-header-cell style="padding:0px 25px" *matHeaderCellDef>N°</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">N°</th>
                     <td mat-cell style="padding:0px 25px" *matCellDef="let raw; let i = index">
                       {{i+1}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="name">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Nombre/Empresa</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Nombre/Empresa</th>
                     <td mat-cell style="padding:0px 8px; min-width: 250px" *matCellDef="let raw">
                       <button mat-button class="ms-color-11">
                         <mat-icon style="vertical-align: middle; margin-right: 8px">
@@ -74,28 +79,36 @@
                   </ng-container>
 
                   <ng-container matColumnDef="ruc">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>RUC</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">RUC</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.ruc ? raw.ruc : '---'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="address">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Dirección</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Dirección</th>
                     <td mat-cell style="padding:0px 8px; min-width:300px" *matCellDef="let raw">
                       {{raw.address ? raw.address : '---'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="phone">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Teléfono</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Teléfono</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.phone ? raw.phone : '---'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="detractionAccount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Cuenta de detracciones
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Cuenta de detracciones
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.detractionAccount ? raw.detractionAccount : '---'}}
@@ -103,7 +116,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="bankAccounts">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Cuentas de deposito</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Cuentas de deposito</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <button *ngIf="user['role']['thirdPartiesProvidersAccountsAction']"
                         mat-raised-button color="secondary" (click)="openBankAccounts(raw)"
@@ -114,7 +129,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="contact">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Contactos</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Contactos</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <button *ngIf="user['role']['thirdPartiesProvidersContactsAction']"
                         mat-raised-button color="secondary" (click)="openContactList(raw)"
@@ -125,7 +142,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="createdBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">
                       Creado por</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <span>{{raw.createdBy ? raw.createdBy.displayName : '---' }}</span><br>
@@ -136,7 +155,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="editedBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">
                       Editado por</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <span>{{raw.editedBy ? raw.editedBy.displayName : '---' }}</span><br>
@@ -147,7 +168,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="actions" stickyEnd>
-                    <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Acciones</th>
                     <td mat-cell class="w3-center mat-elevation-z4" style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
                         <button *ngIf="user['role']['thirdPartiesProvidersEditAction']"
@@ -165,7 +188,7 @@
                     </td>
                   </ng-container>
 
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" style="text-align-last: center;"></tr>
                   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
                 </table>

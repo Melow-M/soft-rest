@@ -106,7 +106,7 @@
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Cuentas de deposito</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <button *ngIf="user['role']['thirdPartiesProvidersAccountsAction']"
-                        mat-raised-button color="primary" (click)="openBankAccounts(raw)"
+                        mat-raised-button color="secondary" (click)="openBankAccounts(raw)"
                         [disabled]="raw.bankAccounts ? !raw.bankAccounts.length : true">
                         <mat-icon>credit_card</mat-icon> Cuentas
                       </button>
@@ -117,7 +117,7 @@
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Contactos</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <button *ngIf="user['role']['thirdPartiesProvidersContactsAction']"
-                        mat-raised-button color="primary" (click)="openContactList(raw)"
+                        mat-raised-button color="secondary" (click)="openContactList(raw)"
                         [disabled]="raw.contacts ? !raw.contacts.length : true">
                         <mat-icon>contacts</mat-icon> Contactos
                       </button>

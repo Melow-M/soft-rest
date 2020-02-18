@@ -112,7 +112,7 @@
             <mat-hint>Opcional</mat-hint>
           </mat-form-field>
 
-          <button mat-raised-button class="w3-block" color="primary" (click)="addContact()">
+          <button mat-raised-button class="w3-block" color="secondary" (click)="addContact()">
             <mat-icon>contacts</mat-icon> Agregar contacto
           </button>
 
@@ -135,7 +135,7 @@
 
 <mat-divider></mat-divider>
 <mat-dialog-actions align="end" style="margin-bottom: -16px;">
-  <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
-  <button mat-raised-button class="w3-margin-right" color="primary" (click)="save()"
+  <button mat-raised-button class="w3-margin-right" color="PRIMARY" mat-dialog-close>Cancelar</button>
+  <button mat-raised-button class="w3-margin-right" color="secondary" (click)="save()"
     [disabled]="!dataFormGroup.valid || (dni$ | async) || (ruc$ | async) || (savingCustomer$ | async)">Crear</button>
 </mat-dialog-actions>

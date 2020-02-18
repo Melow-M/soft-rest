@@ -11,6 +11,9 @@ import { StocktakingEditDialogComponent } from './stocktaking-edit-dialog/stockt
 import { StocktakingDeleteConfirmComponent } from './stocktaking-delete-confirm/stocktaking-delete-confirm.component';
 import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/stocktaking-kardex-dialog.component';
 import { StocktakingRemoveHouseholdDialogComponent } from './stocktaking-remove-household-dialog/stocktaking-remove-household-dialog.component';
+import * as XLSX from 'xlsx';
+import { DatePipe } from '@angular/common';
+
 
 @Component({
   selector: 'app-stocktaking',
@@ -42,6 +45,19 @@ export class StocktakingComponent implements OnInit {
     'OTROS'
   ];
 
+    //Excel
+    headersXlsx: string[] = [
+      'Nombre',
+      'SKU',
+      'Medida',
+      'Stock',
+      'Costo promedio',
+      'Valor Total',
+      'Descripción',
+      'Creado por',
+      'Editado por'
+    ]
+
   items$: Observable<(any)[]>;
   typeAndItems$: Observable<(any)[]>;
 
@@ -49,7 +65,8 @@ export class StocktakingComponent implements OnInit {
     public dbs: DatabaseService,
     public auth: AuthService,
     private fb: FormBuilder,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private datePipe: DatePipe,
   ) { }
 
   ngOnInit() {
@@ -157,5 +174,38 @@ export class StocktakingComponent implements OnInit {
       }
     });
   }
+
+  downloadXls(): void {
+    console.log(this.dataSource.data);
+    let table_xlsx: any[] = [];
+    let dateRange;
+    table_xlsx.push(this.headersXlsx);
+
+    this.dataSource.data.forEach((element) => {
+
+      const temp = [
+        element['name'],
+        element['sku'],
+        element['unit'],
+        element['stock'],
+        element['averageCost'],
+        element['averageCost']*element['stock'],
+        element['description'],
+        element['createdBy']['displayName'],
+        !!element['editedBy'] ? element['editedBy']['displayName'] : "",
+      ];
+      table_xlsx.push(temp);
+    })
+
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'inventario');
+
+    const name = 'inventario.xlsx';
+
+    XLSX.writeFile(wb, name);
+  }
+
 
 }

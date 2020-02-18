@@ -292,7 +292,7 @@
 
 
 <mat-dialog-actions align="end">
-    <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
-    <button mat-raised-button class="w3-margin-right" color="primary" (click)="onSubmitPurchase()"
+    <button mat-raised-button class="w3-margin-right" color="PRIMARY" mat-dialog-close>Cancelar</button>
+    <button mat-raised-button class="w3-margin-right" color="secondary" (click)="onSubmitPurchase()"
         [disabled]="!documentForm.valid || (savingPurchase$ | async) || !inputsTableDataSource.data.length">Crear</button>
 </mat-dialog-actions>

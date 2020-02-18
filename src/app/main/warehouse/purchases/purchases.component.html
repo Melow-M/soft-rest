@@ -46,7 +46,7 @@
 
                             <span style="flex: auto 1 1"></span>
 
-                            <button *ngIf="user['role']['warehousePurchasesDownloadAction']"
+                            <button *ngIf="user['role']['warehousePurchasesDownloadAction']" (click)="downloadXls()"
                                 type="button" style="margin-right: 16px" color="secondary" mat-raised-button>
                                 <mat-icon style="margin-right: 8px; vertical-align: middle;">cloud_download
                                 </mat-icon>
@@ -89,7 +89,7 @@
                                         <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>
                                             Lista de items</th>
                                         <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                                            <button mat-raised-button color="primary" (click)="showItemsList(raw)">
+                                            <button mat-raised-button color="secondary" (click)="showItemsList(raw)">
                                                 <mat-icon>list</mat-icon> Lista
                                             </button>
                                         </td>
@@ -197,7 +197,7 @@
                                         </th>
                                         <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                                             <ng-container *ngIf="raw.payments; else notPayments">
-                                                <button mat-raised-button color="primary" (click)="showPayments(raw)"
+                                                <button mat-raised-button color="secondary" (click)="showPayments(raw)"
                                                     [disabled]="!raw.payments.length">
                                                     <mat-icon>list</mat-icon> Pagos
                                                 </button>

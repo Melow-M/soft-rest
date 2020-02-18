@@ -28,18 +28,18 @@ export class CombosComponent implements OnInit {
 
   filterControl: FormControl = new FormControl()
 
-    //Excel
-    headersXlsx: string[] = [
-      'Fecha de Creación',
-      'Nombre',
-      'Productos',
-      'Estado',
-      'Rango de Fechas',
-      'Precio real',
-      'Precio de venta',
-      'Unidades Vendidas',
-      'Creado por:'
-    ]
+  //Excel
+  headersXlsx: string[] = [
+    'Fecha de Creación',
+    'Nombre',
+    'Productos',
+    'Estado',
+    'Rango de Fechas',
+    'Precio real',
+    'Precio de venta',
+    'Unidades Vendidas',
+    'Creado por:'
+  ]
 
 
   //Paginator

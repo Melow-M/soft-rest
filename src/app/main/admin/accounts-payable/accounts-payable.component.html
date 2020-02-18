@@ -77,7 +77,7 @@
                       Lista de items</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <button *ngIf="user['role']['adminAccountsPayableListAction']"
-                        mat-raised-button color="primary" (click)="showItemsList(raw)">
+                        mat-raised-button color="secondary" (click)="showItemsList(raw)">
                         <mat-icon>list</mat-icon> Lista
                       </button>
                     </td>
@@ -178,7 +178,7 @@
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <ng-container *ngIf="raw.payments; else notPayments">
                         <button *ngIf="user['role']['adminAccountsPayablePaysAction']"
-                          mat-raised-button color="primary" (click)="showPayments(raw)"
+                          mat-raised-button color="secondary" (click)="showPayments(raw)"
                           [disabled]="!raw.payments.length">
                           <mat-icon>list</mat-icon> Pagos
                         </button>

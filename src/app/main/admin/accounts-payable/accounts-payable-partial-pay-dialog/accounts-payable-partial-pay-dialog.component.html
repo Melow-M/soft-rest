@@ -56,7 +56,7 @@
 
 <mat-divider></mat-divider>
 <mat-dialog-actions align="end">
-  <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
-  <button mat-raised-button class="w3-margin-right" color="primary" (click)="pay()"
+  <button mat-raised-button class="w3-margin-right" color="PRIMARY" mat-dialog-close>Cancelar</button>
+  <button mat-raised-button class="w3-margin-right" color="secondary" (click)="pay()"
     [disabled]="!dataFormGroup.valid || (savingPayment$ | async) || (import$ | async)">Pagar</button>
 </mat-dialog-actions>

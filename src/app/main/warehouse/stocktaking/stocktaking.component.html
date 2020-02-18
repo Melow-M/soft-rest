@@ -54,7 +54,8 @@
 
             <span style="flex: auto 1 1"></span>
 
-            <button *ngIf="user['role']['warehouseStocktakingDownloadAction']" type="button" style="margin-right: 16px" color="secondary" mat-raised-button>
+            <button *ngIf="user['role']['warehouseStocktakingDownloadAction']" (click)="downloadXls()"
+                    type="button" style="margin-right: 16px" color="secondary" mat-raised-button>
               <mat-icon style="margin-right: 8px; vertical-align: middle;">cloud_download
               </mat-icon>
               <span style="vertical-align: middle;">Descargar</span>

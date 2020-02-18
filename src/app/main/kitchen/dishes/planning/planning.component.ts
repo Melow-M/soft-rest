@@ -87,6 +87,26 @@ export class PlanningComponent implements OnInit {
   displayedColumns: string[] = ['index', 'category', 'dish', 'amount', 'supplies', 'actions'];
   dataSource = new MatTableDataSource();
 
+  list: Array<any> = [
+    {
+      name: 'Menú Ejecutivo',
+      value: 'executive',
+      view: false,
+      list: []
+    },
+    {
+      name: 'Menú Básico',
+      value: 'simple',
+      view: false,
+      list: []
+    },
+    {
+      name: 'Segundo',
+      value: 'second',
+      view: false,
+      list: []
+    }
+  ]
 
   menuList: Array<any> = []
   inputs: Array<any> = null
@@ -115,13 +135,15 @@ export class PlanningComponent implements OnInit {
       tap(res => {
         if (res) {
           this.selectMenu = res
-          this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
+          let index = this.list.findIndex(el => el['name'] == this.selectMenu['name'])
+          this.list[index]['view'] = true
           if (res['value'] == 'second') {
             this.menuForm.get('category').setValue(this.categories['simple'][2])
           }
         }
       })
     )
+
 
     this.listDishes$ = combineLatest(
       this.dbs.onGetRecipes(),
@@ -164,6 +186,7 @@ export class PlanningComponent implements OnInit {
     this.menuList.splice(index, 1);
     this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
   }
+
 
   add() {
 
@@ -211,9 +234,9 @@ export class PlanningComponent implements OnInit {
     }).filter(el => el['required'] > 0)
 
     this.inputsMissing = this.inputsRequired.filter(al => al['missing'] < 0)
-
+    let index = this.list.findIndex(el => el['name'] == this.selectMenu['name'])
     this.menuList[this.menuList.length - 1]['missing'] = this.inputsRequired.filter(al => al['missing'] < 0).length > 0
-    this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
+    this.list[index]['list'] = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
     this.menuForm.reset()
     this.menuForm.get('dish').setValue('')
     this.selectMenu['verified'] = true
@@ -251,12 +274,17 @@ export class PlanningComponent implements OnInit {
 
   cancel() {
     this.menuList = []
-    this.dataSource.data = []
     this.verifiedCheck = {
       executive: false,
       simple: false,
       second: false
     }
+    this.list = this.list.map(el => {
+      el['view'] = false
+      el['list'] = []
+      return el
+    })
+
     this.selectMenu = null
     this.selectMenuForm.reset()
   }
@@ -311,11 +339,7 @@ export class PlanningComponent implements OnInit {
         batch.set(inputRef, inputData);
 
         batch.commit().then(() => {
-          console.log('orden guardada');
-          this.menuList = []
-          this.dataSource.data = this.menuList
-          this.selectMenuForm.reset()
-          this.selectMenu = null
+          this.cancel()
         })
       })
   }

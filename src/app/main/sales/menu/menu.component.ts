@@ -44,6 +44,10 @@ export class MenuComponent implements OnInit {
   visaView = false
   masterCardView = false
 
+  receivable: boolean = false
+  receivableAccount: string = ''
+  showReceivable: boolean = false
+
   selectablePlate: any = null
   selectIndex: number = null
 
@@ -201,10 +205,10 @@ export class MenuComponent implements OnInit {
     )
 
     this.change$ = this.pay.valueChanges.pipe(
-      startWith(1),
+      startWith(-1),
       map(pay => {
         if (this.total) {
-          return pay - this.total ? pay - this.total : -1
+          return pay - this.total > 0 ? pay - this.total : -1
         } else {
           return 0
         }
@@ -286,6 +290,13 @@ export class MenuComponent implements OnInit {
       this.ticketForm.get('dni').setValue(customer)
       this.ticketForm.get('name').setValue(customer)
       this.ticketForm.get('phone').setValue(customer.phone)
+      if (customer['receivableAccount']) {
+        this.showReceivable = true
+        this.receivableAccount = customer['receivableAccount']
+      } else {
+        this.showReceivable = false
+      }
+
     }
 
     if (this.billForm.get('ruc').value || this.billForm.get('businessName').value) {
@@ -294,6 +305,12 @@ export class MenuComponent implements OnInit {
       this.billForm.get('businessName').setValue(customer)
       this.billForm.get('phone').setValue(customer.businessPhone)
       this.billForm.get('address').setValue(customer.businessAddress)
+      if (customer['receivableAccount']) {
+        this.receivableAccount = customer['receivableAccount']
+        this.showReceivable = true
+      } else {
+        this.showReceivable = false
+      }
     }
 
   }
@@ -302,6 +319,7 @@ export class MenuComponent implements OnInit {
     this.billView = true
     this.ticketView = false
     this.checketView = false
+    this.showReceivable = false
     this.ticketForm.reset('')
   }
 
@@ -317,16 +335,24 @@ export class MenuComponent implements OnInit {
     this.pay.reset()
   }
 
-  goToCategories(){
+  goToCategories() {
     this.entry = []
     this.soup = []
     this.second = []
     this.dessert = []
-    this.MenuList=false
-    this.categoriesList=true
+    this.MenuList = false
+    this.categoriesList = true
     this.selectablePlate = null
   }
-  
+
+  selectPlate(plate, i) {
+    if (!this.generateSale) {
+      this.selectablePlate = plate
+      this.selectIndex = i
+      this.MenuList = true
+      this.categoriesList = false
+    }
+  }
   firstOrder(type: string, price: number, name: string) {
     let plates = this.plates.filter(el => el['menuType'] == type)
     this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
@@ -470,7 +496,11 @@ export class MenuComponent implements OnInit {
 
 
     this.dialog.open(VoucherComponent, {
-      data: payOrder
+      data: {
+        ...payOrder,
+        receivable: this.receivable,
+        account: this.receivableAccount
+      }
     })
 
 

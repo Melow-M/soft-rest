@@ -77,17 +77,17 @@
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="balance">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Saldo</th>
-                    <td mat-cell style="padding:0px 8px; min-width: 50px" *matCellDef="let raw">
-                      S/.{{raw.balance | number: '.2'}}
+                  <ng-container matColumnDef="paidAmount">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Importe pagado</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      S/. {{raw.paidAmount | number: '.2'}}
                     </td>
                   </ng-container>
 
-                  <ng-container matColumnDef="debt">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Deuda</th>
-                    <td mat-cell style="padding:0px 8px; min-width: 50px" *matCellDef="let raw">
-                      S/.{{raw.balance | number: '.2'}}
+                  <ng-container matColumnDef="indebtAmount">
+                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Importe adeudado</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      S/. {{raw.indebtAmount | number: '.2'}}
                     </td>
                   </ng-container>
 
@@ -95,31 +95,18 @@
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>
                       Lista de items</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <button *ngIf="user['role']['adminAccountsPayableListAction']" mat-raised-button color="primary">
+                      <button *ngIf="user['role']['adminAccountsPayableListAction']" mat-raised-button color="primary"
+                        (click)="list(raw['id'])">
                         <mat-icon>list</mat-icon> Lista
                       </button>
                     </td>
                   </ng-container>
-
-
-                  <ng-container matColumnDef="paidAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Importe pagado</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.paidAmount ? (raw.paidAmount | currency : 'S/.') : '---'}}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="indebtAmount">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Importe adeudado</th>
-                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      {{raw.indebtAmount ? (raw.indebtAmount | currency : 'S/.') : '---'}}
-                    </td>
-                  </ng-container>
-
+                  
                   <ng-container matColumnDef="payments">
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Pagos a cuenta</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                      <button *ngIf="user['role']['adminAccountsPayablePaysAction']" mat-raised-button color="primary">
+                      <button *ngIf="user['role']['adminAccountsPayablePaysAction']" mat-raised-button color="primary"
+                        (click)="showPayments()">
                         <mat-icon>list</mat-icon> Pagos
                       </button>
                     </td>
@@ -129,10 +116,12 @@
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Acciones</th>
                     <td mat-cell class="mat-elevation-z4" style="padding:0px 24px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
-                        <button *ngIf="user['role']['adminAccountsPayableTotalPayAction']" mat-menu-item>
+                        <button *ngIf="user['role']['adminAccountsPayableTotalPayAction']" mat-menu-item
+                          (click)="totalPay()">
                           <mat-icon class="ms-icons-color">gavel</mat-icon> Pago total
                         </button>
-                        <button *ngIf="user['role']['adminAccountsPayablePartialPayAction']" mat-menu-item>
+                        <button *ngIf="user['role']['adminAccountsPayablePartialPayAction']" mat-menu-item
+                          (click)="partialPay()">
                           <mat-icon class="ms-icons-color">gavel</mat-icon> Pago parcial
                         </button>
                         <button *ngIf="user['role']['thirdPartiesCustomersEditAction']" mat-menu-item

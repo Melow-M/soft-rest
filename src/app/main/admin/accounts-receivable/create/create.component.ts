@@ -50,11 +50,12 @@ export class CreateComponent implements OnInit {
   }
 
   save() {
-    let batch = this.af.firestore.batch();
-    let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/receivableUsers`).doc();
-    let inputData: ReceivableUser;
-
     let customer = this.createForm.get('user').value
+
+    let batch = this.af.firestore.batch();
+    
+    let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/receivableUsers`).doc(customer['id']);
+    let inputData: ReceivableUser;
 
     let customerRef = this.af.firestore.collection(`/db/deliciasTete/thirdPartiesCustomers`).doc(customer['id']);
 
@@ -62,7 +63,7 @@ export class CreateComponent implements OnInit {
       take(1))
       .subscribe(user => {
         inputData = {
-          id: inputRef.id,
+          id: customer['id'],
           name: customer['name'] ? customer['name'] : customer['businessName'],
           customerId: customer['id'],
           balance: this.createForm.get('balance').value ? this.createForm.get('balance').value : 0,

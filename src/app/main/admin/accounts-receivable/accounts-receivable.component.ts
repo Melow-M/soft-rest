@@ -1,3 +1,7 @@
+import { PaymentsComponent } from './payments/payments.component';
+import { ListComponent } from './list/list.component';
+import { TotalPayComponent } from './total-pay/total-pay.component';
+import { PartialPayComponent } from './partial-pay/partial-pay.component';
 import { CreateComponent } from './create/create.component';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -8,7 +12,7 @@ import { AuthService } from 'src/app/core/auth.service';
 import { Customer } from "src/app/core/models/third-parties/customer.model";
 import { ReceivableUser } from "src/app/core/models/admin/receivableUser.model";
 
-import { tap, map, startWith, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { tap, map, startWith, debounceTime, distinctUntilChanged, take, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-accounts-receivable',
@@ -22,7 +26,7 @@ export class AccountsReceivableComponent implements OnInit {
 
   filterFormControl = new FormControl();
 
-  displayedColumns: string[] = ['index', 'name', 'balance', 'debt', 'itemsList', 'paidAmount', 'indebtAmount', 'payments', 'actions'];
+  displayedColumns: string[] = ['index', 'name', 'indebtAmount', 'paidAmount', 'itemsList', 'payments', 'actions'];
 
 
   dataSource = new MatTableDataSource();
@@ -46,13 +50,29 @@ export class AccountsReceivableComponent implements OnInit {
         this.filterFormControl.valueChanges.pipe(startWith<any>(''), debounceTime(300), distinctUntilChanged())
       ).pipe(
         map(([customers, filterKey]) => {
-          console.log(customers);
+          let array = customers.map(el => {
+            this.dbs.getListReceivable(el['id']).pipe(
+              map(list => {
+                return list.reduce((a, b) => a + b['amount'], 0)
+              }),
+              take(1)
+            ).subscribe(e => {
+              el['indebtAmount'] = e
+            })
+            return el
+          })
 
-          this.dataSource.data = customers;
-          this.dataSource.filter = filterKey;
+          this.dataSource.data = array;
+          this.dataSource.filter
+          
+          
+          
+          
+          
+          = filterKey;
           this.loadingCustomers.next(false);
 
-          return customers;
+          return array;
         })
       )
   }
@@ -72,8 +92,27 @@ export class AccountsReceivableComponent implements OnInit {
 
   }
 
-  create(){
+  create() {
     this.dialog.open(CreateComponent)
   }
 
+  partialPay() {
+    this.dialog.open(PartialPayComponent)
+  }
+
+  totalPay() {
+    this.dialog.open(TotalPayComponent)
+  }
+
+  list(id) {
+    this.dialog.open(ListComponent, {
+      data: id
+    })
+  }
+
+  showPayments(id) {
+    this.dialog.open(PaymentsComponent, {
+      data: id
+    })
+  }
 }

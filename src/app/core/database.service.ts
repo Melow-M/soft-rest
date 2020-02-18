@@ -1123,11 +1123,16 @@ export class DatabaseService {
   }
 
   //Receivable account
-  
+
   getReceivableUsers(): Observable<ReceivableUser[]> {
     let customersCollection = this.af.collection<ReceivableUser>('db/deliciasTete/receivableUsers', ref => ref.orderBy('createdAt', 'desc'));
     let customers$ = customersCollection.valueChanges().pipe(shareReplay(1));
     return customers$;
+  }
+
+  getListReceivable(user) {
+    let listCollection = this.af.collection<ReceivableUser>('db/deliciasTete/receivableUsers/' + user + '/list', ref => ref.orderBy('createdAt', 'desc'));
+    return listCollection.valueChanges().pipe(shareReplay(1))
   }
 
   changeBalance(user: ReceivableUser, amount: number): Observable<firebase.firestore.WriteBatch> {

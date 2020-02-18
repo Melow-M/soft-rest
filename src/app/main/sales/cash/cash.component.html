@@ -11,7 +11,7 @@
                     style="vertical-align:middle; height: 35px;width: 35px; font-size: 35px; margin-right: 1em; margin-left: 0.3em;">
                     monetization_on
                 </mat-icon>
-                Caja
+                Caja :  {{currentCash['name']}}
             </h1>
 
             <ng-template #openView class="w3-display-container">
@@ -57,34 +57,34 @@
             </ng-template>
 
             <div *ngIf="isOpening$ | async; else openView" style="margin-top: 3vh;">
-                <div style="display: flex; justify-content: space-around;">
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
                     <button *ngIf="user['role']['salesCashCloseAction']" mat-raised-button
-                        style="background: #EE8434; color: white" (click)="closeCash()">
+                        style="background: #EE8434; color: white; margin: 10px 0; " (click)="closeCash()">
                         <mat-icon style="vertical-align: middle;">vpn_key</mat-icon>
                         Cerrar Caja
                     </button>
-                    <button *ngIf="user['role']['salesCashTotalAction']" mat-raised-button style="background: #C8C8C8"
+                    <button *ngIf="user['role']['salesCashTotalAction']" mat-raised-button style="background: #C8C8C8; margin: 10px 0;"
                         (click)="totals()">
                         <mat-icon style="vertical-align: middle;">attach_money</mat-icon>
                         Total Venta
                     </button>
-                    <button *ngIf="user['role']['salesCashHistoryAction']" mat-raised-button style="background: #C8C8C8"
+                    <button *ngIf="user['role']['salesCashHistoryAction']" mat-raised-button style="background: #C8C8C8; margin: 10px 0;"
                         (click)="record()">
                         <mat-icon style="vertical-align: middle;">restore</mat-icon>
                         Historial
                     </button>
                     <button *ngIf="user['role']['salesCashAddMoneyAction']" mat-raised-button
-                        style="background: #C8C8C8" (click)="addMoney()">
+                        style="background: #C8C8C8; margin: 10px 0;" (click)="addMoney()">
                         <mat-icon style="vertical-align: middle;">add_circle</mat-icon>
                         Agregar Dinero
                     </button>
                     <button *ngIf="user['role']['salesCashRetrieveMoneyAction']" mat-raised-button
-                        style="background: #C8C8C8" (click)="removeMoney()">
+                        style="background: #C8C8C8; margin: 10px 0;" (click)="removeMoney()">
                         <mat-icon style="vertical-align: middle;">remove_circle</mat-icon>
                         Retirar Dinero
                     </button>
                     <button *ngIf="user['role']['salesCashConfigurationAction']" mat-raised-button
-                        style="background: #C8C8C8" [matMenuTriggerFor]="importConfiguration">
+                        style="background: #C8C8C8; margin: 10px 0;" [matMenuTriggerFor]="importConfiguration">
                         <mat-icon style="vertical-align: middle;">settings</mat-icon>
                     </button>
                     <mat-menu #importConfiguration="matMenu">
@@ -94,7 +94,7 @@
                     </mat-menu>
                 </div>
                 <div *ngIf="transactions$ | async">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2vh;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2vh; flex-wrap: wrap;">
                         <div *ngIf="balance$|async as init">
                             <span class="currentBalance">Saldo Actual s/. {{balance + init | number: '.2'}}</span>
                         </div>

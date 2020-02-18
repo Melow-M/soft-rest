@@ -227,7 +227,7 @@ export class VoucherComponent implements OnInit {
           type: 'Ingreso',
           description: 'Venta ' + this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
           amount: this.data['total'],
-          status: 'PAGADO',
+          status: this.data['receivable'] ? 'DEUDA' : 'PAGADO',
           ticketType: this.data['documentType'],
           paymentType: this.data['paymentType'].toUpperCase(),
           editedBy: user,
@@ -236,10 +236,34 @@ export class VoucherComponent implements OnInit {
           createdBy: user,
         }
 
+        if (this.data['receivable']) {
+          let receivableUserRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/receivableUsers/`).doc(this.data['account']);
+          let receivableRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/receivableUsers/${this.data['account']}/list`).doc(inputRef.id);
+
+          let receivableData = {
+            id: inputRef.id,
+            orderList: this.data['orderList'],
+            description: 'Venta ' + this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
+            amount: this.data['total'],
+            ticketType: this.data['documentType'],
+            paymentType: this.data['paymentType'].toUpperCase(),
+            editedBy: user,
+            editedAt: new Date(),
+            createdAt: new Date(),
+            createdBy: user,
+          }
+
+          batch.set(receivableRef, receivableData)
+
+          batch.update(receivableUserRef,{
+            indebtAmount: this.data['total']
+          })
+        }
 
         batch.set(inputRef, inputData);
 
         batch.set(transactionRef, transactionData)
+
 
         this.countDishes.forEach(dish => {
           let dishRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(dish['id']);

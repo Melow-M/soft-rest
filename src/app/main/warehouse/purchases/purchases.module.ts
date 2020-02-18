@@ -15,7 +15,8 @@ import { RegDocumentsCreateInputDialogComponent } from './register-documents/reg
 import { RegDocumentsCreateGroceryDialogComponent } from './register-documents/reg-documents-create-grocery-dialog/reg-documents-create-grocery-dialog.component';
 import { RegDocumentsCreateHouseholdDialogComponent } from './register-documents/reg-documents-create-household-dialog/reg-documents-create-household-dialog.component';
 import { RegDocumentsCreateDessertsDialogComponent } from './register-documents/reg-documents-create-desserts-dialog/reg-documents-create-desserts-dialog.component';
-import { CreateInputDialogComponent } from './register-documents/create-input-dialog/create-input-dialog.component';
+import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
+
 
 @NgModule({
   declarations: [
@@ -58,10 +59,11 @@ import { CreateInputDialogComponent } from './register-documents/create-input-di
     PurchasesCreateProviderDialogComponent,
     PurchasesShowItemsDialogComponent,
     PurchasesShowPaymentsDialogComponent,
-    PurchasesCancelDialogComponent
+    PurchasesCancelDialogComponent,
+    CreateInputDialogComponent
   ],
   providers: [
-    CreateInputDialogComponent
+    
   ]
 })
 export class PurchasesModule { }

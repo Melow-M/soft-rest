@@ -3,11 +3,11 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors }
 import { MatDialog, MatTableDataSource, MatPaginator, MatSnackBar, MatDialogRef } from '@angular/material';
 import { Provider } from 'src/app/core/models/third-parties/provider.model';
 import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model';
-import { CreateInputDialogComponent } from '../../stocktaking/create-input-dialog/create-input-dialog.component';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { tap, map, debounceTime, take } from 'rxjs/operators';
 import { PurchasesCreateProviderDialogComponent } from '../purchases-create-provider-dialog/purchases-create-provider-dialog.component';
+import { CreateInputDialogComponent } from '../create-input-dialog/create-input-dialog.component';
 
 @Component({
   selector: 'app-register-documents',

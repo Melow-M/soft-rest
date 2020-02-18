@@ -176,7 +176,33 @@ export class PlanningComponent implements OnInit {
 
   deleteItem(i) {
     this.menuList.splice(i, 1);
-    this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
+    let required = this.menuList.map(el => {
+      return el['dish']['inputs'].map(al => {
+        return {
+          ...al,
+          required: al['quantity'] * el['amount']
+        }
+      })
+
+    }).reduce((a, b) => a.concat(b), [])
+
+    this.inputsRequired = this.inputs.map(el => {
+      let amount = 0
+      let missing = 0
+      required.forEach(al => {
+        if (el['id'] == al['id']) {
+          amount += al['required']
+          missing = el['stock'] - amount
+        }
+      })
+      return {
+        ...el,
+        required: amount,
+        missing: missing
+      }
+    }).filter(el => el['required'] > 0)
+
+    this.inputsMissing = this.inputsRequired.filter(al => al['missing'] < 0)
   }
   editItem(element, index) {
     this.menuForm.get('dish').setValue(element['dish'])
@@ -187,6 +213,9 @@ export class PlanningComponent implements OnInit {
     this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
   }
 
+  verifiedInputs() {
+
+  }
 
   add() {
 
@@ -207,6 +236,15 @@ export class PlanningComponent implements OnInit {
       cost: cost
     })
 
+    let rrr = []
+    this.menuForm.get('dish').value['inputs'].forEach(el => {
+      rrr.push({
+        ...el,
+        required: el['quantity'] * this.menuForm.get('amount').value
+      })
+    })
+    console.log(rrr);
+    
     let required = this.menuList.map(el => {
       return el['dish']['inputs'].map(al => {
         return {
@@ -216,6 +254,9 @@ export class PlanningComponent implements OnInit {
       })
 
     }).reduce((a, b) => a.concat(b), [])
+
+    console.log(required);
+    
 
     this.inputsRequired = this.inputs.map(el => {
       let amount = 0

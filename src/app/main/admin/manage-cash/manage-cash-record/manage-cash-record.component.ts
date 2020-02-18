@@ -1,20 +1,20 @@
-import { TransactionsComponent } from './transactions/transactions.component';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { tap, startWith, map, debounceTime } from 'rxjs/operators';
-import { Observable, combineLatest } from 'rxjs';
-import { DatabaseService } from 'src/app/core/database.service';
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { ManageCashTransactionsComponent } from './manage-cash-transactions/manage-cash-transactions.component';
+import { startWith, map, tap } from 'rxjs/operators';
 import { DatePipe } from '@angular/common';
+import { DatabaseService } from 'src/app/core/database.service';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { Observable, combineLatest } from 'rxjs';
+import { MatTableDataSource, MatPaginator, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'app-record',
-  templateUrl: './record.component.html',
-  styleUrls: ['./record.component.css']
+  selector: 'app-manage-cash-record',
+  templateUrl: './manage-cash-record.component.html'
 })
-export class RecordComponent implements OnInit {
+export class ManageCashRecordComponent implements OnInit {
 
+  
   displayedColumns: string[] = ['index', 'opening', 'closing', 'openingBalance', 'totalBalance', 'totalIncomes', 'totalExpensives', 'responsible', 'actions'];
   dataSource = new MatTableDataSource();
 
@@ -46,7 +46,6 @@ export class RecordComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
     const view = this.dbs.getCurrentMonthOfViewDate();
 
     this.search = this.fb.group({
@@ -88,7 +87,7 @@ export class RecordComponent implements OnInit {
   }
 
   view(open) {
-    this.dialog.open(TransactionsComponent, {
+    this.dialog.open(ManageCashTransactionsComponent, {
       data: {
         cash: this.data['id'],
         open: open
@@ -122,6 +121,4 @@ export class RecordComponent implements OnInit {
     const name = 'Historial_caja.xlsx'
     XLSX.writeFile(wb, name);
   }
-
-
 }

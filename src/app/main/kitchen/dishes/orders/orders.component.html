@@ -93,7 +93,7 @@
                                     <mat-icon>check_circle</mat-icon> Aprobar
                                 </button>
                                 <button mat-menu-item (click)="cancelOrder(element)"
-                                *ngIf="element['status']=='en proceso'">
+                                    *ngIf="element['status']=='en proceso'">
                                     <mat-icon>cancel</mat-icon> Cancelar
                                 </button>
                                 <button mat-menu-item (click)="publicOrder(element)"
@@ -219,7 +219,7 @@
                 <span style="font-size:1.3em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
                     Insumos {{currentOrder['name']}} ({{currentOrder['date'].toMillis() | date: 'dd/MM/yyyy'}})</span>
             </div>
-            <div style="font-size:1em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
+            <div style="font-size:1em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;" *ngIf="viewCost">
                 <span>Costo Total: S/. {{currentOrder['total'] | number: '.2'}}</span>
             </div>
             <div>
@@ -228,6 +228,9 @@
                     Descargar
                 </button>
             </div>
+        </div>
+        <div>
+            <mat-checkbox [(ngModel)]="viewCost">Ver costos</mat-checkbox>
         </div>
         <div class="mat-elevation-z8 w3-margin-top w3-round" style="border-radius: 10px 10px 0 0; margin-top: 2vh;">
             <div class="w3-round-large" style="overflow:auto; border-radius: 10px 10px 0 0;">
@@ -277,7 +280,7 @@
                     </ng-container>
 
                     <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
-                        matColumnDef="cost">
+                        matColumnDef="cost" *ngIf="viewCost">
                         <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
                             style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9;">
                             Costo Unitario </th>
@@ -286,7 +289,7 @@
                             S/. {{element['cost'] | number: '.2'}} </td>
                     </ng-container>
                     <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
-                        matColumnDef="costTotal">
+                        matColumnDef="costTotal" *ngIf="viewCost">
                         <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
                             style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9;">
                             Costo Total </th>
@@ -295,8 +298,9 @@
                             S/. {{element['cost']*element['required'] | number: '.2'}} </td>
                     </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedInputsColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedInputsColumns;"></tr>
+                    <tr mat-header-row *matHeaderRowDef="viewCost? displayedInputsColumns:displayedInputs2Columns"></tr>
+                    <tr mat-row
+                        *matRowDef="let row; columns: viewCost? displayedInputsColumns:displayedInputs2Columns;"></tr>
                 </table>
             </div>
         </div>

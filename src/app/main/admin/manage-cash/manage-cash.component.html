@@ -139,6 +139,10 @@
                           mat-menu-item (click)="deleteCash(raw)">
                           <mat-icon class="ms-icons-color">delete</mat-icon> Borrar
                         </button>
+                        <button *ngIf="user['role']['adminManageCashDeleteAction']"
+                          mat-menu-item (click)="viewRecord(raw)">
+                          <mat-icon class="ms-icons-color">folder</mat-icon> Ver historial
+                        </button>
                       </mat-menu>
                       <button mat-icon-button [matMenuTriggerFor]="rawMenu">
                         <mat-icon>more_vert</mat-icon>

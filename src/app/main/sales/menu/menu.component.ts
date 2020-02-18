@@ -346,13 +346,23 @@ export class MenuComponent implements OnInit {
   }
 
   selectPlate(plate, i) {
-    if (!this.generateSale) {
+    if (!this.generateSale && plate['type']) {
+
       this.selectablePlate = plate
       this.selectIndex = i
       this.MenuList = true
+      this.otherList = false
+
       this.categoriesList = false
+      let plates = this.plates.filter(el => el['menuType'] == plate['type'])
+      this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
+      this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
+      this.second = plates.filter(el => el['type'] == 'FONDO')
+      this.dessert = plates.filter(el => el['type'] == 'POSTRE')
     }
   }
+
+
   firstOrder(type: string, price: number, name: string) {
     let plates = this.plates.filter(el => el['menuType'] == type)
     this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
@@ -389,6 +399,8 @@ export class MenuComponent implements OnInit {
   }
 
   deleteSubDish(index, type) {
+    console.log(this.order[index][type]);
+    
     this.order[index][type] = ''
   }
 

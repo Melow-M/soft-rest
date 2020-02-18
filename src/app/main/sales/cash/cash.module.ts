@@ -18,6 +18,7 @@ import {
   MatDatepickerModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { OpenCashComponent } from './open-cash/open-cash.component';
 import { CloseCashComponent } from './close-cash/close-cash.component';
 import { AddComponent } from './add/add.component';
@@ -57,7 +58,9 @@ import { EditImportComponent } from './edit-import/edit-import.component';
     MatCheckboxModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    SatDatepickerModule,
+    SatNativeDateModule
   ],
   entryComponents: [
     CloseCashComponent,

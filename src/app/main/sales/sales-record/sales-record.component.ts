@@ -2,7 +2,7 @@ import { CancelComponent } from './cancel/cancel.component';
 import { User } from './../../../core/models/general/user.model';
 import { ListProductsComponent } from './list-products/list-products.component';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { tap, filter, startWith, map } from 'rxjs/operators';
+import { tap, filter, startWith, map, debounceTime, switchMap } from 'rxjs/operators';
 import { DatabaseService } from './../../../core/database.service';
 import { Observable, combineLatest } from 'rxjs';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -18,6 +18,8 @@ import { AuthService } from 'src/app/core/auth.service';
   styleUrls: ['./sales-record.component.css']
 })
 export class SalesRecordComponent implements OnInit {
+
+  orders$:Observable<any>
 
   data$: Observable<Order[]>
   displayedColumns: string[] = ['index', 'date', 'documentType', 'numberDocument', 'client', 'cashSale', 'products', 'user', 'actions'];
@@ -51,27 +53,35 @@ export class SalesRecordComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    const view = this.dbs.getCurrentMonthOfViewDate();
+
     this.search = this.fb.group({
-      initDate: [''],
-      lastDate: [''],
+      date: [{begin: view.from, end: new Date()}],
       users: ['']
     })
 
+    
+    // this.dataFormGroup.get('date').setValue({begin: view.from, end: new Date()});
+
+    this.orders$ =
+      this.search.get('date').valueChanges
+        .pipe(
+          startWith<any>({begin: view.from, end: new Date()}),
+          debounceTime(300),
+          switchMap(date => {
+            return this.dbs.onGetOrders(date.begin, date.end);
+          })
+        );
+
     this.data$ =
       combineLatest(
-        this.dbs.getOrders(),
+        this.orders$,
         this.dbs.getCustomers(),
         this.search.get('users').valueChanges.pipe(
           startWith('')
-        ),
-        this.search.get('initDate').valueChanges.pipe(
-          startWith('')
-        ),
-        this.search.get('lastDate').valueChanges.pipe(
-          startWith('')
-        ),
+        )
       ).pipe(
-        map(([orders, customers, user, init, final]) => {
+        map(([orders, customers, user]) => {
           let array = orders.map(el => {
             let customer = el['customerId'] ? customers.filter(al => al['id'] == el['customerId'])[0] : ''
             return {
@@ -79,13 +89,7 @@ export class SalesRecordComponent implements OnInit {
               customerName: customer ? customer['type'] == 'NATURAL' ? customer['name'] : customer['businessName'] : ''
             }
           })
-          return array.filter(el => user['displayName'] ? el['createdBy']['displayName'] == user['displayName'] : true).filter(el => {
-            if (init || final) {
-              return this.filterTime(init, final, el)
-            } else {
-              return true
-            }
-          })
+          return array.filter(el => user['displayName'] ? el['createdBy']['displayName'] == user['displayName'] : true)
         }),
         tap(res => {
           this.dataSource.data = res
@@ -105,18 +109,6 @@ export class SalesRecordComponent implements OnInit {
       })
     );
 
-  }
-
-  filterTime(from, to, el) {
-    if (from && to) {
-      return el['createdAt'].toMillis() >= from.getTime() && el['createdAt'].toMillis() <= to.setHours(23, 59, 59)
-    } else {
-      if (from) {
-        return el['createdAt'].toMillis() >= from.getTime()
-      } else if (to) {
-        return el['createdAt'].toMillis() <= to.setHours(23, 59, 59)
-      }
-    }
   }
 
   showSelectedUser(user): string | undefined {

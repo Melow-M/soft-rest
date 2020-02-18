@@ -19,6 +19,8 @@ export class OrdersComponent implements OnInit {
   inputsView: boolean = false
   menuView: boolean = false
 
+  viewCost:boolean = false
+
   currentOrder: any
 
   orders$: Observable<any>
@@ -37,6 +39,7 @@ export class OrdersComponent implements OnInit {
   dataMenuSource = new MatTableDataSource();
 
   displayedInputsColumns: string[] = ['index', 'input', 'unit', 'amount', 'cost', 'costTotal'];
+  displayedInputs2Columns: string[] = ['index', 'input', 'unit', 'amount'];
   dataInputsSource = new MatTableDataSource();
 
   data_xls: any

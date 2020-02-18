@@ -1,3 +1,4 @@
+import { ManageCashRecordComponent } from './manage-cash-record/manage-cash-record.component';
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Cash } from 'src/app/core/models/sales/cash/cash.model';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
@@ -84,6 +85,12 @@ export class ManageCashComponent implements OnInit {
       data: {
         cash: cash
       }
+    });
+  }
+
+  viewRecord(cash){
+    this.dialog.open(ManageCashRecordComponent, {
+      data: cash
     });
   }
 

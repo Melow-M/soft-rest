@@ -67,7 +67,7 @@ export class RegisterDocumentsComponent implements OnInit {
         documentType: [null, Validators.required, this.purchaseValidator(this.dbs)],
         documentSerial: [null, Validators.required, this.purchaseValidator(this.dbs)],
         documentCorrelative: [null, Validators.required, this.purchaseValidator(this.dbs)],
-        socialReason: [{value: null, disabled: true}, Validators.required],     //Depends on RUC, should not be sent
+        //socialReason: [{value: null, disabled: true}, Validators.required],     //Depends on RUC, should not be sent
         provider: [null, Validators.required, this.purchaseValidator(this.dbs)],
         paymentType: [null, Validators.required],
         creditExpirationDate: [{value: null, disabled: true}, Validators.required]  //Depend on Credito
@@ -145,6 +145,7 @@ export class RegisterDocumentsComponent implements OnInit {
       this.itemsListForm.value
     ];
     this.inputsTableDataSource.paginator = this.inputsTablePaginator;
+    this.itemsListForm.reset();
   }
 
   onDeleteInput(element){

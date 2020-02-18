@@ -198,7 +198,9 @@ export class EditDialogComponent implements OnInit {
               phone: this.dataFormGroup.value['phone'],
               mail: this.dataFormGroup.value['mail'],
               editedAt: new Date(),
-              editedBy: user
+              editedBy: user,
+              createdAt: this.dataFormGroup.value['createdAt'],
+              createdBy: this.dataFormGroup.value['createdBy'],
             }
           } else {
             data = {
@@ -209,7 +211,9 @@ export class EditDialogComponent implements OnInit {
               businessPhone: this.dataFormGroup.value['businessPhone'],
               contacts: this.contactsList,
               editedAt: new Date(),
-              editedBy: user
+              editedBy: user,
+              createdAt: this.dataFormGroup.value['createdAt'],
+              createdBy: this.dataFormGroup.value['createdBy'],
             }
           }
 

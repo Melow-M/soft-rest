@@ -7,6 +7,7 @@ export interface Input {
   sku: string;      //Código
   unit: string;
   stock: number;
+  cost: number;
   emergencyStock: number;
   averageCost: number;
   picture?: string | null; 

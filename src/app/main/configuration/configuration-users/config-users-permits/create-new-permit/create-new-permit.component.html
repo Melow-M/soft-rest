@@ -117,7 +117,7 @@
 </mat-dialog-content>
 <mat-divider></mat-divider>
 <mat-dialog-actions align="end" style="margin-bottom: -16px">
-  <button mat-stroked-button class="w3-margin-right" mat-dialog-close color="warn">Cancelar</button>
-  <button mat-raised-button color="primary" (click)="create()"
+  <button mat-raised-button class="w3-margin-right" mat-dialog-close color="PRIMARY">Cancelar</button>
+  <button mat-raised-button color="secondary" (click)="create()"
     [disabled]="!permitsConfigurationFormGroup.valid || (nameExist$ | async)">Crear</button>
 </mat-dialog-actions>

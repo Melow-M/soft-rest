@@ -172,11 +172,11 @@
 
                 <div class="buttons">
                     <div class="flex-div" style="justify-content: space-around;">
-                        <button mat-raised-button style="background-color: #B70705; color:white;"
+                        <button mat-raised-button color="PRIMARY"
                             (click)=" cancelOrder()">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
                             (click)="MenuList=false; categoriesList=true; selectablePlate = null">Categorías</button>
-                        <button mat-raised-button style="background: #EE8434; color: white"
+                        <button mat-raised-button color="secondary"
                             (click)="MenuList=false; generateSale=true; this.selectablePlate=''"
                             [disabled]="!order.length">Siguiente</button>
                     </div>
@@ -215,11 +215,11 @@
                 </div>
                 <div class="buttons" style="margin-top: 3vh;">
                     <div class="flex-div" style="justify-content: space-around;">
-                        <button mat-raised-button style="background-color: #B70705; color:white;"
+                        <button mat-raised-button color="PRIMARY"
                             (click)="cancelOrder(); searchProduct.setValue('') ">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
                             (click)="otherList=false; categoriesList=true; selectablePlate = null; searchProduct.setValue('') ">Categorías</button>
-                        <button mat-raised-button style="background: #EE8434; color: white"
+                        <button mat-raised-button color="secondary"
                             (click)="otherList=false; generateSale=true; searchProduct.setValue('') ">Siguiente</button>
                     </div>
                 </div>
@@ -396,13 +396,13 @@
                 </div>
                 <div class="buttons" style="margin-top: 2vh;">
                     <div class="flex-div" style="justify-content: space-around;">
-                        <button mat-raised-button style="background-color: #B70705; color:white;"
+                        <button mat-raised-button color="PRIMARY"
                             (click)="cancelOrder()">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
                             (click)="generateSale=false; categoriesList=true; this.pay.setValue('')">Categorías</button>
-                        <button *ngIf="!billView" mat-raised-button style="background: #EE8434; color: white"
+                        <button *ngIf="!billView" mat-raised-button color="secondary"
                             [disabled]="!(pay.value >= total)" (click)="printVoucher()">Grabar</button>
-                        <button *ngIf="billView" mat-raised-button style="background: #EE8434; color: white"
+                        <button *ngIf="billView" mat-raised-button color="secondary"
                             [disabled]="!(pay.value >= total) || !billForm.valid"
                             (click)="printVoucher()">Grabar</button>
                     </div>

@@ -12,4 +12,5 @@ export interface Menu {
   createdBy: User;
   editedAt: Date;
   editedBy: User;
+  type: string;
 }

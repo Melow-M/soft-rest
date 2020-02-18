@@ -66,15 +66,15 @@
         </div>
     </mat-dialog-content>
     <mat-dialog-actions style="margin-bottom: -16px;" align="end">
-        <button mat-stroked-button class="w3-margin-right" mat-dialog-close
-            style="background: #B70705; color: white; font-family: Raleway;">Cancelar</button>
-        <button *ngIf="!confirm" mat-stroked-button class="w3-margin-right" (click)="confirm = true"
-            style="background: #EE8434; color: white; font-family: Raleway;"
+        <button mat-raised-button class="w3-margin-right" mat-dialog-close
+            color="PRIMARY">Cancelar</button>
+        <button *ngIf="!confirm" mat-raised-button class="w3-margin-right" (click)="confirm = true"
+            color="secondary"
             [disabled]="!removeForm.valid">Aceptar</button>
-        <button *ngIf="confirm && !data.edit" mat-stroked-button class="w3-margin-right" mat-dialog-close
-            style="background: #EE8434; color: white; font-family: Raleway;" (click)="save()">Sí, retirar</button>
-        <button *ngIf="confirm && data.edit" mat-stroked-button class="w3-margin-right" mat-dialog-close
-            style="background: #EE8434; color: white; font-family: Raleway;" (click)="edit()">Sí, editar</button>
+        <button *ngIf="confirm && !data.edit" mat-raised-button class="w3-margin-right" mat-dialog-close
+            color="secondary" (click)="save()">Sí, retirar</button>
+        <button *ngIf="confirm && data.edit" mat-raised-button class="w3-margin-right" mat-dialog-close
+            color="secondary" (click)="edit()">Sí, editar</button>
 
     </mat-dialog-actions>
 </div>

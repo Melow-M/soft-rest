@@ -75,7 +75,7 @@
                         <mat-hint>Opcional</mat-hint>
                     </mat-form-field>
 
-                    <button mat-raised-button class="w3-block" color="primary" (click)="addBank()">
+                    <button mat-raised-button class="w3-block" color="secondary" (click)="addBank()">
                         <mat-icon>credit_card</mat-icon> Agregar cuenta
                     </button>
 
@@ -117,7 +117,7 @@
                         <mat-hint>Opcional</mat-hint>
                     </mat-form-field>
 
-                    <button mat-raised-button class="w3-block" color="primary" (click)="addContact()">
+                    <button mat-raised-button class="w3-block" color="secondary" (click)="addContact()">
                         <mat-icon>contacts</mat-icon> Agregar contacto
                     </button>
 
@@ -142,7 +142,7 @@
 
 <mat-divider></mat-divider>
 <mat-dialog-actions align="end">
-    <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
-    <button mat-raised-button class="w3-margin-right" color="primary" (click)="save()"
+    <button mat-raised-button class="w3-margin-right" color="secondary" mat-dialog-close>Cancelar</button>
+    <button mat-raised-button class="w3-margin-right" color="PRIMARY" (click)="save()"
         [disabled]="!dataFormGroup.valid || (ruc$ | async) || (savingCustomer$ | async)">Crear</button>
 </mat-dialog-actions>

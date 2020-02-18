@@ -30,6 +30,7 @@ import { Role } from './models/general/role.model';
 import { ReceivableUser } from './models/admin/receivableUser.model';
 
 import { saveAs } from 'file-saver';
+import { Menu } from './models/sales/menu/menu.model';
 
 @Injectable({
   providedIn: 'root'
@@ -872,7 +873,249 @@ export class DatabaseService {
     // doc.save(`Lista_de_insumos.pdf`);
   }
 
-  printTicket(elements: { quantity: number, description: string, vUnit: number, import: number }[], ticketNumber: string) {
+  calculateTotalTicketLength(elements: { quantity: number, description: string, vUnit: number, import: number,  element: Menu | Meal | Combo | Promo | Grocery}[]){
+    let individualLength = 0;
+    elements.forEach(el => {
+      if(el.element.hasOwnProperty('type')){
+        switch(el.element['type']){
+          case 'executive':
+            individualLength += 3;
+            break;
+          case 'simple':
+            individualLength += 2;
+            break;
+          case 'second':
+            individualLength++;
+            break;
+        }
+      }
+      else{
+        if(el.element.hasOwnProperty('products')){
+          el.element['products'].forEach(product => {
+            individualLength++;
+          })
+        }
+      }
+    });
+    individualLength += elements.length;
+
+    return individualLength
+  }
+
+  cutTextTicket(doc: any, text: string): string{
+    if (doc.getTextWidth(text) >= 175) {
+      //Cut description
+      let descriptionSliced = "ERROR";
+      for (let j = text.length; j > 0; j--) {
+        if (doc.getTextWidth(text.slice(0, j)) < 175) {
+          descriptionSliced = text.slice(0, j);
+          j = 0;
+          return this.toTitleCase(descriptionSliced);
+        };
+      }
+    }
+
+    else {
+      //Original description
+      return this.toTitleCase(text);
+
+    }
+
+  }
+
+  toTitleCase(str): string {
+    return str.replace(
+        /\w\S*/g,
+        function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+    );
+  }
+
+  printTicket(elements: { quantity: number, description: string, vUnit: number, import: number,  element: Menu | Meal | Combo | Promo | Grocery}[], ticketNumber: string) {
+    console.log(elements);
+    //Ejemplo: 
+    // let elements = [{
+    //   quantity: 2,
+    //   description: 'ALMUERZO BASICO BASICOOOo',
+    //   vUnit: 10.55,
+    //   import: 20.39
+    //   },{
+    //   quantity: 1,
+    //   description: 'Coca Cola 475 ml',
+    //   vUnit: 3,
+    //   import: 3
+    //   }];
+
+    // let ticketNumber = 'T001-000001';
+
+    let total = elements.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue.import;
+    }, 0);
+
+    var doc = new jsPDF({
+      unit: 'pt',
+      format: [414, 353 + 21 * (this.calculateTotalTicketLength(elements) - 1) ],
+      orientation: 'p'
+    });
+
+    doc.setFontStyle("bold");
+    doc.setFontSize(15),
+      doc.text("TICKET", 207, 59, {
+        align: "center",
+        baseline: "middle"
+      });
+
+    doc.text(ticketNumber, 207, 82, {
+      align: "center",
+      baseline: "middle"
+    });
+
+    doc.text("DELICIAS TETE S.A.C. - 20603001304", 207, 122, {
+      align: "center",
+      baseline: "middle"
+    });
+    doc.setFontStyle('normal'),
+      doc.text("Comedor SENATI", 207, 143, {
+        align: "center",
+        baseline: "middle"
+      });
+
+    doc.setFontSize(14),
+      doc.line(22, 168, 392, 168);
+    doc.setFontStyle('bold');
+
+    doc.text("Cant.", 39, 188, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.text("Descrip.", 138, 188, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.text("V Unit.", 268, 188, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.text("Importe.", 331, 188, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.line(22, 196, 392, 196);
+
+    //Inside elements
+    doc.setFontStyle('normal');
+
+    for (let i =0, aux = 0; i < this.calculateTotalTicketLength(elements); i++, aux++) {
+
+      doc.setFontStyle('normal');
+      doc.text(elements[aux].quantity.toFixed(2), 70, 228 + 21 * i, {
+        align: "right",
+        baseline: "bottom"
+      });
+
+      doc.setFontStyle('bold');
+
+      //Cutting text
+      doc.text(this.cutTextTicket(doc, elements[aux].description), 88, 228 + 21 * i, {
+        align: "left",
+        baseline: "bottom",
+      });
+      
+      doc.setFontStyle('normal');
+      doc.text(elements[aux].vUnit.toFixed(2), 309, 228 + 21 * i, {
+        align: "right",
+        baseline: "bottom"
+      });
+
+      doc.text(elements[aux].import.toFixed(2), 379, 228 + 21 * i, {
+        align: "right",
+        baseline: "bottom"
+      });
+
+      //entering components of each element
+      if(elements[aux].element.hasOwnProperty('type')){
+        i++
+        doc.text("-"+this.cutTextTicket(doc, elements[aux].element['mainDish']['name']), 88, 228 + 21 * i, {
+          align: "left",
+          baseline: "bottom",
+        });
+        
+        switch(elements[aux].element['type']){
+          case 'executive':
+            i++;
+            doc.text("-"+this.cutTextTicket(doc, elements[aux].element['appetizer']['name']), 88, 228 + 21 * i, {
+              align: "left",
+              baseline: "bottom",
+            });
+            i++;
+            doc.text("-"+this.cutTextTicket(doc, elements[aux].element['dessert']['name']), 88, 228 + 21 * i, {
+              align: "left",
+              baseline: "bottom",
+            });
+            break;
+          case 'simple':
+            i++;
+            doc.text("-"+this.cutTextTicket(doc, elements[aux].element['appetizer']['name']), 88, 228 + 21 * i, {
+              align: "left",
+              baseline: "bottom",
+            });
+            break;
+          case 'second':
+            break;
+        }
+      }
+      else{
+        if(elements[aux].element.hasOwnProperty('products')){
+          elements[aux].element['products'].forEach(product => {
+            i++
+            doc.text("-"+this.cutTextTicket(doc, product['product']['name']), 88, 228 + 21 * i, {
+              align: "left",
+              baseline: "bottom",
+            });
+          })
+        }
+      }
+      //
+
+      if (i == this.calculateTotalTicketLength(elements) - 1) {
+        doc.setFontStyle('bold');
+        doc.text('TOTAL', 70, 278 + 21 * i, {
+          align: "right",
+          baseline: "bottom"
+        });
+
+        doc.text("S/.", 207, 278 + 21 * i, {
+          align: "center",
+          baseline: "bottom"
+        });
+
+
+        doc.text(total.toFixed(2), 379, 278 + 21 * i, {
+          align: "right",
+          baseline: "bottom"
+        });
+
+        doc.setFontStyle('normal');
+        doc.text("----- Gracias por su preferencia -----", 207, 323 + 21 * i, {
+          align: "center",
+          baseline: "bottom"
+        });
+
+      }
+    }
+
+    doc.autoPrint({ variant: 'non-conform' });
+    //doc.save(`TICKET-${ticketNumber}.pdf`);
+    saveAs(doc.output('blob'));
+
+  }
+
+  printTicket2(elements: { quantity: number, description: string, vUnit: number, import: number,  element: Menu | Meal | Combo | Promo | Grocery}[], ticketNumber: string) {
     //Ejemplo: 
     // let elements = [{
     //   quantity: 2,
@@ -974,6 +1217,7 @@ export class DatabaseService {
           };
         }
       }
+
       else {
         //Original description
         doc.text(elements[i].description, 88, 228 + 21 * i, {
@@ -1023,13 +1267,28 @@ export class DatabaseService {
       }
     }
 
-    // doc.autoPrint({ variant: 'non-conform' });
-    // doc.save(`TICKET-${ticketNumber}.pdf`);
+    doc.autoPrint({ variant: 'non-conform' });
     saveAs(doc.output('blob'));
 
   }
 
   //Offer
+
+  calculateRecipeCost(recipe: Recipe): Observable<number>{
+    let itemColl = this.af.collection<Input>(`/db/deliciasTete/warehouseInputs/`).valueChanges();
+    let inputArray: Input[];
+
+    return itemColl.pipe(take(1), map((inputList)=> {
+      inputArray = inputList.filter(input => {
+        if(!!recipe.inputs.find(inputFromRecipe => (inputFromRecipe.id == input.id))){
+          return recipe.inputs.find(inputFromRecipe => (inputFromRecipe.id == input.id))
+        }
+      })
+      return inputArray.reduce((acc, curr)=> {
+        return acc + curr.cost*recipe.inputs.find(inputRecipe => inputRecipe.id == curr.id).quantity;
+      },0 )
+    }))
+  }
 
   onGetProductType(type: string): Observable<Array<Grocery | Meal | Dessert>> {
     switch (type) {
@@ -1040,7 +1299,7 @@ export class DatabaseService {
         return this.af.collection<Meal>(`/db/deliciasTete/warehouseDesserts`).valueChanges();
         break;
       case 'Platos':
-        return this.af.collection<Dessert>(`/db/deliciasTete/kitchenDishes`).valueChanges();
+        return this.af.collection<Dessert>(`/db/deliciasTete/kitchenRecipes`).valueChanges();
         break;
     }
   }

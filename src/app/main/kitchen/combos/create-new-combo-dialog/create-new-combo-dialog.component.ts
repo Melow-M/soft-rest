@@ -86,9 +86,9 @@ export class CreateNewComboDialogComponent implements OnInit {
   initForms(){
     this.comboForm = this.fb.group({
       name: [null, Validators.required],
-      price: [null, Validators.required],
-      realPrice: [{value: null, disabled: true}, Validators.required],
-      percentageDiscount: [{value: null, disabled: true}, Validators.required],
+      price: [0, Validators.required],
+      realPrice: [{value: 0, disabled: true}, Validators.required],
+      percentageDiscount: [{value: 0, disabled: true}, Validators.required],
       validityPeriod: [null, Validators.required],
       dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
     })
@@ -113,10 +113,25 @@ export class CreateNewComboDialogComponent implements OnInit {
     }
   }
 
-  onAddItem(){
+  async onAddItem(){
     let table = this.inputTableDataSource.data;
-    console.log(this.itemForm.value);
-    table.push({...this.itemForm.value, index: this.inputTableDataSource.data.length});
+    let aux = null;
+    if(this.itemForm.value['product'].hasOwnProperty('price')){
+      table.push({
+        ...this.itemForm.value, 
+        index: this.inputTableDataSource.data.length
+      });
+    }
+    else{
+      aux = await this.dbs.calculateRecipeCost(this.itemForm.value['product']).toPromise();
+      this.itemForm.value['product']['price'] = aux;
+      table.push({
+        ...this.itemForm.value, 
+        index: this.inputTableDataSource.data.length,
+      });
+      
+    }
+    
     this.inputTableDataSource.data = table;
     this.inputTableDataSource.paginator = this.inputTablePaginator;
     this.itemForm.get('product').setValue(''); this.itemForm.get('quantity').setValue('')
@@ -131,15 +146,7 @@ export class CreateNewComboDialogComponent implements OnInit {
     console.log(item);
   }
 
-  getTotal(): number{
-    if(this.inputTableDataSource.data.length){
-      return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
-        return <number>acc + <number>(curr['product']['price']*curr['quantity'])
-      }, 0);
 
-    }
-    return 0
-  }
 
   onUploadCombo(){
     let aux: {product: Grocery | Meal | Dessert, quantity: number}[] = [];
@@ -198,13 +205,25 @@ export class CreateNewComboDialogComponent implements OnInit {
     return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }
 
+  getTotal(): number{
+    if(this.inputTableDataSource.data.length){
+      return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
+        return <number>acc + <number>(curr['product']['price']*curr['quantity'])
+      }, 0);
+
+    }
+    return 0
+  }
 
   getTotalPrice(){
     return (this.getTotal()).toFixed(2)
   }
 
   getPercentage(){
-    return ((this.getTotal()-this.comboForm.get('price').value)/this.getTotal()).toFixed(2)
+    if(!this.comboForm.get('price').value || !this.getTotal()){
+      return 0;
+    }
+    return ((this.getTotal()-this.comboForm.get('price').value)*100/this.getTotal()).toFixed(2)
   }
 }
 

@@ -16,6 +16,7 @@ import {
   MatDatepickerModule,
   MatAutocompleteModule
 } from '@angular/material';
+import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SalesRecordRoutingModule } from './sales-record-routing.module';
 import { ListProductsComponent } from './list-products/list-products.component';
@@ -45,7 +46,9 @@ import { CancelComponent } from './cancel/cancel.component';
     FormsModule,
     ReactiveFormsModule,
     MatDatepickerModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    SatDatepickerModule, 
+    SatNativeDateModule
   ],
   entryComponents: [
     ListProductsComponent,

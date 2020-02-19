@@ -18,6 +18,7 @@ import {
   MatDatepickerModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { OpenCashComponent } from './open-cash/open-cash.component';
 import { CloseCashComponent } from './close-cash/close-cash.component';
 import { AddComponent } from './add/add.component';
@@ -26,6 +27,7 @@ import { TotalsComponent } from './totals/totals.component';
 import { RecordComponent } from './record/record.component';
 import { DeleteTransactionComponent } from './delete-transaction/delete-transaction.component';
 import { TransactionsComponent } from './record/transactions/transactions.component';
+import { EditImportComponent } from './edit-import/edit-import.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,8 @@ import { TransactionsComponent } from './record/transactions/transactions.compon
     TotalsComponent,
     RecordComponent,
     DeleteTransactionComponent,
-    TransactionsComponent
+    TransactionsComponent,
+    EditImportComponent
   ],
   imports: [
     CommonModule,
@@ -55,7 +58,9 @@ import { TransactionsComponent } from './record/transactions/transactions.compon
     MatCheckboxModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    SatDatepickerModule,
+    SatNativeDateModule
   ],
   entryComponents: [
     CloseCashComponent,
@@ -65,7 +70,8 @@ import { TransactionsComponent } from './record/transactions/transactions.compon
     RemoveComponent,
     TotalsComponent,
     DeleteTransactionComponent,
-    TransactionsComponent
+    TransactionsComponent,
+    EditImportComponent
   ]
 })
 export class CashModule { }

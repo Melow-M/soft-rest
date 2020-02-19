@@ -1,3 +1,4 @@
+import { EditImportComponent } from './edit-import/edit-import.component';
 import { DeleteTransactionComponent } from './delete-transaction/delete-transaction.component';
 import { AuthService } from './../../../core/auth.service';
 import { Cash } from './../../../core/models/sales/cash/cash.model';
@@ -76,8 +77,8 @@ export class CashComponent implements OnInit {
       this.auth.user$
     ).pipe(
       map(([cashes, user]) => {
-        this.currentCash = cashes.filter(el => el['open'])[0]
         let cashOpen = cashes.filter(el => el['open']).filter(el => el['currentOwnerId'] == user.uid)
+        this.currentCash = cashOpen[0]
         return cashOpen.length == 1
       })
     )
@@ -98,9 +99,12 @@ export class CashComponent implements OnInit {
       })
     )
 
-    this.transactions$ = this.dbs.getCashes().pipe(
-      switchMap(cashes => {
-        let cash = cashes.filter(el => el['open'])[0]
+    this.transactions$ = combineLatest(
+      this.dbs.getCashes(),
+      this.auth.user$
+    ).pipe(
+      switchMap(([cashes, user]) => {
+        let cash = cashes.filter(el => el['open']).filter(el => el['currentOwnerId'] == user.uid)[0]
         return combineLatest(
           this.dbs.getTransactions(cash.id, cash.currentOpeningId),
           this.search.valueChanges.pipe(
@@ -187,6 +191,12 @@ export class CashComponent implements OnInit {
 
   addMoney() {
     this.dialog.open(AddComponent, {
+      data: this.currentCash
+    })
+  }
+
+  editImport() {
+    this.dialog.open(EditImportComponent, {
       data: this.currentCash
     })
   }

@@ -37,6 +37,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
 
   inputList: Observable<string | Input[]>;
 
+  unit:string = 'KG'
   constructor(
     private fb: FormBuilder,
     private dbs: DatabaseService,
@@ -100,9 +101,9 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     this.inputTableDataSource.paginator = this.inputTablePaginator;
   }
 
-  onDeleteItem(item, index){
+  onDeleteItem(item){
     let table = this.inputTableDataSource.data;
-    table.splice(index, 1);
+    table.splice(item.index, 1);
     table.forEach((el, index) => {el['index'] = index})
     this.inputTableDataSource.data = table;
     this.inputTableDataSource.paginator = this.inputTablePaginator;
@@ -145,6 +146,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     })).subscribe();
 
   }
+
 
   formatInput(value: string){
     let aux = value;

@@ -11,7 +11,8 @@ import {
   MatDialogModule,
   MatDividerModule,
   MatAutocompleteModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatCheckboxModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VoucherComponent } from './voucher/voucher.component';
@@ -33,7 +34,8 @@ import { VoucherComponent } from './voucher/voucher.component';
     MatAutocompleteModule,
     FormsModule, 
     ReactiveFormsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatCheckboxModule
   ],
   entryComponents:[
     VoucherComponent

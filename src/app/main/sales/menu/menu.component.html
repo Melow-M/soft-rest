@@ -15,35 +15,41 @@
                 </div>
                 <div class="order-list">
                     <ol>
-                        <li class="order" *ngFor="let plate of order; let i = index"
-                            (click)="selectablePlate = plate;selectIndex=i; MenuList=true; categoriesList=false"
+                        <li class="order" *ngFor="let plate of order; let i = index" (click)="selectPlate(plate, i)"
                             [ngStyle]="{'border':selectablePlate==plate?'1px solid black':'none'}">
                             <div class="flex-div"
-                                style="justify-content: space-between; width: 100%; font-weight: bold; font-size: medium;">
-                                <span>{{plate['amount']}} {{plate['name'] | titlecase}}</span>
-                                <span>
-                                    <span>S/. {{plate['price'] * plate['amount'] | number : '.2'}}</span>
-                                    <mat-icon style="cursor: pointer;margin-left: 10px; vertical-align: middle;"
-                                        (click)="deleteDish(i)">delete</mat-icon>
-                                </span>
+                                style="justify-content: space-between; width: 100%; font-weight: bold;">
+                                <span style="width: 7%;">{{plate['amount']}}</span>
+                                <span style="width: 54%; text-align: left;">{{plate['name'] | titlecase}}</span>
+                                <span style="width: 26%; text-align: right;">S/.
+                                    {{plate['price'] * plate['amount'] | number : '.2'}}</span>
+                                <mat-icon style="cursor: pointer; margin-left:5px; vertical-align: middle;"
+                                    (click)="deleteDish(i)">
+                                    delete</mat-icon>
                             </div>
                             <div *ngIf="plate['mainDish']">
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
                                     *ngIf="plate['appetizer']">
-                                    <span>{{plate['appetizer']['name'] | titlecase}}</span>
-                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'appetizer')">delete
+                                    <span style="width: 7%;"></span>
+                                    <span style="width: 80%;">{{plate['appetizer']['name'] | titlecase}}</span>
+                                    <mat-icon style="cursor: pointer; margin-left:5px"
+                                        (click)="deleteSubDish(i,'appetizer')">delete
                                     </mat-icon>
                                 </div>
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
                                     *ngIf="plate['mainDish']">
-                                    <span>{{plate['mainDish']['name'] | titlecase}}</span>
-                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'mainDish')">delete
+                                    <span style="width: 7%;"></span>
+                                    <span style="width: 80%;">{{plate['mainDish']['name'] | titlecase}}</span>
+                                    <mat-icon style="cursor: pointer; margin-left:5px"
+                                        (click)="deleteSubDish(i,'mainDish')">delete
                                     </mat-icon>
                                 </div>
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                    *ngIf="plate['type']=='executive'">
-                                    <span>{{plate['dessert']['name'] | titlecase}}</span>
-                                    <mat-icon style="cursor: pointer;" (click)="deleteSubDish(i,'dessert')">delete
+                                    *ngIf="plate['dessert']">
+                                    <span style="width: 7%;"></span>
+                                    <span style="width: 80%;">{{plate['dessert']['name'] | titlecase}}</span>
+                                    <mat-icon style="cursor: pointer; margin-left:5px"
+                                        (click)="deleteSubDish(i,'dessert')">delete
                                     </mat-icon>
                                 </div>
                             </div>
@@ -110,60 +116,62 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="MenuList" style="width:100%; height: 80vh;">
-                <div class="type">
-                    <span class="header">Tipo</span>
-                    <div class="flex-div">
-                        <div class="category" *ngFor="let menu of menus$|async"
-                            [ngStyle]="{'background': menu['value']=='executive'?'rgba(183, 7, 5, 0.2)':menu['value']=='simple'?'rgba(237, 172, 47, 0.4)':''}"
-                            (click)="firstOrder(menu['value'],menu['price'],menu['name'])">
-                            <div class="w3-center">
-                                <img *ngIf="menu['value']=='executive'" class="icon"
-                                    src="../../../../assets/images/comida.png" alt="">
-                                <mat-icon *ngIf="menu['value']=='simple'" class="icon">restaurant</mat-icon>
-                                <img *ngIf="menu['value']=='second'" class="icon"
-                                    src="../../../../assets/images/almuerzo.png" alt="">
-                                <p>{{menu['shortName']}}</p>
+            <div *ngIf="MenuList" style="width:100%;">
+                <div style="height: 74vh;">
+                    <div class="type">
+                        <span class="header">Tipo</span>
+                        <div class="flex-div" style="height: 19vh; overflow-x: auto;">
+                            <div class="category" *ngFor="let menu of menus$|async"
+                                [ngStyle]="{'background': menu['value']=='executive'?'rgba(183, 7, 5, 0.2)':menu['value']=='simple'?'rgba(237, 172, 47, 0.4)':''}"
+                                (click)="firstOrder(menu['value'],menu['price'],menu['name'])">
+                                <div class="w3-center">
+                                    <img *ngIf="menu['value']=='executive'" class="icon"
+                                        src="../../../../assets/images/comida.png" alt="">
+                                    <mat-icon *ngIf="menu['value']=='simple'" class="icon">restaurant</mat-icon>
+                                    <img *ngIf="menu['value']=='second'" class="icon"
+                                        src="../../../../assets/images/almuerzo.png" alt="">
+                                    <p>{{menu['shortName']}}</p>
+                                </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
-                </div>
-                <div class="plates" *ngIf="plate$ | async">
-                    <div class="flex-div" style="justify-content: space-between; overflow: auto;  height: 43.5vh;">
-                        <div style="margin-bottom: 2vh;" *ngIf="entry.length">
-                            <span class="header">Entrada</span>
-                            <div class="flex-div">
-                                <div class="box" *ngFor="let plate of entry" (click)="selectedDish(plate)">
-                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
-                                    <p>{{plate['name'] | titlecase}}</p>
+                    <div class="plates" *ngIf="plate$ | async">
+                        <div class="flex-div" style="justify-content: space-between; overflow: auto;  height: 43.5vh;">
+                            <div style="margin-bottom: 2vh;" *ngIf="entry.length">
+                                <span class="header">Entrada</span>
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of entry" (click)="selectedDish(plate)">
+                                        <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                        <p>{{plate['name'] | titlecase}}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div style="margin-bottom: 2vh;" *ngIf="soup.length">
-                            <span class="header">Sopa</span>
-                            <div class="flex-div">
-                                <div class="box" *ngFor="let plate of soup" (click)="selectedDish(plate)">
-                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
-                                    <p>{{plate['name'] | titlecase}}</p>
+                            <div style="margin-bottom: 2vh;" *ngIf="soup.length">
+                                <span class="header">Sopa</span>
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of soup" (click)="selectedDish(plate)">
+                                        <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                        <p>{{plate['name'] | titlecase}}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div style="margin-bottom: 2vh;" *ngIf="dessert.length">
-                            <span class="header">Postres</span>
-                            <div class="flex-div">
-                                <div class="box" *ngFor="let plate of dessert" (click)="selectedDish(plate)">
-                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
-                                    <p>{{plate['name'] | titlecase}}</p>
+                            <div style="margin-bottom: 2vh;" *ngIf="dessert.length">
+                                <span class="header">Postres</span>
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of dessert" (click)="selectedDish(plate)">
+                                        <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                        <p>{{plate['name'] | titlecase}}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div style="margin-bottom: 2vh;" *ngIf="second.length">
-                            <span class="header">Segundos</span>
-                            <div class="flex-div">
-                                <div class="box" *ngFor="let plate of second" (click)="selectedDish(plate)">
-                                    <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
-                                    <p>{{plate['name'] | titlecase}}</p>
+                            <div style="margin-bottom: 2vh;" *ngIf="second.length">
+                                <span class="header">Segundos</span>
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of second" (click)="selectedDish(plate)">
+                                        <span class="stock">{{plate['stock']}} / {{plate['initialStock']}}</span>
+                                        <p>{{plate['name'] | titlecase}}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -175,7 +183,7 @@
                         <button mat-raised-button style="background-color: #B70705; color:white;"
                             (click)=" cancelOrder()">Cancelar</button>
                         <button mat-raised-button style="background-color: #C8C8C8;"
-                            (click)="MenuList=false; categoriesList=true; selectablePlate = null">Categorías</button>
+                            (click)="goToCategories()">Categorías</button>
                         <button mat-raised-button style="background: #EE8434; color: white"
                             (click)="MenuList=false; generateSale=true; this.selectablePlate=''"
                             [disabled]="!order.length">Siguiente</button>
@@ -184,31 +192,141 @@
             </div>
             <div class="categories others" style="padding-right: 0;" *ngIf="otherList">
                 <span class="header">{{otherTitle}}</span>
-                <mat-form-field class="w3-block" appearance="outline">
-                    <input type="text" placeholder="Búsqueda por producto" matInput [formControl]="searchProduct">
-                </mat-form-field>
-                <div style="height: 51.9vh; overflow: auto;" *ngIf="others$ | async as others">
-                    <div *ngIf="favorites.length">
-                        <span class="header">Los 5 Favoritos <mat-icon style="vertical-align: middle;">grade</mat-icon>
-                        </span>
-                        <div class="flex-div">
-                            <div class="box" *ngFor="let plate of favorites" (click)="addOrder(plate)">
-                                <span class="stock">{{plate['stock'] | number: '2.0'}}</span>
-                                <p>{{plate['name']}}</p>
-                                <span class="price">S/. {{plate['price'] | number: '.2'}}</span>
+                <div style="height: 65vh;">
+                    <mat-form-field *ngIf="otherTitle=='Otros'" class="w3-block" appearance="outline">
+                        <input type="text" placeholder="Búsqueda por producto" matInput [formControl]="searchProduct">
+                    </mat-form-field>
+                    <div style="height: 51.9vh; overflow: auto;" *ngIf="otherTitle=='Otros'">
+                        <div *ngIf="others$ | async as others">
+                            <div *ngIf="favorites.length">
+                                <span class="header">Los 5 Favoritos <mat-icon style="vertical-align: middle;">grade
+                                    </mat-icon>
+                                </span>
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of favorites" (click)="addOrder(plate)">
+                                        <span class="stock">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price">S/. {{plate['price'] | number: '.2'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="others.length">
+                                <span class="header">Todos</span>
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                        <span class="stock"
+                                            *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price" *ngIf="plate['price']">S/.
+                                            {{plate['price'] | number: '.2'}}</span>
+                                        <span class="price" *ngIf="plate['promoPrice']">S/.
+                                            {{plate['promoPrice'] | number: '.2'}}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="others[otherTitle.toLowerCase()].length">
-                        <span class="header">Todos</span>
-                        <div class="flex-div">
-                            <div class="box" *ngFor="let plate of others[otherTitle.toLowerCase()]"
-                                (click)="addOrder(plate)">
-                                <span class="stock" *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
-                                <p>{{plate['name']}}</p>
-                                <span class="price" *ngIf="plate['price']">S/. {{plate['price'] | number: '.2'}}</span>
-                                <span class="price" *ngIf="plate['promoPrice']">S/.
-                                    {{plate['promoPrice'] | number: '.2'}}</span>
+                    <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Piqueos'">
+                        <div *ngIf="appetizer$ | async as others">
+                            <div *ngIf="others.length">
+                                <span class="header">Todos</span>
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of others[otherTitle.toLowerCase()]"
+                                        (click)="addOrder(plate)">
+                                        <span class="stock"
+                                            *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price" *ngIf="plate['price']">S/.
+                                            {{plate['price'] | number: '.2'}}</span>
+                                        <span class="price" *ngIf="plate['promoPrice']">S/.
+                                            {{plate['promoPrice'] | number: '.2'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Bebidas'">
+                        <div *ngIf="drinks$ | async as others">
+                            <div *ngIf="others.length">
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                        <span class="stock"
+                                            *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price" *ngIf="plate['price']">S/.
+                                            {{plate['price'] | number: '.2'}}</span>
+                                        <span class="price" *ngIf="plate['promoPrice']">S/.
+                                            {{plate['promoPrice'] | number: '.2'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Promociones'">
+                        <div *ngIf="offers$ | async as others">
+                            <div *ngIf="others.length">
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                        <span class="stock"
+                                            *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price" *ngIf="plate['price']">S/.
+                                            {{plate['price'] | number: '.2'}}</span>
+                                        <span class="price" *ngIf="plate['promoPrice']">S/.
+                                            {{plate['promoPrice'] | number: '.2'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Postres'">
+                        <div *ngIf="dessert$ | async as others">
+                            <div *ngIf="others.length">
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                        <span class="stock"
+                                            *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price" *ngIf="plate['price']">S/.
+                                            {{plate['price'] | number: '.2'}}</span>
+                                        <span class="price" *ngIf="plate['promoPrice']">S/.
+                                            {{plate['promoPrice'] | number: '.2'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Extras'">
+                        <div *ngIf="extras$ | async as others">
+                            <div *ngIf="others.length">
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                        <span class="stock"
+                                            *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price" *ngIf="plate['price']">S/.
+                                            {{plate['price'] | number: '.2'}}</span>
+                                        <span class="price" *ngIf="plate['promoPrice']">S/.
+                                            {{plate['promoPrice'] | number: '.2'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Combos'">
+                        <div *ngIf="combo$ | async as others">
+                            <div *ngIf="others.length">
+                                <div class="flex-div">
+                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                        <span class="stock"
+                                            *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price" *ngIf="plate['price']">S/.
+                                            {{plate['price'] | number: '.2'}}</span>
+                                        <span class="price" *ngIf="plate['promoPrice']">S/.
+                                            {{plate['promoPrice'] | number: '.2'}}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -226,7 +344,7 @@
             </div>
             <div *ngIf="generateSale" class="sale categories">
                 <span class="header">Generar Venta</span>
-                <div style="height: 67vh; overflow: auto;">
+                <div style="height: 66vh; overflow: auto;">
                     <div class="container-box" style="width: 100%;">
                         <span class="title-box">Comprobante</span>
                         <div class="flex-div" style=" align-items: center;width: 100%; justify-content: space-between;">
@@ -349,7 +467,9 @@
                                         </mat-form-field>
                                     </form>
                                 </div>
-
+                                <div *ngIf="showReceivable" class="w3-margin-top">
+                                    <mat-checkbox [(ngModel)]="receivable">A cuenta</mat-checkbox>
+                                </div>
                             </div>
                         </div>
                         <div class="container-box">

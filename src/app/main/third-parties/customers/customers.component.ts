@@ -1,3 +1,5 @@
+import { ReceivableUser } from 'src/app/core/models/admin/receivableUser.model';
+import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatTableDataSource, MatPaginator, MatSort, MatDialog, MatSnackBar } from '@angular/material';
@@ -5,7 +7,7 @@ import { Subscription, Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
 import { Customer } from "src/app/core/models/third-parties/customer.model";
-import { tap, map, startWith, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { tap, map, startWith, debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
 import { ContactsDialogComponent } from './contacts-dialog/contacts-dialog.component';
 import { CreateDialogComponent } from './create-dialog/create-dialog.component';
 import { EditDialogComponent } from './edit-dialog/edit-dialog.component';
@@ -38,7 +40,8 @@ export class CustomersComponent implements OnInit {
     public dbs: DatabaseService,
     public auth: AuthService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private af: AngularFirestore
   ) { }
 
   ngOnInit() {
@@ -103,17 +106,46 @@ export class CustomersComponent implements OnInit {
     });
   }
 
-  onAddReceivableAccount(customer: Customer): void{
-    this.dbs.onAddReceivableAccount(customer).subscribe(batch =>{
-      batch.commit().then(()=> {
-        this.snackBar.open('Se creo la cuenta por cobrar', 'Aceptar');
-      })
-      .catch((err)=> {
-        console.log(err);
-        this.snackBar.open('No se pudo crear la cuenta por cobrar. Por favor, vuelva a intentarlo', 'Aceptar');
+  onAddReceivableAccount(customer: Customer): void {
+    let batch = this.af.firestore.batch();
+    let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/receivableUsers`).doc();
+    let inputData: ReceivableUser;
 
+
+    let customerRef = this.af.firestore.collection(`/db/deliciasTete/thirdPartiesCustomers`).doc(customer['id']);
+
+    this.auth.user$.pipe(
+      take(1))
+      .subscribe(user => {
+        inputData = {
+          id: inputRef.id,
+          name: customer['name'] ? customer['name'] : customer['businessName'],
+          customerId: customer['id'],
+          balance: 0,
+          debt: 0,
+          paidAmount: 0,
+          indebtAmount: 0,
+          createdBy: user,
+          createdAt: new Date(),
+          editedBy: user,
+          editedAt: new Date()
+        }
+
+        batch.set(inputRef, inputData);
+
+        batch.update(customerRef, {
+          receivableAccount: inputRef.id
+        })
+
+        batch.commit().then(() => {
+          this.snackBar.open('Se creo la cuenta por cobrar', 'Aceptar');
+        })
+          .catch((err) => {
+            console.log(err);
+            this.snackBar.open('No se pudo crear la cuenta por cobrar. Por favor, vuelva a intentarlo', 'Aceptar');
+
+          })
       })
-    });
   }
 
 }

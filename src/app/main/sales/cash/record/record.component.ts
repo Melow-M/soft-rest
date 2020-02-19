@@ -1,6 +1,6 @@
 import { TransactionsComponent } from './transactions/transactions.component';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { tap, startWith, map } from 'rxjs/operators';
+import { tap, startWith, map, debounceTime } from 'rxjs/operators';
 import { Observable, combineLatest } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
@@ -46,28 +46,25 @@ export class RecordComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
+    const view = this.dbs.getCurrentMonthOfViewDate();
+
     this.search = this.fb.group({
-      initDate: [''],
-      finalDate: ['']
+      date: [{begin: view.from, end: new Date()}]
     })
 
     this.openings$ =
       combineLatest(
         this.dbs.getOpenCash(this.data['id']),
-        this.search.get('initDate').valueChanges.pipe(
-          startWith('')
-        ),
-        this.search.get('finalDate').valueChanges.pipe(
-          startWith('')
-        ),
+        this.search.get('date').valueChanges
+        .pipe(
+          startWith<any>({begin: view.from, end: new Date()}),
+        )
+        
       ).pipe(
-        map(([cashes, init, final]) => {
+        map(([cashes, date]) => {
           return cashes.filter(el => {
-            if (init || final) {
-              return this.filterTime(init, final, el)
-            } else {
-              return true
-            }
+            return this.filterTime(date.begin, date.end, el)
           })
         }),
         tap(res => {

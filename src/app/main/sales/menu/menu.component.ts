@@ -44,18 +44,28 @@ export class MenuComponent implements OnInit {
   visaView = false
   masterCardView = false
 
+  receivable: boolean = false
+  receivableAccount: string = ''
+  showReceivable: boolean = false
+
   selectablePlate: any = null
   selectIndex: number = null
 
   others$: Observable<any>
-  other: Array<Grocery> = []
+  extras$: Observable<any>
+  combo$: Observable<any>
+  drinks$: Observable<any>
+  dessert$: Observable<any>
+  offers$: Observable<any>
+  appetizer$: Observable<any>
+  //other: Array<Grocery> = []
 
   plate$: Observable<Meal[]>
-  plates: Array<Meal>
-  entry: Array<Meal>
-  soup: Array<Meal>
-  second: Array<Meal>
-  dessert: Array<Meal>
+  plates: Array<Meal> = []
+  entry: Array<Meal> = []
+  soup: Array<Meal> = []
+  second: Array<Meal> = []
+  dessert: Array<Meal> = []
 
 
   favorites: Array<any> = []
@@ -159,10 +169,6 @@ export class MenuComponent implements OnInit {
     this.plate$ = this.dbs.onGetDishes().pipe(
       tap(dishes => {
         let plates = dishes.filter(el => el['status'] == 'DISPONIBLE')
-        this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
-        this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
-        this.second = plates.filter(el => el['type'] == 'FONDO')
-        this.dessert = plates.filter(el => el['type'] == 'POSTRE')
         this.plates = plates.map(el => {
           return {
             ...el,
@@ -199,10 +205,10 @@ export class MenuComponent implements OnInit {
     )
 
     this.change$ = this.pay.valueChanges.pipe(
-      startWith(1),
+      startWith(-1),
       map(pay => {
         if (this.total) {
-          return pay - this.total ? pay - this.total : -1
+          return pay - this.total > 0 ? pay - this.total : -1
         } else {
           return 0
         }
@@ -223,8 +229,6 @@ export class MenuComponent implements OnInit {
     this.others$ =
       combineLatest(
         this.dbs.onGetOthers(),
-        this.dbs.onGetOffer(),
-        this.dbs.onGetCombo(),
         this.searchProduct.valueChanges.pipe(
           startWith(''),
           distinctUntilChanged(),
@@ -235,14 +239,21 @@ export class MenuComponent implements OnInit {
         )
       )
         .pipe(
-          map(([product, offer, combo, search]) => {
-            return {
-              otros: product.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true),
-              promociones: offer.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true),
-              combos: combo.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true)
-            }
+          map(([product, search]) => {
+            return product.filter(el => search ? el['name'].toLowerCase().includes(search.toLowerCase()) : true)
           })
         )
+
+    this.extras$ = this.dbs.onGetRecipes().pipe(
+      map(recipes => {
+        return recipes.filter(el => el['category'] == 'Extras')
+      })
+    )
+    this.combo$ = this.dbs.onGetCombo()
+    this.drinks$ = this.dbs.getDrinks()
+    this.dessert$ = this.dbs.getDesserts()
+    this.offers$ = this.dbs.onGetOffer()
+    this.appetizer$ = this.dbs.getAppetizers()
 
 
   }
@@ -283,6 +294,13 @@ export class MenuComponent implements OnInit {
       this.ticketForm.get('dni').setValue(customer)
       this.ticketForm.get('name').setValue(customer)
       this.ticketForm.get('phone').setValue(customer.phone)
+      if (customer['receivableAccount']) {
+        this.showReceivable = true
+        this.receivableAccount = customer['receivableAccount']
+      } else {
+        this.showReceivable = false
+      }
+
     }
 
     if (this.billForm.get('ruc').value || this.billForm.get('businessName').value) {
@@ -291,6 +309,12 @@ export class MenuComponent implements OnInit {
       this.billForm.get('businessName').setValue(customer)
       this.billForm.get('phone').setValue(customer.businessPhone)
       this.billForm.get('address').setValue(customer.businessAddress)
+      if (customer['receivableAccount']) {
+        this.receivableAccount = customer['receivableAccount']
+        this.showReceivable = true
+      } else {
+        this.showReceivable = false
+      }
     }
 
   }
@@ -299,6 +323,7 @@ export class MenuComponent implements OnInit {
     this.billView = true
     this.ticketView = false
     this.checketView = false
+    this.showReceivable = false
     this.ticketForm.reset('')
   }
 
@@ -314,20 +339,53 @@ export class MenuComponent implements OnInit {
     this.pay.reset()
   }
 
+  goToCategories() {
+    this.entry = []
+    this.soup = []
+    this.second = []
+    this.dessert = []
+    this.MenuList = false
+    this.categoriesList = true
+    this.selectablePlate = null
+  }
+
+  selectPlate(plate, i) {
+    if (!this.generateSale && plate['type']) {
+
+      this.selectablePlate = plate
+      this.selectIndex = i
+      this.MenuList = true
+      this.otherList = false
+
+      this.categoriesList = false
+      let plates = this.plates.filter(el => el['menuType'] == plate['type'])
+      this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
+      this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
+      this.second = plates.filter(el => el['type'] == 'FONDO')
+      this.dessert = plates.filter(el => el['type'] == 'POSTRE')
+    }
+  }
+
+
   firstOrder(type: string, price: number, name: string) {
+    let plates = this.plates.filter(el => el['menuType'] == type)
+    this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
+    this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
+    this.second = plates.filter(el => el['type'] == 'FONDO')
+    this.dessert = plates.filter(el => el['type'] == 'POSTRE')
     this.selectMenu = type
-    let selectEntry = this.plates.filter(el => el['type'] == 'ENTRADA').map(el => el['stock'])
-    let selectSecond = this.second.map(el => el['stock'])
-    let selectDessert = this.dessert.map(el => el['stock'])
+    let selectEntry = this.plates.filter(el => el['type'] == 'ENTRADA').map(el => el['sold'])
+    let selectSecond = this.second.map(el => el['sold'])
+    let selectDessert = this.dessert.map(el => el['sold'])
 
 
     let newDish = {
       type: type,
       price: price,
       name: name,
-      appetizer: type != 'second' ? this.plates.filter(el => el['stock'] == Math.min(...selectEntry) && el['type'] == 'ENTRADA')[0] : '',
-      mainDish: this.plates.filter(el => el['stock'] == Math.min(...selectSecond) && el['type'] == 'FONDO')[0],
-      dessert: type == 'executive' ? this.plates.filter(el => el['stock'] == Math.min(...selectDessert) && el['type'] == 'POSTRE')[0] : '',
+      appetizer: type != 'second' ? plates.filter(el => el['sold'] == Math.max(...selectEntry) && el['type'] == 'ENTRADA')[0] : '',
+      mainDish: plates.filter(el => el['sold'] == Math.min(...selectSecond) && el['type'] == 'FONDO')[0],
+      dessert: type == 'executive' ? plates.filter(el => el['sold'] == Math.max(...selectDessert) && el['type'] == 'POSTRE')[0] : '',
       amount: 1
     }
     this.order.push(newDish)
@@ -345,6 +403,8 @@ export class MenuComponent implements OnInit {
   }
 
   deleteSubDish(index, type) {
+    console.log(this.order[index][type]);
+
     this.order[index][type] = ''
   }
 
@@ -452,7 +512,11 @@ export class MenuComponent implements OnInit {
 
 
     this.dialog.open(VoucherComponent, {
-      data: payOrder
+      data: {
+        ...payOrder,
+        receivable: this.receivable,
+        account: this.receivableAccount
+      }
     })
 
 

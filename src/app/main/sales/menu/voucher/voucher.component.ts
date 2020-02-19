@@ -306,11 +306,11 @@ export class VoucherComponent implements OnInit {
         console.log(this.data['orderList']);
 
         this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
-        /*
+        
         batch.commit().then(() => {
           console.log('orden guardada');
           this.dialog.close()
-        })*/
+        })
       })
 
   }

@@ -173,8 +173,6 @@ export class ProvidersEditDialogComponent implements OnInit {
             bankAccounts: this.bankAccounts,
             editedAt: new Date(),
             editedBy: user,
-            createdAt: this.dataFormGroup.value['createdAt'],
-            createdBy: this.dataFormGroup.value['createdBy']
           }
 
           batch.update(providerRef, data);

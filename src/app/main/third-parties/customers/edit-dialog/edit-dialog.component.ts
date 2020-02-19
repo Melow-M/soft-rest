@@ -199,8 +199,6 @@ export class EditDialogComponent implements OnInit {
               mail: this.dataFormGroup.value['mail'],
               editedAt: new Date(),
               editedBy: user,
-              createdAt: this.dataFormGroup.value['createdAt'],
-              createdBy: this.dataFormGroup.value['createdBy'],
             }
           } else {
             data = {
@@ -212,12 +210,12 @@ export class EditDialogComponent implements OnInit {
               contacts: this.contactsList,
               editedAt: new Date(),
               editedBy: user,
-              createdAt: this.dataFormGroup.value['createdAt'],
-              createdBy: this.dataFormGroup.value['createdBy'],
+
             }
           }
 
-          batch.set(customerRef, data);
+          console.log(data);
+          batch.update(customerRef, data);
 
           batch.commit()
             .then(() => {

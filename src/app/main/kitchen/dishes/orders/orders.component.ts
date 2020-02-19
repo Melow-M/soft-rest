@@ -1,9 +1,13 @@
+import { CancelComponent } from './cancel/cancel.component';
+
+import { ApproveComponent } from './approve/approve.component';
+import { ToPostComponent } from './to-post/to-post.component';
 import { Meal } from 'src/app/core/models/sales/menu/meal.model';
 import { element } from 'protractor';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { AuthService } from './../../../../core/auth.service';
 import { tap, filter, take, map } from 'rxjs/operators';
-import { MatTableDataSource, MatPaginator } from '@angular/material';
+import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
 import { Observable, combineLatest } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -19,7 +23,7 @@ export class OrdersComponent implements OnInit {
   inputsView: boolean = false
   menuView: boolean = false
 
-  viewCost:boolean = false
+  viewCost: boolean = false
 
   currentOrder: any
 
@@ -55,7 +59,8 @@ export class OrdersComponent implements OnInit {
     public dbs: DatabaseService,
     public auth: AuthService,
     private af: AngularFirestore,
-    public datePipe: DatePipe
+    public datePipe: DatePipe,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -171,138 +176,29 @@ export class OrdersComponent implements OnInit {
   }
 
   approve(element) {
-    const batch = this.af.firestore.batch();
-    this.auth.user$.pipe(
-      take(1)
-    ).subscribe(user => {
-      element['menu'].forEach((el, index) => {
-        let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc();
-        let menuData:Meal = {
-          id: menuRef.id,
-          name: el['dish']['name'], // Lomo Saltado
-          sku: 'AP-' + element['sku'].split('-')[1] + '-' + ('00' + (index + 1)).slice(-3),//AP102001
-          description: '',
-          picture: ' ',
-          unit: 'UND.',// UND., KG., GR., L., M., PULG. ...
-          stock: el['amount'],
-          initialStock: el['amount'],
-          emergencyStock: 0,
-          menuType: el['menuType'],
-          type: el['category']['value'], // ENTRADA, FONDO, POSTRE, PIQUEO, BEBIDA
-          recipeId: el['dish']['recipeId'],
-          status: 'COCINANDO', // DISPONIBLE, COCINANDO, INACTIVO
-          price: 0,
-          createdAt: new Date,
-          createdBy: user,
-          editedAt: new Date,
-          editedBy: user,
-        }
-        let costRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/${menuRef.id}/costTrend`).doc();
-        let costData = {
-          id: costRef.id,
-          cost: el['cost'],
-          price: 0,
-          kitchenOrder: element['id'],
-          createdAt: new Date()
-        }
-
-        batch.set(menuRef, menuData)
-        batch.set(costRef, costData)
-
-      })
-
-      element['inputs'].forEach(el => {
-
-        let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/warehouseInputs/`).doc(el['id']);
-
-        let data = {
-          stock: el['stock'] - el['required']
-        }
-        batch.update(inputRef, data)
-        let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseInputs/${el['id']}/kardex`).doc(inputRef.id)
-
-        let inputKardex = {
-          id: inputRef.id,
-          details: 'Preparación de menú, orden de cocina: ' + element['sku'],
-          insQuantity: 0,
-          insPrice: 0,
-          insTotal: 0,
-          outsQuantity: el['required'],
-          outsPrice: el['cost'],
-          outsTotal: el['required'] * el['cost'],
-          balanceQuantity: 0,
-          balancePrice: 0,
-          balanceTotal: 0,
-          type: 'SALIDA',
-          createdAt: new Date(),
-          createdBy: user
-        }
-
-        batch.set(kardexRef, inputKardex)
-      })
-
-      let orderRef = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders`).doc(element['id']);
-
-      batch.update(orderRef, {
-        status: 'aprobado'
-      })
-
-      batch.commit().then(() => {
-        console.log('aprobado');
-
-      })
+    this.dialog.open(ApproveComponent, {
+      data: element
     })
-
   }
 
   cancelOrder(element) {
-    const batch = this.af.firestore.batch();
-
-    let orderRef = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders`).doc(element['id']);
-
-    batch.update(orderRef, {
-      status: 'cancelado'
-    })
-
-    batch.commit().then(() => {
-      console.log('cancelado');
-
+    this.dialog.open(CancelComponent, {
+      data: element
     })
 
   }
 
   publicOrder(element) {
-    const batch = this.af.firestore.batch();
-    this.auth.user$.pipe(
-      take(1)
-    ).subscribe(user => {
-      element['menu'].forEach(el => {
-        let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(el['dishId']);
-        let menuDataUpdate = {
-          status: 'DISPONIBLE', // DISPONIBLE, COCINANDO, INACTIVO
-          editedAt: new Date,
-          editedBy: user,
-        }
-
-        batch.update(menuRef, menuDataUpdate)
-      })
-
-      let orderRef = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders`).doc(element['id']);
-
-      batch.update(orderRef, {
-        status: 'publicado'
-      })
-
-      batch.commit().then(() => {
-        console.log('publicado');
-
-      })
+    this.dialog.open(ToPostComponent, {
+      data: element
     })
+    
   }
 
 
 
   finish(element) {
+    
     const batch = this.af.firestore.batch();
     this.auth.user$.pipe(
       take(1)
@@ -310,8 +206,6 @@ export class OrdersComponent implements OnInit {
       element['menu'].forEach(el => {
         let menuRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(el['dishId']);
         let menuDataUpdate = {
-          stock: 0,
-          initialStock: 0,
           status: 'INACTIVO', // DISPONIBLE, COCINANDO, INACTIVO
           editedAt: new Date,
           editedBy: user,
@@ -327,7 +221,7 @@ export class OrdersComponent implements OnInit {
       })
 
       batch.commit().then(() => {
-        console.log('publicado');
+        console.log('finalizado');
 
       })
     })

@@ -15,6 +15,7 @@ export interface Meal {
   recipeId: string;
   status: string; // DISPONIBLE, COCINANDO, INACTIVO
   price: number;
+  cost:number;
   createdAt: Date;
   createdBy: User;
   editedAt: Date;

@@ -244,7 +244,11 @@ export class MenuComponent implements OnInit {
           })
         )
 
-    this.extras$ = this.dbs.getExtras()
+    this.extras$ = this.dbs.onGetRecipes().pipe(
+      map(recipes => {
+        return recipes.filter(el => el['category'] == 'Extras')
+      })
+    )
     this.combo$ = this.dbs.onGetCombo()
     this.drinks$ = this.dbs.getDrinks()
     this.dessert$ = this.dbs.getDesserts()
@@ -400,7 +404,7 @@ export class MenuComponent implements OnInit {
 
   deleteSubDish(index, type) {
     console.log(this.order[index][type]);
-    
+
     this.order[index][type] = ''
   }
 

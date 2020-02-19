@@ -25,6 +25,9 @@ import { PlanningComponent } from './planning/planning.component';
 import { ConfigurationComponent } from './configuration/configuration.component';
 import { RecipeComponent } from './configuration/recipe/recipe.component';
 import { OthersComponent } from './others/others.component';
+import { ApproveComponent } from './orders/approve/approve.component';
+import { CancelComponent } from './orders/cancel/cancel.component';
+import { ToPostComponent } from './orders/to-post/to-post.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +37,10 @@ import { OthersComponent } from './others/others.component';
     PlanningComponent,
     ConfigurationComponent,
     RecipeComponent,
-    OthersComponent
+    OthersComponent,
+    ApproveComponent,
+    CancelComponent,
+    ToPostComponent
   ],
   imports: [
     CommonModule,
@@ -57,7 +63,10 @@ import { OthersComponent } from './others/others.component';
     ReactiveFormsModule
   ],
   entryComponents: [
-    MissingInputsComponent
+    MissingInputsComponent,
+    ApproveComponent,
+    CancelComponent,
+    ToPostComponent
   ],
 
 })

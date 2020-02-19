@@ -1,13 +1,12 @@
-import { element } from 'protractor';
 import { AuthService } from './../../../../core/auth.service';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { MissingInputsComponent } from './../missing-inputs/missing-inputs.component';
-import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
+import { MatTableDataSource, MatDialog } from '@angular/material';
 import { startWith, distinctUntilChanged, debounceTime, map, filter, tap, take } from 'rxjs/operators';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Observable, combineLatest } from 'rxjs';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-planning',
@@ -110,7 +109,7 @@ export class PlanningComponent implements OnInit {
 
   menuList: Array<any> = []
   inputs: Array<any> = null
-  inputsRequired: Array<any> = null
+  inputsRequired: Array<any> = []
   inputsMissing: Array<any> = []
 
   numberOrder: string
@@ -144,7 +143,6 @@ export class PlanningComponent implements OnInit {
       })
     )
 
-
     this.listDishes$ = combineLatest(
       this.dbs.onGetRecipes(),
       this.menuForm.get('dish').valueChanges.pipe(
@@ -174,8 +172,43 @@ export class PlanningComponent implements OnInit {
     return dish ? dish['name'] : undefined;
   }
 
-  deleteItem(i) {
-    this.menuList.splice(i, 1);
+  deleteItem(index) {
+    let menuType = this.menuList[index]['menuType']
+
+    let rrr = []
+    this.menuList[index]['dish']['inputs'].forEach(el => {
+      rrr.push({
+        ...el,
+        required: el['quantity'] * this.menuList[index]['amount']
+      })
+    })
+
+    this.inputs.forEach(al => {
+      rrr.forEach(el => {
+        if (al['id'] == el['id']) {
+          al['stock'] += el['required']
+
+        }
+      })
+    })
+
+    this.inputsMissing = this.inputs.filter(al => al['stock'] < 0)
+
+    let ind = this.list.findIndex(el => el['value'] == menuType)
+    this.menuList.splice(index, 1);
+    this.list[ind]['list'] = this.menuList.filter(el => el['menuType'] == menuType)
+
+  }
+
+  editItem(element, index) {
+    this.menuForm.get('dish').setValue(element['dish'])
+    this.menuForm.get('category').setValue(element['category'])
+    this.menuForm.get('amount').setValue(element['amount'])
+
+    this.deleteItem(index)
+  }
+
+  verifiedInputs() {
     let required = this.menuList.map(el => {
       return el['dish']['inputs'].map(al => {
         return {
@@ -188,32 +221,16 @@ export class PlanningComponent implements OnInit {
 
     this.inputsRequired = this.inputs.map(el => {
       let amount = 0
-      let missing = 0
       required.forEach(al => {
         if (el['id'] == al['id']) {
           amount += al['required']
-          missing = el['stock'] - amount
         }
       })
       return {
         ...el,
-        required: amount,
-        missing: missing
+        required: amount
       }
     }).filter(el => el['required'] > 0)
-
-    this.inputsMissing = this.inputsRequired.filter(al => al['missing'] < 0)
-  }
-  editItem(element, index) {
-    this.menuForm.get('dish').setValue(element['dish'])
-    this.menuForm.get('category').setValue(element['category'])
-    this.menuForm.get('amount').setValue(element['amount'])
-
-    this.menuList.splice(index, 1);
-    this.dataSource.data = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
-  }
-
-  verifiedInputs() {
 
   }
 
@@ -243,45 +260,36 @@ export class PlanningComponent implements OnInit {
         required: el['quantity'] * this.menuForm.get('amount').value
       })
     })
-    console.log(rrr);
-    
-    let required = this.menuList.map(el => {
-      return el['dish']['inputs'].map(al => {
-        return {
-          ...al,
-          required: al['quantity'] * el['amount']
-        }
-      })
 
-    }).reduce((a, b) => a.concat(b), [])
-
-    console.log(required);
-    
-
-    this.inputsRequired = this.inputs.map(el => {
-      let amount = 0
-      let missing = 0
-      required.forEach(al => {
-        if (el['id'] == al['id']) {
-          amount += al['required']
-          missing = el['stock'] - amount
+    let prueba = this.inputs.map(al => {
+      let here = false
+      rrr.forEach(el => {
+        if (al['id'] == el['id']) {
+          al['stock'] -= el['required']
+          here = true
         }
       })
       return {
-        ...el,
-        required: amount,
-        missing: missing
+        ...al,
+        here: here
       }
-    }).filter(el => el['required'] > 0)
+    })
 
-    this.inputsMissing = this.inputsRequired.filter(al => al['missing'] < 0)
+    this.inputsMissing = this.inputs.filter(al => al['stock'] < 0)
+
     let index = this.list.findIndex(el => el['name'] == this.selectMenu['name'])
-    this.menuList[this.menuList.length - 1]['missing'] = this.inputsRequired.filter(al => al['missing'] < 0).length > 0
+    this.menuList[this.menuList.length - 1]['missing'] = prueba.filter(el => el['here']).filter(al => al['stock'] < 0).length > 0
     this.list[index]['list'] = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
     this.menuForm.reset()
+    
+    if(this.selectMenu.value=='second'){
+      this.menuForm.get('category').setValue(this.categories['simple'][2])
+    }
     this.menuForm.get('dish').setValue('')
     this.selectMenu['verified'] = true
+
     this.verified()
+
   }
 
   missingInputs() {
@@ -314,6 +322,23 @@ export class PlanningComponent implements OnInit {
   }
 
   cancel() {
+    let required = this.menuList.map(el => {
+      return el['dish']['inputs'].map(al => {
+        return {
+          ...al,
+          required: al['quantity'] * el['amount']
+        }
+      })
+    }).reduce((a, b) => a.concat(b), [])
+
+    this.inputs.forEach(el => {
+      required.forEach(al => {
+        if (el['id'] == al['id']) {
+          el['stock'] += al['required']
+        }
+      })
+    })
+
     this.menuList = []
     this.verifiedCheck = {
       executive: false,
@@ -328,9 +353,13 @@ export class PlanningComponent implements OnInit {
 
     this.selectMenu = null
     this.selectMenuForm.reset()
+    this.inputsMissing = []
+    this.inputsRequired = []
   }
 
   save() {
+
+    this.verifiedInputs()
 
     const batch = this.af.firestore.batch();
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenOrders/`).doc();
@@ -374,8 +403,6 @@ export class PlanningComponent implements OnInit {
           editedAt: new Date(),
           editedBy: user
         }
-        console.log(inputData);
-
 
         batch.set(inputRef, inputData);
 

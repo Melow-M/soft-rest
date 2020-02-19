@@ -106,7 +106,7 @@
                     <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Pagos a cuenta</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <button *ngIf="user['role']['adminAccountsPayablePaysAction']" mat-raised-button color="primary"
-                        (click)="showPayments()">
+                        (click)="showPayments(raw['id'])">
                         <mat-icon>list</mat-icon> Pagos
                       </button>
                     </td>

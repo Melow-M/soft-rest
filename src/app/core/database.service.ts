@@ -480,7 +480,7 @@ export class DatabaseService {
 
   //Kitchen
   onGetKitchenOrders() {
-    return this.af.collection(`/db/deliciasTete/kitchenOrders`, ref => ref.orderBy('createdAt')).valueChanges().pipe(shareReplay(1))
+    return this.af.collection(`/db/deliciasTete/kitchenOrders`, ref => ref.orderBy('createdAt','desc')).valueChanges().pipe(shareReplay(1))
   }
 
   onGetRecipes(): Observable<Recipe[]> {

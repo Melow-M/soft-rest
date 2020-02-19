@@ -104,7 +104,7 @@
                                     <mat-icon>attachment</mat-icon> Finalizar
                                 </button>
                             </mat-menu>
-                            <button mat-icon-button [matMenuTriggerFor]="requestsMenu">
+                            <button mat-icon-button [matMenuTriggerFor]="requestsMenu" [disabled]="element['status']=='finalizado'">
                                 <mat-icon>more_vert</mat-icon>
                             </button>
                     </ng-container>

@@ -392,7 +392,7 @@
                                     <form [formGroup]="billForm" *ngIf="filteredCustomersBusiness$ | async as filter">
                                         <mat-form-field appearance="outline" class="w3-block">
                                             <mat-label>RUC</mat-label>
-                                            <input matInput type="text" placeholder="RUC" formControlName="ruc"
+                                            <input matInput type="number" placeholder="RUC" formControlName="ruc"
                                                 [matAutocomplete]="autoCustomersRuc" autocomplete="off"
                                                 (keyup.enter)="chooseCustomer()">
                                             <mat-autocomplete #autoCustomersRuc="matAutocomplete"
@@ -434,7 +434,7 @@
                                     <form [formGroup]="ticketForm" *ngIf="filteredCustomersNatural$ | async as filter">
                                         <mat-form-field appearance="outline" class="w3-block">
                                             <mat-label>DNI</mat-label>
-                                            <input matInput type="text" placeholder="DNI" formControlName="dni"
+                                            <input matInput type="number" placeholder="DNI" formControlName="dni"
                                                 [matAutocomplete]="autoCustomersDni" autocomplete="off"
                                                 (keyup.enter)="chooseCustomer()">
                                             <mat-autocomplete #autoCustomersDni="matAutocomplete"

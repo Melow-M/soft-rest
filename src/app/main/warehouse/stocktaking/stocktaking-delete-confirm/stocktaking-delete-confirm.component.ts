@@ -63,6 +63,7 @@ export class StocktakingDeleteConfirmComponent implements OnInit {
       })
       .catch(err => {
         console.log(err);
+        this.loading.next(1);
         this.snackbar.open('Parece que hubo un error accediendo a la base de datos!', 'Aceptar', {
           duration: 6000
         });

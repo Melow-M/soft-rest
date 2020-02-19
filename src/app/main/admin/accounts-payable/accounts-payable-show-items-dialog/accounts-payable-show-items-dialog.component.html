@@ -24,7 +24,7 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Item</th>
         <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-          {{raw.name}}
+          {{raw.item}}
         </td>
       </ng-container>
 
@@ -38,7 +38,7 @@
       <ng-container matColumnDef="amount" stickyEnd>
         <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Importe</th>
         <td mat-cell style="padding:0px 15px" *matCellDef="let raw">
-          {{raw.amount | currency : 'S/.'}}
+          {{raw.cost | currency : 'S/.'}}
         </td>
       </ng-container>
 
@@ -52,5 +52,5 @@
 
 <mat-divider></mat-divider>
 <mat-dialog-actions align="end">
-  <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cerrar</button>
+  <button mat-raised-button class="w3-margin-right" color="secondary" mat-dialog-close>Cerrar</button>
 </mat-dialog-actions>

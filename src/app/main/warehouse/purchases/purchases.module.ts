@@ -15,6 +15,10 @@ import { RegDocumentsCreateInputDialogComponent } from './register-documents/reg
 import { RegDocumentsCreateGroceryDialogComponent } from './register-documents/reg-documents-create-grocery-dialog/reg-documents-create-grocery-dialog.component';
 import { RegDocumentsCreateHouseholdDialogComponent } from './register-documents/reg-documents-create-household-dialog/reg-documents-create-household-dialog.component';
 import { RegDocumentsCreateDessertsDialogComponent } from './register-documents/reg-documents-create-desserts-dialog/reg-documents-create-desserts-dialog.component';
+import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
+import {LazyLoadImageModule, intersectionObserverPreset } from 'ng-lazyload-image';
+import { Ng2ImgMaxModule } from 'ng2-img-max';
+
 
 @NgModule({
   declarations: [
@@ -27,7 +31,8 @@ import { RegDocumentsCreateDessertsDialogComponent } from './register-documents/
     RegDocumentsCreateInputDialogComponent,
     RegDocumentsCreateGroceryDialogComponent,
     RegDocumentsCreateHouseholdDialogComponent,
-    RegDocumentsCreateDessertsDialogComponent
+    RegDocumentsCreateDessertsDialogComponent,
+    CreateInputDialogComponent
   ],
   imports: [
     CommonModule,
@@ -49,16 +54,22 @@ import { RegDocumentsCreateDessertsDialogComponent } from './register-documents/
     MatTableModule,
     MatPaginatorModule,
     MatProgressBarModule,
-    MatMenuModule
+    MatMenuModule,
+    LazyLoadImageModule.forRoot({
+      preset: intersectionObserverPreset
+    }),
+    Ng2ImgMaxModule
   ],
   entryComponents: [
     RegisterDocumentsComponent,
     PurchasesCreateProviderDialogComponent,
     PurchasesShowItemsDialogComponent,
     PurchasesShowPaymentsDialogComponent,
-    PurchasesCancelDialogComponent
+    PurchasesCancelDialogComponent,
+    CreateInputDialogComponent
   ],
   providers: [
+    
   ]
 })
 export class PurchasesModule { }

@@ -93,16 +93,18 @@ export class VoucherComponent implements OnInit {
         id: el['id'],
         amount: el['amount'],
         stock: el['stock'],
-        price: el['price']
+        price: el['price'],
       }
     })
 
     this.print = this.data['orderList'].map(el => {
+      console.log(el);
       return {
         quantity: el['amount'],
         description: el['name'],
         vUnit: el['price'],
-        import: el['amount'] * el['price']
+        import: el['amount'] * el['price'],
+        element: el
       }
     }).map((el, index, array) => {
       let counter = 0
@@ -301,12 +303,14 @@ export class VoucherComponent implements OnInit {
           batch.set(kardexRef, inputKardex)
         })
 
-        this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
+        console.log(this.data['orderList']);
 
+        this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
+        /*
         batch.commit().then(() => {
           console.log('orden guardada');
           this.dialog.close()
-        })
+        })*/
       })
 
   }

@@ -221,7 +221,7 @@
 </div>
 
 <mat-dialog-actions align="end">
-    <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close type="button">Cancelar</button>
+    <button mat-raised-button class="w3-margin-right" color="PRIMARY" mat-dialog-close type="button">Cancelar</button>
     <button [disabled]="!inputTableDataSource.data.length || promoForm.status != 'VALID'"
-        mat-raised-button class="w3-margin-right" color="primary" mat-dialog-close type="button" (click)="onUploadOffer()">Crear</button>
+        mat-raised-button class="w3-margin-right" color="secondary" mat-dialog-close type="button" (click)="onUploadOffer()">Crear</button>
 </mat-dialog-actions>

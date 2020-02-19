@@ -21,7 +21,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
   //Table
   inputTableDataSource = new MatTableDataSource();
   inputTableDisplayedColumns: string[] = [
-    'index', 'itemName', 'itemUnit', 'quantity', 'actions'
+    'index', 'itemName', 'itemUnit', 'quantity', 'cost', 'actions'
   ]
   @ViewChild('inputTablePaginator', {static:false}) inputTablePaginator: MatPaginator;
   
@@ -79,13 +79,19 @@ export class CreateNewRecipeDialogComponent implements OnInit {
   }
 
   onFilterInputs(inputList: Input[], inputForm: string | Input){
-    if(typeof inputForm != 'string'){
-      return inputList.filter(input => input.name.toLowerCase().includes(inputForm.name.toLowerCase()))
+    if(inputForm == null){
+      return inputList;
     }
     else{
-      const filterValue = inputForm.toLowerCase();
-      return inputList.filter(input => input.name.toLowerCase().includes(filterValue))
+      if(typeof inputForm != 'string'){
+        return inputList.filter(input => input.name.toLowerCase().includes(inputForm.name.toLowerCase()))
+      }
+      else{
+        const filterValue = inputForm.toLowerCase();
+        return inputList.filter(input => input.name.toLowerCase().includes(filterValue))
+      }
     }
+
   }
 
 
@@ -99,6 +105,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     table.push({...this.itemForm.value, index: this.inputTableDataSource.data.length});
     this.inputTableDataSource.data = table;
     this.inputTableDataSource.paginator = this.inputTablePaginator;
+    this.itemForm.reset();
   }
 
   onDeleteItem(item){
@@ -111,6 +118,9 @@ export class CreateNewRecipeDialogComponent implements OnInit {
   }
 
   onUploadRecipe(){
+    console.log(this.inputTableDataSource.data);
+  }
+  onUploadRecipe2(){
     let recipe: Recipe = {
       id: null,
       name: this.productForm.get('productName').value.toUpperCase(),
@@ -156,6 +166,10 @@ export class CreateNewRecipeDialogComponent implements OnInit {
       return aux.split('')[0].toUpperCase() + aux.split('').slice(1).join('');
     }
     else return value;
+  }
+
+  getCostoTotal(){
+    return this.inputTableDataSource.data.reduce((accumulator, currentValue) => Number(accumulator) + Number(currentValue['item']['cost']*currentValue['quantity']),0)
   }
 
   repeatedNameValidator(dbs: DatabaseService){

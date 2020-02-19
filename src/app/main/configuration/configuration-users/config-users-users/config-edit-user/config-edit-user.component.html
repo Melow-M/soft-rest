@@ -134,7 +134,7 @@
 </mat-dialog-content>
 <mat-divider></mat-divider>
 <mat-dialog-actions align="end" style="margin-bottom: -16px">
-  <button mat-stroked-button mat-dialog-close color="warn">Cancelar</button>
-  <button mat-raised-button color="primary" (click)="edit()"
+  <button mat-raised-button mat-dialog-close color="PRIMARY">Cancelar</button>
+  <button mat-raised-button color="secondary" (click)="edit()"
     [disabled]="!personalDataFormGroup.valid || !jobDataFormGroup.valid || (emailExist$ | async) || loading">Guardar</button>
 </mat-dialog-actions>

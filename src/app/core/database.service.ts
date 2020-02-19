@@ -8,7 +8,7 @@ import * as firebase from 'firebase/app';
 
 import { shareReplay, tap, combineLatest, startWith } from 'rxjs/operators';
 import { Provider } from './models/third-parties/provider.model';
-import { Payable } from './models/admin/payable.model';
+import { Payable, PayableLimited, ItemModel } from './models/admin/payable.model';
 import { Cash } from './models/sales/cash/cash.model';
 import { User } from './models/general/user.model';
 
@@ -16,7 +16,6 @@ import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model'
 import { AuthService } from './auth.service';
 import { take, map } from 'rxjs/operators';
 import { CostTrend } from './models/warehouse/costTrend.model';
-import { Purchase } from './models/warehouse/purchase.model';
 import { Input } from './models/warehouse/input.model';
 import { Household } from './models/warehouse/household.model';
 import { Grocery } from './models/warehouse/grocery.model';
@@ -28,6 +27,9 @@ import { Promo } from './models/sales/menu/promo.model';
 import { Combo } from './models/sales/menu/combo.model';
 import { Role } from './models/general/role.model';
 import { ReceivableUser } from './models/admin/receivableUser.model';
+
+import { saveAs } from 'file-saver';
+import { Menu } from './models/sales/menu/menu.model';
 
 @Injectable({
   providedIn: 'root'
@@ -317,109 +319,50 @@ export class DatabaseService {
   }
 
 
-  onAddPurchase(purchase: Purchase, itemsList: Array<{ kitchenInputId: string; item: KitchenInput; quantity: number; cost: number; }>):
+  onAddPurchase(payableDoc: PayableLimited, itemsList: Array<ItemModel>):
     Observable<firebase.firestore.WriteBatch> {
-    let purchaseRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/accountsPayable`).doc();
-    let purchaseData: Purchase = purchase;
+
+    //Payable
+    let payableRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/accountsPayable`).doc();
+    let payableData: Payable;
     let batch = this.af.firestore.batch()
 
-    let payableData: Payable;
-
+    //costTrend and item
     let costTrendRef: DocumentReference;
     let costTrendData: CostTrend
     let itemRef: DocumentReference;
-    let types: string;
     let typ: string;
+
+    //Kardex
+    let kardexRef: DocumentReference;
+    let kardexData: Kardex;
 
     let date = new Date();
 
     return this.auth.user$.pipe(
       take(1),
       map(user => {
-        //purchaseDoc
-        purchaseData.id = purchaseRef.id;
-        purchaseData.itemsList = itemsList;
-
-        purchaseData.createdAt = new Date();
-        purchaseData.createdBy = user;
-        purchaseData.editedAt = null;
-        purchaseData.editedBy = null;
-        purchaseData.approvedAt = null;
-        purchaseData.approvedBy = null;
-
-        purchaseData.status = 'GRABADO';
-
-        //Se cambio el purchase model por el payable model. Se procede a combertir que cambiar aca
-        //batch.set(purchaseRef, purchaseData);
-
-        let temp = [];
-        purchaseData.itemsList.forEach(el => {
-          temp.push({
-            id: el.item.id,
-            type: el.item.type, //INSUMO, MENAJE, POSTRE, OTROS
-            name: el.item.name,
-            sku: el.item.sku,
-            quantity: el.quantity,
-            amount: el.cost,
-            item: el.item
-          });
-        })
-
+        //payableData
         payableData = {
-          id: purchaseRef.id,
-          documentDate: purchaseData.documentDetails.documentDate,
-          documentType: purchaseData.documentDetails.documentType, // FACTURA, BOLETA, TICKET
-          documentSerial: purchaseData.documentDetails.documentSerial,
-          documentCorrelative: purchaseData.documentDetails.documentCorrelative,
-          provider: {
-            id: purchaseData.documentDetails.provider.id,
-            name: purchaseData.documentDetails.provider.name,
-            ruc: purchaseData.documentDetails.provider.ruc,
-          },
-
-          payments: purchaseData.documentDetails.paymentType == 'CREDITO' ? [{//SOLO CREDITO
-            type: 'PARCIAL',
-            paymentType: purchaseData.documentDetails.paymentType,
-            amount: purchaseData.imports.paidImport,
-            cashReference: null,
-            paidAt: date,
-            paidBy: user,
-          }] : [{
-            type: 'TOTAL',
-            paymentType: purchaseData.documentDetails.paymentType,
-            amount: purchaseData.imports.totalImport,
-            cashReference: null,
-            paidAt: date,
-            paidBy: user,
-          }],
-
-          itemsList: temp,
-
-          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null : purchaseData.documentDetails.creditExpirationDate,
-          paymentDate: null,
-          totalAmount: purchaseData.imports.totalImport,
-          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null : purchaseData.imports.subtotalImport,
-          igvAmount: purchaseData.imports.igvImport == undefined ? null : purchaseData.imports.igvImport,
-          paymentType: purchaseData.documentDetails.paymentType, // CREDITO, EFECTIVO, TARJETA
-          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.paidImport : purchaseData.imports.totalImport,
-          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport : null, //no existe por credito
-          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE' : 'PAGADO', // PENDIENTE, PAGADO, ANULADO
+          ...payableDoc,
+          id: payableRef.id,
           createdAt: date,
           createdBy: user,
           editedAt: null,
           editedBy: null,
           approvedAt: null,
-          approvedBy: null,
+          approvedBy: null
         }
 
-        batch.set(purchaseRef, payableData);
+        payableData.payments[0].paidBy = user;
+        payableData.payments[0].paidAt = date;
 
         //
 
         //Cost trends
-        itemsList.forEach(item => {
-          if (item.cost != item.item.cost) {
-            switch (item.item.type) {
+        itemsList.forEach((item: ItemModel, index) => {
+          
+            switch (item.type) {
               case 'Insumos':
                 typ = 'warehouseInputs';
                 break;
@@ -434,19 +377,136 @@ export class DatabaseService {
                 break;
             }
 
-            itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.kitchenInputId);
+            itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.id);
 
-            costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.kitchenInputId}/costTrend`).doc();
+            costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/costTrend`).doc();
             costTrendData = {
-              cost: Math.round(item.cost * 100.0 / item.quantity * 100.0) / 100.0,
+              cost: item.cost,
               id: costTrendRef.id,
               createdAt: date
             };
 
-            batch.update(itemRef, { cost: costTrendData.cost });
+            kardexRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/kardex`).doc();
+            kardexData = {
+              id: kardexRef.id,
+              details: 'Compra: '+payableData.documentType +" "+payableData.documentSerial + "-"+payableData.documentCorrelative+". " +payableData.provider.name,
+              insQuantity: item.quantity,
+              insPrice: item.cost,
+              insTotal: Math.round(item.cost * item.quantity * 100.0) / 100.0,
+              outsQuantity: 0.00,
+              outsPrice: 0.00,
+              outsTotal: 0.00,
+              balanceQuantity: 0.00,
+              balancePrice: 0.00,
+              balanceTotal: 0.00,
+              type: 'ENTRADA', /**@ ENTRADA, SALIDA, INICIAL, REINICIO, ANULADO */
+              createdAt: date,
+              createdBy: user,
+            }
+
+            payableData.itemsList[index].kardexId = kardexRef.id;
+            payableData.itemsList[index].costTrendId = costTrendRef.id;
+
+            payableData.itemsList[index].item = payableData.itemsList[index].item['name'];
+
+            batch.update(itemRef, { 
+              averageCost: costTrendData.cost,
+              stock: firebase.firestore.FieldValue.increment(item.quantity),
+              editedAt: date,
+              editedBy: user
+             });
+
             batch.set(costTrendRef, costTrendData);
-          }
-        })
+            batch.set(kardexRef, kardexData);
+
+          })
+
+          //updating payable data
+          batch.set(payableRef, payableData);
+
+        return batch;
+      }))
+  }
+
+  onDeletePurchase(payableDoc: Payable): Observable<firebase.firestore.WriteBatch> {
+    console.log(payableDoc);
+    let payableTemp: Payable = {...payableDoc}
+
+    //Payable
+    let payableRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/accountsPayable`).doc(payableDoc.id);
+    let batch = this.af.firestore.batch()
+
+    //costTrend and item
+    let costTrendRef: DocumentReference;
+    let itemRef: DocumentReference;
+    let typ: string;
+
+    //Kardex
+    let kardexRef: DocumentReference;
+
+    let date = new Date();
+
+    return this.auth.user$.pipe(
+      take(1),
+      map((user) => {
+        //payableData
+
+        //
+
+        //Cost trends
+        payableTemp.itemsList.forEach(async(item: ItemModel, index) => {
+          
+            switch (item.type) {
+              case 'Insumos':
+                typ = 'warehouseInputs';
+                break;
+              case 'Otros':
+                typ = 'warehouseGrocery';
+                break;
+              case 'Postres':
+                typ = 'warehouseDesserts';
+                break;
+              case 'Menajes':
+                typ = 'warehouseHousehold';
+                break;
+            }
+
+            itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.id);
+
+            costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/costTrend`).doc(item.costTrendId);
+
+            kardexRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/kardex`).doc(item.kardexId);
+
+            //item
+            batch.update(itemRef, { 
+              /*averageCost: await this.af.collection<CostTrend>(`/db/deliciasTete/${typ}/${item.id}/costTrend`, ref => ref.orderBy('createdAt')).valueChanges()
+                            .pipe(take(1), map(res => 
+                              {res.find(el => el.id != item.costTrendId).cost;
+                                console.log('now!!');
+                              }
+                              
+                            )).toPromise(),*/
+              stock: firebase.firestore.FieldValue.increment(item.quantity*(-1)),
+              editedAt: date,
+              editedBy: user
+             });
+
+            //costTrend
+            batch.delete(costTrendRef);
+
+            //kardex
+            batch.update(kardexRef, {
+              type: 'ANULADO'
+            });
+
+          })
+
+          //updating payable data
+          batch.set(payableRef, {
+            editedAt: date,
+            editedBy: user,
+            status: 'ANULADO'
+          });
 
         return batch;
       }))
@@ -741,8 +801,38 @@ export class DatabaseService {
       baseline: "bottom"
     });
 
-    doc.autoPrint({ variant: 'non-conform' });
-    doc.save(`Caja.pdf`);
+    //window.open(doc.output('bloburl'), '_blank');
+
+    //saveAs(doc.output('blob'));
+
+    let blob = doc.output('blob');
+
+    // doc.output('dataurlnewwindow');
+
+    saveAs(blob);
+
+    // console.log(navigator.userAgent);
+    // if (window.navigator.msSaveOrOpenBlob) { //IE 11+
+    //   console.log('IE 11');
+    //   window.navigator.msSaveOrOpenBlob(blob, "my.pdf");
+    // } else if (navigator.userAgent.match('FxiOS')) { //FF iOS
+    //   alert("Cannot display on FF iOS");
+    // } else if (navigator.userAgent.match('CriOS')) { //Chrome iOS
+    //   console.log('chrome iOS');
+    //   var reader = new FileReader();
+    //   reader.onloadend = function () { window.open(String(reader.result));};
+    //   reader.readAsDataURL(blob);
+    // } else if (navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPhone/i)) { //Safari & Opera iOS
+    //   console.log('Safari and Opera')
+    //   var url = window.URL.createObjectURL(blob);
+    //   window.location.href = url;
+    // }
+    // else{
+    //   alert('desktop');
+    //   saveAs(doc.output('blob'));
+    // }
+
+
   }
 
   //Funcion para obtener valores de fechas
@@ -835,12 +925,254 @@ export class DatabaseService {
         };
       }
     }
-
-    doc.autoPrint({ variant: 'non-conform' });
-    doc.save(`Lista_de_insumos.pdf`);
+    saveAs(doc.output('blob'));
+    // doc.autoPrint({ variant: 'non-conform' });
+    // doc.save(`Lista_de_insumos.pdf`);
   }
 
-  printTicket(elements: { quantity: number, description: string, vUnit: number, import: number }[], ticketNumber: string) {
+  calculateTotalTicketLength(elements: { quantity: number, description: string, vUnit: number, import: number,  element: Menu | Meal | Combo | Promo | Grocery}[]){
+    let individualLength = 0;
+    elements.forEach(el => {
+      if(el.element.hasOwnProperty('type')){
+        switch(el.element['type']){
+          case 'executive':
+            individualLength += 3;
+            break;
+          case 'simple':
+            individualLength += 2;
+            break;
+          case 'second':
+            individualLength++;
+            break;
+        }
+      }
+      else{
+        if(el.element.hasOwnProperty('products')){
+          el.element['products'].forEach(product => {
+            individualLength++;
+          })
+        }
+      }
+    });
+    individualLength += elements.length;
+
+    return individualLength
+  }
+
+  cutTextTicket(doc: any, text: string): string{
+    if (doc.getTextWidth(text) >= 175) {
+      //Cut description
+      let descriptionSliced = "ERROR";
+      for (let j = text.length; j > 0; j--) {
+        if (doc.getTextWidth(text.slice(0, j)) < 175) {
+          descriptionSliced = text.slice(0, j);
+          j = 0;
+          return this.toTitleCase(descriptionSliced);
+        };
+      }
+    }
+
+    else {
+      //Original description
+      return this.toTitleCase(text);
+
+    }
+
+  }
+
+  toTitleCase(str): string {
+    return str.replace(
+        /\w\S*/g,
+        function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+    );
+  }
+
+  printTicket(elements: { quantity: number, description: string, vUnit: number, import: number,  element: Menu | Meal | Combo | Promo | Grocery}[], ticketNumber: string) {
+    console.log(elements);
+    //Ejemplo: 
+    // let elements = [{
+    //   quantity: 2,
+    //   description: 'ALMUERZO BASICO BASICOOOo',
+    //   vUnit: 10.55,
+    //   import: 20.39
+    //   },{
+    //   quantity: 1,
+    //   description: 'Coca Cola 475 ml',
+    //   vUnit: 3,
+    //   import: 3
+    //   }];
+
+    // let ticketNumber = 'T001-000001';
+
+    let total = elements.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue.import;
+    }, 0);
+
+    var doc = new jsPDF({
+      unit: 'pt',
+      format: [414, 353 + 21 * (this.calculateTotalTicketLength(elements) - 1) ],
+      orientation: 'p'
+    });
+
+    doc.setFontStyle("bold");
+    doc.setFontSize(15),
+      doc.text("TICKET", 207, 59, {
+        align: "center",
+        baseline: "middle"
+      });
+
+    doc.text(ticketNumber, 207, 82, {
+      align: "center",
+      baseline: "middle"
+    });
+
+    doc.text("DELICIAS TETE S.A.C. - 20603001304", 207, 122, {
+      align: "center",
+      baseline: "middle"
+    });
+    doc.setFontStyle('normal'),
+      doc.text("Comedor SENATI", 207, 143, {
+        align: "center",
+        baseline: "middle"
+      });
+
+    doc.setFontSize(14),
+      doc.line(22, 168, 392, 168);
+    doc.setFontStyle('bold');
+
+    doc.text("Cant.", 39, 188, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.text("Descrip.", 138, 188, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.text("V Unit.", 268, 188, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.text("Importe.", 331, 188, {
+      align: "left",
+      baseline: "bottom"
+    });
+
+    doc.line(22, 196, 392, 196);
+
+    //Inside elements
+    doc.setFontStyle('normal');
+
+    for (let i =0, aux = 0; i < this.calculateTotalTicketLength(elements); i++, aux++) {
+
+      doc.setFontStyle('normal');
+      doc.text(elements[aux].quantity.toFixed(2), 70, 228 + 21 * i, {
+        align: "right",
+        baseline: "bottom"
+      });
+
+      doc.setFontStyle('bold');
+
+      //Cutting text
+      doc.text(this.cutTextTicket(doc, elements[aux].description), 88, 228 + 21 * i, {
+        align: "left",
+        baseline: "bottom",
+      });
+      
+      doc.setFontStyle('normal');
+      doc.text(elements[aux].vUnit.toFixed(2), 309, 228 + 21 * i, {
+        align: "right",
+        baseline: "bottom"
+      });
+
+      doc.text(elements[aux].import.toFixed(2), 379, 228 + 21 * i, {
+        align: "right",
+        baseline: "bottom"
+      });
+
+      //entering components of each element
+      if(elements[aux].element.hasOwnProperty('type')){
+        i++
+        doc.text("-"+this.cutTextTicket(doc, elements[aux].element['mainDish']['name']), 88, 228 + 21 * i, {
+          align: "left",
+          baseline: "bottom",
+        });
+        
+        switch(elements[aux].element['type']){
+          case 'executive':
+            i++;
+            doc.text("-"+this.cutTextTicket(doc, elements[aux].element['appetizer']['name']), 88, 228 + 21 * i, {
+              align: "left",
+              baseline: "bottom",
+            });
+            i++;
+            doc.text("-"+this.cutTextTicket(doc, elements[aux].element['dessert']['name']), 88, 228 + 21 * i, {
+              align: "left",
+              baseline: "bottom",
+            });
+            break;
+          case 'simple':
+            i++;
+            doc.text("-"+this.cutTextTicket(doc, elements[aux].element['appetizer']['name']), 88, 228 + 21 * i, {
+              align: "left",
+              baseline: "bottom",
+            });
+            break;
+          case 'second':
+            break;
+        }
+      }
+      else{
+        if(elements[aux].element.hasOwnProperty('products')){
+          elements[aux].element['products'].forEach(product => {
+            i++
+            doc.text("-"+this.cutTextTicket(doc, product['product']['name']), 88, 228 + 21 * i, {
+              align: "left",
+              baseline: "bottom",
+            });
+          })
+        }
+      }
+      //
+
+      if (i == this.calculateTotalTicketLength(elements) - 1) {
+        doc.setFontStyle('bold');
+        doc.text('TOTAL', 70, 278 + 21 * i, {
+          align: "right",
+          baseline: "bottom"
+        });
+
+        doc.text("S/.", 207, 278 + 21 * i, {
+          align: "center",
+          baseline: "bottom"
+        });
+
+
+        doc.text(total.toFixed(2), 379, 278 + 21 * i, {
+          align: "right",
+          baseline: "bottom"
+        });
+
+        doc.setFontStyle('normal');
+        doc.text("----- Gracias por su preferencia -----", 207, 323 + 21 * i, {
+          align: "center",
+          baseline: "bottom"
+        });
+
+      }
+    }
+
+    doc.autoPrint({ variant: 'non-conform' });
+    //doc.save(`TICKET-${ticketNumber}.pdf`);
+    saveAs(doc.output('blob'));
+
+  }
+
+  printTicket2(elements: { quantity: number, description: string, vUnit: number, import: number,  element: Menu | Meal | Combo | Promo | Grocery}[], ticketNumber: string) {
     //Ejemplo: 
     // let elements = [{
     //   quantity: 2,
@@ -942,6 +1274,7 @@ export class DatabaseService {
           };
         }
       }
+
       else {
         //Original description
         doc.text(elements[i].description, 88, 228 + 21 * i, {
@@ -992,10 +1325,27 @@ export class DatabaseService {
     }
 
     doc.autoPrint({ variant: 'non-conform' });
-    doc.save(`TICKET-${ticketNumber}.pdf`);
+    saveAs(doc.output('blob'));
+
   }
 
   //Offer
+
+  calculateRecipeCost(recipe: Recipe): Observable<number>{
+    let itemColl = this.af.collection<Input>(`/db/deliciasTete/warehouseInputs/`).valueChanges();
+    let inputArray: Input[];
+
+    return itemColl.pipe(take(1), map((inputList)=> {
+      inputArray = inputList.filter(input => {
+        if(!!recipe.inputs.find(inputFromRecipe => (inputFromRecipe.id == input.id))){
+          return recipe.inputs.find(inputFromRecipe => (inputFromRecipe.id == input.id))
+        }
+      })
+      return inputArray.reduce((acc, curr)=> {
+        return acc + curr.averageCost*recipe.inputs.find(inputRecipe => inputRecipe.id == curr.id).quantity;
+      },0 )
+    }))
+  }
 
   onGetProductType(type: string): Observable<Array<Grocery | Meal | Dessert>> {
     switch (type) {
@@ -1006,7 +1356,7 @@ export class DatabaseService {
         return this.af.collection<Meal>(`/db/deliciasTete/warehouseDesserts`).valueChanges();
         break;
       case 'Platos':
-        return this.af.collection<Dessert>(`/db/deliciasTete/kitchenDishes`).valueChanges();
+        return this.af.collection<Dessert>(`/db/deliciasTete/kitchenRecipes`).valueChanges();
         break;
     }
   }

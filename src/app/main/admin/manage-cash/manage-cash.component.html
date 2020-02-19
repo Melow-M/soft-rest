@@ -56,6 +56,9 @@
                 <table mat-table [dataSource]="dataSource" matSort style="width:100%">
 
                   <ng-container matColumnDef="index" sticky>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">
                     <th mat-header-cell style="padding:0px 25px" *matHeaderCellDef>N°</th>
                     <td mat-cell style="padding:0px 25px" *matCellDef="let raw; let i = index">
                       {{i+1}}
@@ -63,7 +66,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="open">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef matTooltip="Ordenar tabla por estado"
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right" matTooltip="Ordenar tabla por estado"
                       matTooltipPosition="above" mat-sort-header>Estado
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -73,7 +78,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="currentOwner">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef matTooltip="Ordenar tabla por usuario"
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right" matTooltip="Ordenar tabla por usuario"
                       matTooltipPosition="above" mat-sort-header>Usuario
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -82,7 +89,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="name">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef matTooltip="Ordenar tabla por nombre"
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right" matTooltip="Ordenar tabla por nombre"
                       matTooltipPosition="above" mat-sort-header>Caja</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.name}}
@@ -90,7 +99,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="supervisor">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por supervisor" matTooltipPosition="above" mat-sort-header>Supervisor
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -99,14 +110,18 @@
                   </ng-container>
 
                   <ng-container matColumnDef="password">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Contraseña</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Contraseña</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.password}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="lastOpening">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por apertura" matTooltipPosition="above" mat-sort-header>Última apertura
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -117,7 +132,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="lastClosure">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por apertura" matTooltipPosition="above" mat-sort-header>Último cierre
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -128,7 +145,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="actions" stickyEnd>
-                    <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Acciones</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Acciones</th>
                     <td mat-cell style="padding:0px 15px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
                         <button *ngIf="user['role']['adminManageCashEditAction']"
@@ -150,7 +169,7 @@
                     </td>
                   </ng-container>
 
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" style="text-align-last: center;"></tr>
                   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
                 </table>

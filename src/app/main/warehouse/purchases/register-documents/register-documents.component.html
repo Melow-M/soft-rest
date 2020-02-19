@@ -71,12 +71,12 @@
                     </mat-form-field>
 
                     <!-- socialReason -->
-                    <mat-form-field appearance="outline" class="w3-margin-bottom">
+                    <!-- <mat-form-field appearance="outline" class="w3-margin-bottom">
                         <mat-label>Razón social</mat-label>
                         <input formControlName="socialReason" matInput placeholder="Razón social"
                             [value]="socialReason$ | async">
                         <mat-hint>*Requerido</mat-hint>
-                    </mat-form-field>
+                    </mat-form-field> -->
 
                     <!-- Detalle de pago -->
                     <p style="margin-top: 16px"><b>Detalle de Pago</b></p>
@@ -240,7 +240,7 @@
                 <ng-container matColumnDef="Medida">
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Medida</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
-                        {{element.item.unit}}</td>
+                        {{element.unit}}</td>
                     <td mat-footer-cell *matFooterCellDef></td>
                 </ng-container>
                 <ng-container matColumnDef="Cantidad">
@@ -292,7 +292,7 @@
 
 
 <mat-dialog-actions align="end">
-    <button mat-stroked-button class="w3-margin-right" color="warn" mat-dialog-close>Cancelar</button>
-    <button mat-raised-button class="w3-margin-right" color="primary" (click)="onSubmitPurchase()"
+    <button mat-raised-button class="w3-margin-right" color="PRIMARY" mat-dialog-close>Cancelar</button>
+    <button mat-raised-button class="w3-margin-right" color="secondary" (click)="onSubmitPurchase()"
         [disabled]="!documentForm.valid || (savingPurchase$ | async) || !inputsTableDataSource.data.length">Crear</button>
 </mat-dialog-actions>

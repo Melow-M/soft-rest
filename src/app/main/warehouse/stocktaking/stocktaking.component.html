@@ -54,7 +54,8 @@
 
             <span style="flex: auto 1 1"></span>
 
-            <button *ngIf="user['role']['warehouseStocktakingDownloadAction']" type="button" style="margin-right: 16px" color="secondary" mat-raised-button>
+            <button *ngIf="user['role']['warehouseStocktakingDownloadAction']" (click)="downloadXls()"
+                    type="button" style="margin-right: 16px" color="secondary" mat-raised-button>
               <mat-icon style="margin-right: 8px; vertical-align: middle;">cloud_download
               </mat-icon>
               <span style="vertical-align: middle;">Descargar</span>
@@ -64,17 +65,22 @@
           <ng-container *ngIf="items.length; else default">
             <div class="mat-elevation-z8 w3-margin-top" style="border-radius: 10px 10px 10px 10px">
               <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
-                <table mat-table [dataSource]="dataSource" matSort style="width:100%">
+                <table mat-table [dataSource]="dataSource" matSort 
+                  style="width: 100%; text-align: center !important; width: 100%; font-family: Raleway;">
 
                   <ng-container matColumnDef="index" sticky>
-                    <th mat-header-cell style="padding:0px 25px" *matHeaderCellDef>N°</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">N°</th>
                     <td mat-cell style="padding:0px 25px" *matCellDef="let raw; let i = index">
                       {{i+1}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="picture">
-                    <th mat-header-cell *matHeaderCellDef class="w3-center" style="padding:0px 25px">
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">
                       Imagen
                     </th>
                     <td mat-cell *matCellDef="let raw" class="w3-center" style="padding:0px 25px">
@@ -95,7 +101,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="name">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">
                       Nombre </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.name}}
@@ -103,7 +111,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="sku">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por tipo de documento" matTooltipPosition="above" mat-sort-header>SKU
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -112,14 +122,18 @@
                   </ng-container>
 
                   <ng-container matColumnDef="unit">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Medida</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Medida</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.unit}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="stock">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Stock
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Stock
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.stock | number : '.2'}}
@@ -127,7 +141,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="averageCost">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">
                       Costo promedio
                     </th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
@@ -136,7 +152,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="totalValue">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Valor total</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Valor total</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       <span
                         *ngIf="itemsTypeFormControl.value === 'OTROS' || itemsTypeFormControl.value === 'POSTRES'">
@@ -151,7 +169,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="description">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Descripción</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Descripción</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.description ? raw.description : '---'}}
                     </td>
@@ -161,7 +181,9 @@
 
                   <ng-container matColumnDef="price"
                     *ngIf="itemsTypeFormControl.value === 'OTROS' || itemsTypeFormControl.value === 'POSTRES'">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Precio venta</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Precio venta</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{raw.price ? (raw.price | currency : 'S/.') : '---'}}
                     </td>
@@ -169,14 +191,18 @@
 
                   <ng-container matColumnDef="utility"
                     *ngIf="itemsTypeFormControl.value === 'OTROS' || itemsTypeFormControl.value === 'POSTRES'">
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Utilidad</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Utilidad</th>
                     <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                       {{ ((raw.stock * raw.price) - (raw.stock * raw.averageCost)) | currency : 'S/.'}}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="createdBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
                       Creado por</th>
                     <td mat-cell class="w3-small" style="padding:0px 8px" *matCellDef="let raw">
@@ -188,7 +214,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="editedBy">
-                    <th mat-header-cell style="padding:0px 8px; min-width:150px" *matHeaderCellDef
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right"
                       matTooltip="Ordenar tabla por solicitante" matTooltipPosition="above" mat-sort-header>
                       Editado por</th>
                     <td mat-cell class="w3-small" style="padding:0px 8px" *matCellDef="let raw">
@@ -200,7 +228,9 @@
                   </ng-container>
 
                   <ng-container matColumnDef="actions" stickyEnd>
-                    <th mat-header-cell style="padding:0px 8px" *matHeaderCellDef>Acciones</th>
+                    <th mat-header-cell *matHeaderCellDef 
+                                    style="min-width: 150px; background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
+                                    class="w3-center w3-padding w3-border-right">Acciones</th>
                     <td mat-cell class="mat-elevation-z4" style="padding:0px 24px" *matCellDef="let raw">
                       <mat-menu #rawMenu="matMenu">
                         <button *ngIf="user['role']['warehouseStocktakingKardexAction']" mat-menu-item (click)="kardex(raw)" >
@@ -219,7 +249,7 @@
                     </td>
                   </ng-container>
 
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" style="text-align-last: center;"></tr>
                   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
                 </table>

@@ -479,10 +479,13 @@ export class DatabaseService {
 
             //item
             batch.update(itemRef, { 
-              averageCost: await this.af.collection<CostTrend>(`/db/deliciasTete/${typ}/${item.id}/costTrend`, ref => ref.orderBy('createdAt')).valueChanges()
+              /*averageCost: await this.af.collection<CostTrend>(`/db/deliciasTete/${typ}/${item.id}/costTrend`, ref => ref.orderBy('createdAt')).valueChanges()
                             .pipe(take(1), map(res => 
-                              res.find(el => el.id != item.costTrendId).cost
-                            )).toPromise(),
+                              {res.find(el => el.id != item.costTrendId).cost;
+                                console.log('now!!');
+                              }
+                              
+                            )).toPromise(),*/
               stock: firebase.firestore.FieldValue.increment(item.quantity*(-1)),
               editedAt: date,
               editedBy: user

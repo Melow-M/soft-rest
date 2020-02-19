@@ -63,7 +63,8 @@ export class EditNewRecipeDialogComponent implements OnInit {
         quantity: input.quantity,
         sku: input.sku,
         unit: input.unit,
-        index: index
+        index: index,
+        type: input.type
       })
     });
     this.inputTableDataSource.data = aux;
@@ -73,7 +74,8 @@ export class EditNewRecipeDialogComponent implements OnInit {
   initForms(){
     this.productForm = this.fb.group({
       productCategory: [{value: this.data.category, disabled: true }],
-      productName: [{value: this.data.name, disabled: true }]
+      productName: [{value: this.data.name, disabled: true }],
+      price: [{value: this.data.price, disabled: false}, Validators.required],
     })
 
     this.itemForm = this.fb.group({
@@ -137,7 +139,8 @@ export class EditNewRecipeDialogComponent implements OnInit {
         sku: el['sku'],
         quantity: el['quantity'],
         id: el['id'],
-        unit: el['unit']
+        unit: el['unit'],
+        type: el['type']
       });
     });
 
@@ -152,6 +155,8 @@ export class EditNewRecipeDialogComponent implements OnInit {
     })).subscribe();
 
   }
+
+
 
   formatInput(value: string){
     let aux = value;

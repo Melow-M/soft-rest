@@ -13,9 +13,11 @@ export interface Recipe {
     quantity: number;
     id: string;
     unit: string;
+    type: string; //INSUMOS MENAJES OTROS POSTRES
   }>;
   createdAt: Date;
   createdBy: User | null;
   editedAt: Date;
   editedBy: User | null;
+  price: number;
 }

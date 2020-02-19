@@ -27,7 +27,9 @@ export class RecipesComponent implements OnInit {
   inputTableDisplayedColumns: string[] = [
     'index', 'name', 'unit', 'quantity'
   ]
-  @ViewChild('recipeTablePaginator', {static:false}) recipeTablePaginator: MatPaginator;
+  @ViewChild('recipeTablePaginator', {static:false}) set matPaginator(mp: MatPaginator){
+    this.inputTableDataSource.paginator = mp;
+  };
 
   searchForm: FormGroup;
   options: string[] = ['One', 'Two', 'Three'];

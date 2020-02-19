@@ -174,10 +174,9 @@ export class PurchasesComponent implements OnInit {
   }
 
   cancelPurchase(purchase: Payable): void {
+    console.log(purchase);
     this.dialog.open(PurchasesCancelDialogComponent), {
-      data: {
-        purchase: purchase
-      }
+      data: purchase
     }
   }
   downloadXls(): void {

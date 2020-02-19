@@ -8,7 +8,7 @@ import * as firebase from 'firebase/app';
 
 import { shareReplay, tap, combineLatest } from 'rxjs/operators';
 import { Provider } from './models/third-parties/provider.model';
-import { Payable } from './models/admin/payable.model';
+import { Payable, PayableLimited, ItemModel } from './models/admin/payable.model';
 import { Cash } from './models/sales/cash/cash.model';
 import { User } from './models/general/user.model';
 
@@ -16,7 +16,6 @@ import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model'
 import { AuthService } from './auth.service';
 import { take, map } from 'rxjs/operators';
 import { CostTrend } from './models/warehouse/costTrend.model';
-import { Purchase } from './models/warehouse/purchase.model';
 import { Input } from './models/warehouse/input.model';
 import { Household } from './models/warehouse/household.model';
 import { Grocery } from './models/warehouse/grocery.model';
@@ -320,109 +319,50 @@ export class DatabaseService {
   }
 
 
-  onAddPurchase(purchase: Purchase, itemsList: Array<{ kitchenInputId: string; item: KitchenInput; quantity: number; cost: number; }>):
+  onAddPurchase(payableDoc: PayableLimited, itemsList: Array<ItemModel>):
     Observable<firebase.firestore.WriteBatch> {
-    let purchaseRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/accountsPayable`).doc();
-    let purchaseData: Purchase = purchase;
+
+    //Payable
+    let payableRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/accountsPayable`).doc();
+    let payableData: Payable;
     let batch = this.af.firestore.batch()
 
-    let payableData: Payable;
-
+    //costTrend and item
     let costTrendRef: DocumentReference;
     let costTrendData: CostTrend
     let itemRef: DocumentReference;
-    let types: string;
     let typ: string;
+
+    //Kardex
+    let kardexRef: DocumentReference;
+    let kardexData: Kardex;
 
     let date = new Date();
 
     return this.auth.user$.pipe(
       take(1),
       map(user => {
-        //purchaseDoc
-        purchaseData.id = purchaseRef.id;
-        purchaseData.itemsList = itemsList;
-
-        purchaseData.createdAt = new Date();
-        purchaseData.createdBy = user;
-        purchaseData.editedAt = null;
-        purchaseData.editedBy = null;
-        purchaseData.approvedAt = null;
-        purchaseData.approvedBy = null;
-
-        purchaseData.status = 'GRABADO';
-
-        //Se cambio el purchase model por el payable model. Se procede a combertir que cambiar aca
-        //batch.set(purchaseRef, purchaseData);
-
-        let temp = [];
-        purchaseData.itemsList.forEach(el => {
-          temp.push({
-            id: el.item.id,
-            type: el.item.type, //INSUMO, MENAJE, POSTRE, OTROS
-            name: el.item.name,
-            sku: el.item.sku,
-            quantity: el.quantity,
-            amount: el.cost,
-            item: el.item
-          });
-        })
-
+        //payableData
         payableData = {
-          id: purchaseRef.id,
-          documentDate: purchaseData.documentDetails.documentDate,
-          documentType: purchaseData.documentDetails.documentType, // FACTURA, BOLETA, TICKET
-          documentSerial: purchaseData.documentDetails.documentSerial,
-          documentCorrelative: purchaseData.documentDetails.documentCorrelative,
-          provider: {
-            id: purchaseData.documentDetails.provider.id,
-            name: purchaseData.documentDetails.provider.name,
-            ruc: purchaseData.documentDetails.provider.ruc,
-          },
-
-          payments: purchaseData.documentDetails.paymentType == 'CREDITO' ? [{//SOLO CREDITO
-            type: 'PARCIAL',
-            paymentType: purchaseData.documentDetails.paymentType,
-            amount: purchaseData.imports.paidImport,
-            cashReference: null,
-            paidAt: date,
-            paidBy: user,
-          }] : [{
-            type: 'TOTAL',
-            paymentType: purchaseData.documentDetails.paymentType,
-            amount: purchaseData.imports.totalImport,
-            cashReference: null,
-            paidAt: date,
-            paidBy: user,
-          }],
-
-          itemsList: temp,
-
-          creditDate: purchaseData.documentDetails.creditExpirationDate == undefined ? null : purchaseData.documentDetails.creditExpirationDate,
-          paymentDate: null,
-          totalAmount: purchaseData.imports.totalImport,
-          subtotalAmount: purchaseData.imports.subtotalImport == undefined ? null : purchaseData.imports.subtotalImport,
-          igvAmount: purchaseData.imports.igvImport == undefined ? null : purchaseData.imports.igvImport,
-          paymentType: purchaseData.documentDetails.paymentType, // CREDITO, EFECTIVO, TARJETA
-          paidAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.paidImport : purchaseData.imports.totalImport,
-          indebtAmount: purchaseData.documentDetails.paymentType == 'CREDITO' ? purchaseData.imports.indebtImport : null, //no existe por credito
-          status: purchaseData.documentDetails.paymentType == 'CREDITO' ? 'PENDIENTE' : 'PAGADO', // PENDIENTE, PAGADO, ANULADO
+          ...payableDoc,
+          id: payableRef.id,
           createdAt: date,
           createdBy: user,
           editedAt: null,
           editedBy: null,
           approvedAt: null,
-          approvedBy: null,
+          approvedBy: null
         }
 
-        batch.set(purchaseRef, payableData);
+        payableData.payments[0].paidBy = user;
+        payableData.payments[0].paidAt = date;
 
         //
 
         //Cost trends
-        itemsList.forEach(item => {
-          if (item.cost != item.item.cost) {
-            switch (item.item.type) {
+        itemsList.forEach((item: ItemModel, index) => {
+          
+            switch (item.type) {
               case 'Insumos':
                 typ = 'warehouseInputs';
                 break;
@@ -437,19 +377,133 @@ export class DatabaseService {
                 break;
             }
 
-            itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.kitchenInputId);
+            itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.id);
 
-            costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.kitchenInputId}/costTrend`).doc();
+            costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/costTrend`).doc();
             costTrendData = {
-              cost: Math.round(item.cost * 100.0 / item.quantity * 100.0) / 100.0,
+              cost: item.cost,
               id: costTrendRef.id,
               createdAt: date
             };
 
-            batch.update(itemRef, { cost: costTrendData.cost });
+            kardexRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/kardex`).doc();
+            kardexData = {
+              id: kardexRef.id,
+              details: 'Compra: '+payableData.documentType +" "+payableData.documentSerial + "-"+payableData.documentCorrelative+". " +payableData.provider.name,
+              insQuantity: item.quantity,
+              insPrice: item.cost,
+              insTotal: Math.round(item.cost * item.quantity * 100.0) / 100.0,
+              outsQuantity: 0.00,
+              outsPrice: 0.00,
+              outsTotal: 0.00,
+              balanceQuantity: 0.00,
+              balancePrice: 0.00,
+              balanceTotal: 0.00,
+              type: 'ENTRADA', /**@ ENTRADA, SALIDA, INICIAL, REINICIO, ANULADO */
+              createdAt: date,
+              createdBy: user,
+            }
+
+            payableData.itemsList[index].kardexId = kardexRef.id;
+            payableData.itemsList[index].costTrendId = costTrendRef.id;
+
+            payableData.itemsList[index].item = payableData.itemsList[index].item['name'];
+
+            batch.update(itemRef, { 
+              averageCost: costTrendData.cost,
+              stock: firebase.firestore.FieldValue.increment(item.quantity),
+              editedAt: date,
+              editedBy: user
+             });
+
             batch.set(costTrendRef, costTrendData);
-          }
-        })
+            batch.set(kardexRef, kardexData);
+
+          })
+
+          //updating payable data
+          batch.set(payableRef, payableData);
+
+        return batch;
+      }))
+  }
+
+  onDeletePurchase(payableDoc: Payable): Observable<firebase.firestore.WriteBatch> {
+    console.log(payableDoc);
+    let payableTemp: Payable = {...payableDoc}
+
+    //Payable
+    let payableRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/accountsPayable`).doc(payableDoc.id);
+    let batch = this.af.firestore.batch()
+
+    //costTrend and item
+    let costTrendRef: DocumentReference;
+    let itemRef: DocumentReference;
+    let typ: string;
+
+    //Kardex
+    let kardexRef: DocumentReference;
+
+    let date = new Date();
+
+    return this.auth.user$.pipe(
+      take(1),
+      map((user) => {
+        //payableData
+
+        //
+
+        //Cost trends
+        payableTemp.itemsList.forEach(async(item: ItemModel, index) => {
+          
+            switch (item.type) {
+              case 'Insumos':
+                typ = 'warehouseInputs';
+                break;
+              case 'Otros':
+                typ = 'warehouseGrocery';
+                break;
+              case 'Postres':
+                typ = 'warehouseDesserts';
+                break;
+              case 'Menajes':
+                typ = 'warehouseHousehold';
+                break;
+            }
+
+            itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.id);
+
+            costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/costTrend`).doc(item.costTrendId);
+
+            kardexRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/kardex`).doc(item.kardexId);
+
+            //item
+            batch.update(itemRef, { 
+              averageCost: await this.af.collection<CostTrend>(`/db/deliciasTete/${typ}/${item.id}/costTrend`, ref => ref.orderBy('createdAt')).valueChanges()
+                            .pipe(take(1), map(res => 
+                              res.find(el => el.id != item.costTrendId).cost
+                            )).toPromise(),
+              stock: firebase.firestore.FieldValue.increment(item.quantity*(-1)),
+              editedAt: date,
+              editedBy: user
+             });
+
+            //costTrend
+            batch.delete(costTrendRef);
+
+            //kardex
+            batch.update(kardexRef, {
+              type: 'ANULADO'
+            });
+
+          })
+
+          //updating payable data
+          batch.set(payableRef, {
+            editedAt: date,
+            editedBy: user,
+            status: 'ANULADO'
+          });
 
         return batch;
       }))
@@ -1285,7 +1339,7 @@ export class DatabaseService {
         }
       })
       return inputArray.reduce((acc, curr)=> {
-        return acc + curr.cost*recipe.inputs.find(inputRecipe => inputRecipe.id == curr.id).quantity;
+        return acc + curr.averageCost*recipe.inputs.find(inputRecipe => inputRecipe.id == curr.id).quantity;
       },0 )
     }))
   }

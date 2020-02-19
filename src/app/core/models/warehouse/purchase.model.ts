@@ -24,12 +24,7 @@ export interface Purchase {
         indebtImport: number;
     }
 
-    itemsList: Array<{
-        kitchenInputId: string;
-        item: KitchenInput;
-        quantity: number;
-        cost: number;
-    }>;
+    itemsList: Array<ItemModel>;
 
     createdAt: Date;
     createdBy: User;
@@ -40,4 +35,16 @@ export interface Purchase {
 
     status: string;     //GRABADO, APROBADO, ANULADO
 
+}
+
+export interface ItemModel {
+                      //They could be household, grocery, desserts, input
+        type: string;
+        id: string;
+        sku: string;
+        item: string;
+        quantity: number;
+        cost: number;
+        unit: string;
+    
 }

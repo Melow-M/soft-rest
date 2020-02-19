@@ -17,7 +17,8 @@ export class PurchasesShowItemsDialogComponent implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {purchase: Payable}
-  ) { }
+  ) { 
+  }
 
   ngOnInit() {
     this.dataSource.data = this.data.purchase.itemsList;

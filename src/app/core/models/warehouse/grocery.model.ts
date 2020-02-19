@@ -3,15 +3,15 @@ import { User } from '../general/user.model';
 export interface Grocery {
   id: string;
   name: string; // Chocman Doble
-  sku: string; //AP909001
   description: string;
-  picture: string;
+  sku: string; //AP909001
   unit: string; // UND., KG., GR., L., M., PULG. ...
   stock: number;
-  averageCost: number;
   emergencyStock: number;
-  status: string; // DISPONIBLE, INACTIVO
+  averageCost: number;
   price: number;
+  picture: string;
+  status: string; // DISPONIBLE, INACTIVO
   createdAt: Date;
   createdBy: User;
   editedAt: Date;

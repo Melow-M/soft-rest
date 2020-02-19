@@ -8,6 +8,11 @@ import { Observable, of, BehaviorSubject } from 'rxjs';
 import { tap, map, debounceTime, take } from 'rxjs/operators';
 import { PurchasesCreateProviderDialogComponent } from '../purchases-create-provider-dialog/purchases-create-provider-dialog.component';
 import { CreateInputDialogComponent } from '../create-input-dialog/create-input-dialog.component';
+import { Payable, ItemModel, PayableLimited } from 'src/app/core/models/admin/payable.model';
+import { Household } from 'src/app/core/models/warehouse/household.model';
+import { Grocery } from 'src/app/core/models/warehouse/grocery.model';
+import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
+import { Input } from 'src/app/core/models/warehouse/input.model';
 
 @Component({
   selector: 'app-register-documents',
@@ -16,7 +21,7 @@ import { CreateInputDialogComponent } from '../create-input-dialog/create-input-
 })
 export class RegisterDocumentsComponent implements OnInit {
   //Table
-  inputsTableDataSource = new MatTableDataSource([]);
+  inputsTableDataSource = new MatTableDataSource<any>([]);
   inputsTableDisplayedColumns = ['N°', 'Tipo', 'Producto', 'Medida', 'Cantidad', 'Costo', 'Acciones'];
   footerSubtotalDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter', 'descriptionSub', 'subtotal', 'emptyFooter'];
   footerIGVDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter', 'descriptionIGV', 'IGV', 'emptyFooter'];
@@ -142,7 +147,15 @@ export class RegisterDocumentsComponent implements OnInit {
   onAddInput(){
     this.inputsTableDataSource.data = [
       ...this.inputsTableDataSource.data,
-      this.itemsListForm.value
+      {
+        id: <string>(this.itemsListForm.get('kitchenInputId').value),
+        type: <string>(this.itemsListForm.get('type').value),
+        item: <(string | Household | Grocery | Dessert | Input)>(this.itemsListForm.get('item').value),
+        sku: <string>(this.itemsListForm.get('item').value['sku']),
+        quantity: <number>(this.itemsListForm.get('quantity').value),
+        cost: <number>(this.itemsListForm.get('cost').value),
+        unit: <string>(this.itemsListForm.get('item').value['unit']),
+      }
     ];
     this.inputsTableDataSource.paginator = this.inputsTablePaginator;
     this.itemsListForm.reset();
@@ -190,8 +203,48 @@ export class RegisterDocumentsComponent implements OnInit {
       this.documentForm.get('imports.indebtImport').enable();
       this.documentForm.get('imports.totalImport').setValue(this.getTotalCost());
     }
-    console.log(this.documentForm.value);
-    this.dbs.onAddPurchase(this.documentForm.value, this.inputsTableDataSource.data).subscribe(batch => {
+
+    //Constructing doc to upload
+    let payableDoc: PayableLimited;
+    payableDoc = {
+      documentDate: this.documentForm.get('documentDetails.documentDate').value,
+      documentType: this.documentForm.get('documentDetails.documentType').value,
+      documentSerial: this.documentForm.get('documentDetails.documentSerial').value,
+      documentCorrelative: this.documentForm.get('documentDetails.documentCorrelative').value,
+      provider: {
+        id: this.documentForm.get('documentDetails.provider').value['id'],
+        name: this.documentForm.get('documentDetails.provider').value['name'],
+        ruc: this.documentForm.get('documentDetails.provider').value['ruc'],
+      },
+      itemsList: this.inputsTableDataSource.data,
+      payments: this.documentForm.get('documentDetails.paymentType').value == 'CREDITO' ? [{//SOLO CREDITO
+        type: 'PARCIAL',
+        paymentType: this.documentForm.get('documentDetails.paymentType').value,
+        amount: this.documentForm.get('imports.paidImport').value,
+        cashReference: null,
+        paidAt: null,
+        paidBy: null,
+      }] : [{
+        type: 'TOTAL',
+        paymentType: this.documentForm.get('documentDetails.paymentType').value,
+        amount: this.documentForm.get('imports.paidImport').value,
+        cashReference: null,
+        paidAt: null,
+        paidBy: null,
+      }],
+      creditDate: this.documentForm.get('documentDetails.creditExpirationDate').value == undefined ? null : this.documentForm.get('documentDetails.creditExpirationDate').value,
+      paymentDate: null,
+      totalAmount: this.documentForm.get('imports.totalImport').value,
+      subtotalAmount: this.documentForm.get('imports.subtotalImport').value == undefined ? null : this.documentForm.get('documentDetails.subtotalImport').value,
+      igvAmount: this.documentForm.get('imports.igvImport').value == undefined ? null : this.documentForm.get('documentDetails.igvImport').value,
+      paymentType: this.documentForm.get('documentDetails.paymentType').value, // CREDITO, EFECTIVO, TARJETA
+      paidAmount: this.documentForm.get('documentDetails.paymentType').value == 'CREDITO' ? this.documentForm.get('imports.paidImport').value : this.documentForm.get('imports.totalImport').value,
+      indebtAmount: this.documentForm.get('documentDetails.paymentType').value == 'CREDITO' ? this.documentForm.get('imports.indebtImport').value : null,
+      status: this.documentForm.get('documentDetails.paymentType').value == 'CREDITO' ? 'PENDIENTE' : 'PAGADO', // PENDIENTE, PAGADO, ANULADO
+    }
+
+    //Uploading
+    this.dbs.onAddPurchase(payableDoc, this.inputsTableDataSource.data).subscribe(batch => {
       batch.commit().then(() => {
         this.snackbar.open('Se registró la compra exitosamente', 'Aceptar', {duration: 6000});
         this.dialogRef.close();

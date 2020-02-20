@@ -58,7 +58,10 @@ export class CreateNewRecipeDialogComponent implements OnInit {
         validators: Validators.required, 
         asyncValidators: [this.repeatedNameValidator(this.dbs)],
         updateOn: 'blur'
-      }]
+      }],
+      price: [{value: 0, disabled: false}, Validators.required],
+      realPrice: [{value: 0, disabled: true}],
+      percentageDiscount: [{value: 0, disabled: true}]
     })
 
     this.itemForm = this.fb.group({
@@ -118,9 +121,6 @@ export class CreateNewRecipeDialogComponent implements OnInit {
   }
 
   onUploadRecipe(){
-    console.log(this.inputTableDataSource.data);
-  }
-  onUploadRecipe2(){
     let recipe: Recipe = {
       id: null,
       name: this.productForm.get('productName').value.toUpperCase(),
@@ -133,6 +133,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
       createdBy: null,
       editedAt: null,
       editedBy: null,
+      price: this.productForm.get('price').value,
     };
 
     this.inputTableDataSource.data.forEach(el => {
@@ -141,7 +142,8 @@ export class CreateNewRecipeDialogComponent implements OnInit {
         sku: el['item']['sku'],
         quantity: el['quantity'],
         id: el['item']['id'],
-        unit: el['item']['unit']
+        unit: el['item']['unit'],
+        type: el['item']['type']
       });
     });
 
@@ -168,9 +170,26 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     else return value;
   }
 
-  getCostoTotal(){
-    return this.inputTableDataSource.data.reduce((accumulator, currentValue) => Number(accumulator) + Number(currentValue['item']['cost']*currentValue['quantity']),0)
+  getCostoTotal(): number{
+    if(this.inputTableDataSource.data.length){
+      return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
+        return <number>acc + (curr['item']['cost']*curr['quantity'])
+      }, 0);
+    }
+    return 0
   }
+
+  getRealPrice(){
+    return this.getCostoTotal().toFixed(2);
+  }
+
+  getPercentage(){
+    if(!this.productForm.get('price').value || !this.getCostoTotal()){
+      return 0;
+    }
+    return ((this.getCostoTotal()-this.productForm.get('price').value)*100/this.getCostoTotal()).toFixed(2)
+  }
+
 
   repeatedNameValidator(dbs: DatabaseService){
     return(control: AbstractControl): Observable<ValidationErrors|null> => {
@@ -178,7 +197,6 @@ export class CreateNewRecipeDialogComponent implements OnInit {
         //debounceTime(800),
         take(1),
         map( res => {
-          console.log('trying');
           if(!!res.find(recipe => recipe.name.toUpperCase() == this.formatInput(control.value).toUpperCase())){
             return {repeatedName: true}
           }

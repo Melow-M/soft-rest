@@ -1,7 +1,7 @@
 import { Order } from './models/sales/menu/order.model';
 import { Meal } from './models/sales/menu/meal.model';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
 import { AngularFirestoreCollection, AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
@@ -1504,6 +1504,31 @@ export class DatabaseService {
         batch.update(receivableUserRef, receivableUserData)
         return batch;
       }))
+  }
+
+  gettingTotalRealCost(itemsList: Recipe["inputs"]){
+    let itemList: Observable<Input|Household|Grocery|Dessert>[] = [];
+    let itemRef: Observable<Input|Household|Grocery|Dessert>;
+
+    itemsList.forEach(item => {
+      itemRef = this.af.collection<Input>(`/db/deliciasTete/${this.getWarehouseType(item.type)}/${item.id}`).valueChanges().pipe(take(1), map((res)=>(res[0])));
+      itemList.push(itemRef);
+    });
+
+    return forkJoin(itemList).pipe(take(1))
+  }
+
+  getWarehouseType(type: string): string{
+    switch (type) {
+      case 'INSUMOS':
+        return 'warehouseInputs';
+      case 'MENAJES':
+        return 'warehouseHousehold';
+      case 'OTROS':
+        return 'warehouseGrocery';
+      case 'POSTRES':
+        return 'warehouseDesserts';
+    }
   }
 
 }

@@ -8,7 +8,8 @@ import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
 import { DatabaseService } from 'src/app/core/database.service';
 import { switchMap, debounceTime, map } from 'rxjs/operators';
 import { Input } from 'src/app/core/models/warehouse/input.model';
-import { Combo } from 'src/app/core/models/sales/menu/combo.model';
+import { Combo, productComboTable, recipeComboTable, productCombo, recipeCombo } from 'src/app/core/models/sales/menu/combo.model';
+import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 
 @Component({
   selector: 'app-create-new-combo-dialog',
@@ -42,7 +43,9 @@ export class CreateNewComboDialogComponent implements OnInit {
   comboForm: FormGroup;
   itemForm: FormGroup;
 
-  productList$: Observable<Array<Grocery | Meal | Dessert>>;
+  productList$: Observable<Array<Grocery | Recipe | Dessert>>;
+  productsObservable$: Observable<number[]>;
+  productsList: productCombo[] | recipeCombo[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -52,27 +55,13 @@ export class CreateNewComboDialogComponent implements OnInit {
 
   ngOnInit() {
     this.initForms();
-    // this.inputList$= combineLatest(this.dbs.onGetInputs(), this.itemForm.get('item').valueChanges)
-    //   .pipe(map(([inputList, inputForm])=> this.onFilterInputs(inputList, inputForm)),
-    //         startWith(''));
     this.inputTableDataSource.data = [];
 
     this.productList$ = this.itemForm.get('product').valueChanges.pipe(
-      //First tap to initialize table data
-      /*tap((productName: Recipe | string)=>{
-        if(typeof productName=='string'){
-          this.inputTableDataSource.data = [];
-        }
-        else{
-          this.inputTableDataSource.data = productName.inputs;
-        }
-      }),*/
-      //switchMap to get filtered data of options available
       switchMap((productName)=> {
         return this.dbs.onGetProductType(this.itemForm.get('productCategory').value).pipe(
           debounceTime(100), 
           map((productList)=> {
-            console.log(productList);
             return this.filterRecipe(productList, this.itemForm.get('product').value)
           }))
       }));
@@ -113,6 +102,58 @@ export class CreateNewComboDialogComponent implements OnInit {
     }
   }
 
+  //Adding items
+  onAddItem(){
+    let aux: productComboTable[] | recipeComboTable[] = [];
+
+    this.comboForm.get()
+
+    this.productsList.push({
+      name: (<Input>this.itemForm.get('item').value).name,
+      sku: (<Input>this.itemForm.get('item').value).sku,
+      quantity: <number>this.itemForm.get('quantity').value,
+      id: (<Input>this.itemForm.get('item').value).id,
+      unit: (<Input>this.itemForm.get('item').value).unit,
+      type: 'INSUMOS',
+    });
+    
+    this.itemObservable$ = this.dbs.gettingTotalRealCost(this.itemList).pipe(tap(res => {
+      this.itemList.forEach((itemRecipe, index) => {
+          aux.push(
+            {
+              ...itemRecipe,
+              index: index,
+              averageCost: res[index]
+            }
+          )
+      });
+      this.inputTableDataSource.data = aux;
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.itemForm.reset();
+    }));
+  }
+
+  onDeleteItem(item: InputRecipeTable){
+    let aux: InputRecipeTable[] = [];
+
+    this.itemList.splice(item.index, 1);
+
+    this.itemObservable$ = this.dbs.gettingTotalRealCost(this.itemList).pipe(tap(res => {
+      this.itemList.forEach((itemRecipe, index) => {
+          aux.push(
+            {
+              ...itemRecipe,
+              index: index,
+              averageCost: res[index]
+            }
+          )
+      });
+      this.inputTableDataSource.data = aux;
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.itemForm.reset();
+    }));
+  }
+
   async onAddItem(){
     let table = this.inputTableDataSource.data;
     let aux = null;
@@ -136,16 +177,6 @@ export class CreateNewComboDialogComponent implements OnInit {
     this.inputTableDataSource.paginator = this.inputTablePaginator;
     this.itemForm.get('product').setValue(''); this.itemForm.get('quantity').setValue('')
   }
-
-  onDeleteItem(item){
-    let table = this.inputTableDataSource.data;
-    table.splice(item.index, 1);
-    table.forEach((el, index) => {el['index'] = index})
-    this.inputTableDataSource.data = table;
-    this.inputTableDataSource.paginator = this.inputTablePaginator;
-    console.log(item);
-  }
-
 
 
   onUploadCombo(){
@@ -191,7 +222,7 @@ export class CreateNewComboDialogComponent implements OnInit {
     else return value;
   }
 
-  filterRecipe(recipeList: Array<Grocery | Meal | Dessert>, recipeName: Grocery | Meal | Dessert | string){
+  filterRecipe(recipeList: Array<Grocery | Recipe | Dessert>, recipeName: Grocery | Recipe | Dessert | string){
     if(typeof recipeName != 'string'){
       return recipeList.filter(recipe => recipe.name.toUpperCase().includes(recipeName.name.toUpperCase()))
     }

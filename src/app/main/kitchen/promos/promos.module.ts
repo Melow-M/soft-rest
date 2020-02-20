@@ -8,12 +8,14 @@ import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { ConfirmPromoDialogComponent } from './confirm-promo-dialog/confirm-promo-dialog.component';
+import { EditNewPromoDialogComponent } from './edit-new-promo-dialog/edit-new-promo-dialog.component';
 
 @NgModule({
   declarations: [
     PromosComponent,
     CreateNewPromoDialogComponent,
-    ConfirmPromoDialogComponent
+    ConfirmPromoDialogComponent,
+    EditNewPromoDialogComponent
   ],
   imports: [
     PromosRoutingModule,

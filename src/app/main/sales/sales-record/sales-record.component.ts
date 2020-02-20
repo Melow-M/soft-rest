@@ -89,7 +89,7 @@ export class SalesRecordComponent implements OnInit {
               customerName: customer ? customer['type'] == 'NATURAL' ? customer['name'] : customer['businessName'] : ''
             }
           })
-          return array.filter(el => user['displayName'] ? el['createdBy']['displayName'] == user['displayName'] : true)
+          return array.filter(el => user['displayName'] ? el['createdBy']['displayName'] == user['displayName'] : true).reverse()
         }),
         tap(res => {
           this.dataSource.data = res

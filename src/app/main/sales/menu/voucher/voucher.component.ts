@@ -15,6 +15,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export class VoucherComponent implements OnInit {
 
   orders: Array<any>
+  others:Array<any>
   countDishes: Array<any>
   print: Array<any>
 
@@ -87,7 +88,7 @@ export class VoucherComponent implements OnInit {
       }
     }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
 
-    this.orders = this.data['orderList'].filter(el => el['id']).map(el => {
+    this.others = this.data['orderList'].filter(el => !el['category']).map(el => {
       return {
         name: el['name'],
         id: el['id'],
@@ -96,6 +97,8 @@ export class VoucherComponent implements OnInit {
         price: el['price'],
       }
     })
+
+    this.orders = this.data['orderList'].filter(el=>el['category'])
 
     this.print = this.data['orderList'].map(el => {
       console.log(el);
@@ -120,7 +123,10 @@ export class VoucherComponent implements OnInit {
       return el
     }).filter((dish, index, array) => array.findIndex(el => el['description'] === dish['description']) === index)
 
-
+    console.log(this.orders);
+    console.log(this.others);
+    
+    
   }
 
 
@@ -275,7 +281,7 @@ export class VoucherComponent implements OnInit {
           })
         })
 
-        this.orders.forEach(order => {
+        this.others.forEach(order => {
           let groceryRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc(order['id']);
           let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/${order['id']}/kardex`).doc(inputRef.id)
 

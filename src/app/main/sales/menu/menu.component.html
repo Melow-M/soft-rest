@@ -53,6 +53,14 @@
                                     </mat-icon>
                                 </div>
                             </div>
+                            <div *ngIf="plate['products']">
+                                <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                    *ngFor="let plate of plate['products']">
+                                    <span style="width: 7%;"></span>
+                                    <span style="width: 7%;">{{plate['quantity']}}</span>
+                                    <span style="width: 80%;">{{plate['product']['name'] | titlecase}}</span>
+                                </div>
+                            </div>
                         </li>
                     </ol>
                 </div>
@@ -216,25 +224,22 @@
                             <div *ngIf="others.length">
                                 <span class="header">Todos</span>
                                 <div class="flex-div">
-                                    <div *ngFor="let plate of others">
-                                        <div class="box" *ngIf="plate['stock']" (click)="addOrder(plate)">
-                                            <span class="stock"
-                                                *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
-                                            <p>{{plate['name']}}</p>
-                                            <span class="price" *ngIf="plate['price']">S/.
-                                                {{plate['price'] | number: '.2'}}</span>
-                                        </div>
+                                    <div *ngFor="let plate of others" [className]="plate['stock']>0?'box':'box off'"
+                                        (click)="plate['stock']>0?addOrder(plate):''">
+                                        <span class="stock">{{plate['stock'] | number: '2.0'}}</span>
+                                        <p>{{plate['name']}}</p>
+                                        <span class="price" *ngIf="plate['price']">S/.
+                                            {{plate['price'] | number: '.2'}}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Piqueos'">
-                        <div *ngIf="appetizer$ | async as others">
-                            <div *ngIf="others.length">
-                                <span class="header">Todos</span>
+                        <div *ngIf="appetizer$ | async as piqueos">
+                            <div *ngIf="piqueos.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of others[otherTitle.toLowerCase()]"
+                                    <div class="box" *ngFor="let plate of piqueos"
                                         (click)="addOrder(plate)">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>

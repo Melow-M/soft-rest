@@ -4,12 +4,12 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
 import { MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { CreateInputDialogComponent } from '../create-input-dialog/create-input-dialog.component';
 import { Ng2ImgMaxService } from 'ng2-img-max';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { startWith, switchMap, distinctUntilChanged, map, tap, debounceTime, take, finalize } from 'rxjs/operators';
 import { CostTrend } from 'src/app/core/models/warehouse/costTrend.model';
+import { CreateInputDialogComponent } from 'src/app/main/create-input-dialog/create-input-dialog.component';
 
 @Component({
   selector: 'app-stocktaking-edit-dialog',
@@ -51,7 +51,7 @@ export class StocktakingEditDialogComponent implements OnInit {
 
   uploadPercent: Observable<number>;
 
-  typesList: String[] = ['INSUMOS', 'MENAJES', 'POSTRES', 'OTROS'];
+  typesList: String[] = ['INSUMOS', 'INVENTARIO', 'POSTRES', 'OTROS'];
 
   unitAux: { id: string, unit: string };
 
@@ -259,6 +259,7 @@ export class StocktakingEditDialogComponent implements OnInit {
   }
 
   initForm() {
+    console.log(this.data);
     this.inputFormGroup = this.fb.group({
       type: [{ value: this.data.type, disabled: true }, Validators.required],
       name: [this.data.item['name'], Validators.required],

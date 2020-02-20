@@ -186,6 +186,7 @@ export class PurchasesComponent implements OnInit {
     table_xlsx.push(this.headersXlsx);
 
     this.dataSource.data.forEach((element) => {
+      console.log(element);
 
       const temp = [
         this.datePipe.transform(this.getDate(element['createdAt']['seconds']), 'dd/MM/yyyy'),

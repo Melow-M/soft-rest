@@ -53,7 +53,7 @@ export class CreateInputDialogComponent implements OnInit {
 
   uploadPercent: Observable<number>;
 
-  typesList: String[] = ['INSUMOS', 'MENAJES', 'POSTRES', 'OTROS'];
+  typesList: String[] = ['INSUMOS', 'INVENTARIO', 'POSTRES', 'OTROS'];
 
   unitAux: { id: string, unit: string };
 
@@ -339,7 +339,7 @@ export class CreateInputDialogComponent implements OnInit {
             typ = 'warehouseInputs';
             inputData['averageCost'] = this.inputFormGroup.value['cost'];
             break;
-          case 'MENAJES':
+          case 'INVENTARIO':
             typ = 'warehouseHousehold';
             inputData['averageCost'] = this.inputFormGroup.value['cost'];
             break;

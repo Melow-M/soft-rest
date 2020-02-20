@@ -62,7 +62,7 @@ export class RecipesComponent implements OnInit {
           this.inputTableDataSource.data = [];
         }
         else{
-          this.inputTableDataSource.data = productName.inputs;
+          this.inputTableDataSource.data = productName == null ?  [] : productName.inputs;
         }
       }),
       //switchMap to get filtered data of options available
@@ -105,6 +105,7 @@ export class RecipesComponent implements OnInit {
       data: this.searchForm.get('productName').value,
       width: '550px',
     })
+    this.searchForm.reset();
   }
 
   onDeleteRecipe(){
@@ -126,7 +127,8 @@ export class RecipesComponent implements OnInit {
       }
       if(answer.action =="confirm"){
         this.dbs.onDeleteRecipe(this.searchForm.get('productName').value).commit().then(()=> {
-          this.snackBar.open('La receta se eliminó satisfactoriamente.', 'Aceptar')
+          this.snackBar.open('La receta se eliminó satisfactoriamente.', 'Aceptar');
+          this.searchForm.reset();
         }).catch(() => {
           this.snackBar.open('Ocurrió un error. Vuelva a intentarlo.', 'Aceptar')
         });

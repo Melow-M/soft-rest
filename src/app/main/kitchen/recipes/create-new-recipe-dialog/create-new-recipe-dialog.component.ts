@@ -173,7 +173,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
   getCostoTotal(): number{
     if(this.inputTableDataSource.data.length){
       return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
-        return <number>acc + (curr['item']['cost']*curr['quantity'])
+        return <number>acc + (curr['item']['averageCost']*curr['quantity'])
       }, 0);
     }
     return 0

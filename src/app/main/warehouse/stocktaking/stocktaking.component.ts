@@ -6,11 +6,12 @@ import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
 import { startWith, debounceTime, switchMap, map, tap, distinctUntilChanged, take } from 'rxjs/operators';
 import { Household } from 'src/app/core/models/warehouse/household.model';
-import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
 import { StocktakingEditDialogComponent } from './stocktaking-edit-dialog/stocktaking-edit-dialog.component';
 import { StocktakingDeleteConfirmComponent } from './stocktaking-delete-confirm/stocktaking-delete-confirm.component';
 import { StocktakingKardexDialogComponent } from './stocktaking-kardex-dialog/stocktaking-kardex-dialog.component';
 import { StocktakingRemoveHouseholdDialogComponent } from './stocktaking-remove-household-dialog/stocktaking-remove-household-dialog.component';
+import { CreateInputDialogComponent } from 'src/app/main/create-input-dialog/create-input-dialog.component';
+
 import * as XLSX from 'xlsx';
 import { DatePipe } from '@angular/common';
 
@@ -40,7 +41,7 @@ export class StocktakingComponent implements OnInit {
 
   itemsTypes: Array<string> = [
     'INSUMOS',
-    'MENAJES',
+    'INVENTARIO',
     'POSTRES',
     'OTROS'
   ];
@@ -77,7 +78,7 @@ export class StocktakingComponent implements OnInit {
           startWith<any>('INSUMOS'),
           debounceTime(300),
           tap(type => {
-            if (type === 'INSUMOS' || type === 'MENAJES') {
+            if (type === 'INSUMOS' || type === 'INVENTARIO') {
               this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'totalValue', 'description', 'createdBy', 'editedBy', 'actions'];
             } else if (type === 'POSTRES' || type === 'OTROS') {
               this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];

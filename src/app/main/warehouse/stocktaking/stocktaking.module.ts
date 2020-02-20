@@ -6,7 +6,6 @@ import { LazyLoadImageModule, intersectionObserverPreset } from 'ng-lazyload-ima
 
 import { StocktakingComponent } from './stocktaking.component';
 import { StocktakingRoutingModule } from './stocktaking-routing.module';
-import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
 import { MatFormFieldModule, MatAutocompleteModule, MatIconModule, MatButtonModule, MatInputModule, MatSelectModule, MatSnackBarModule, MatDividerModule, MatDatepickerModule, MatDialogModule, MatOptionModule, MatTableModule, MatPaginatorModule, MatProgressBarModule, MatMenuModule, MatCheckboxModule } from '@angular/material';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
@@ -20,7 +19,6 @@ import { StocktakingRemoveHouseholdDialogComponent } from './stocktaking-remove-
 @NgModule({
   declarations: [
     StocktakingComponent,
-    CreateInputDialogComponent,
     StocktakingEditDialogComponent,
     StocktakingDeleteConfirmComponent,
     StocktakingKardexDialogComponent,
@@ -55,7 +53,6 @@ import { StocktakingRemoveHouseholdDialogComponent } from './stocktaking-remove-
     Ng2ImgMaxModule
   ],
   entryComponents: [
-    CreateInputDialogComponent,
     StocktakingEditDialogComponent,
     StocktakingDeleteConfirmComponent,
     StocktakingKardexDialogComponent,

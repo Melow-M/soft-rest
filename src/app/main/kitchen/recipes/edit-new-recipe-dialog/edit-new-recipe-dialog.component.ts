@@ -48,7 +48,7 @@ export class EditNewRecipeDialogComponent implements OnInit {
   ngOnInit() {
     this.initForms();
     this.initTableData();
-    this.inputList = combineLatest(this.dbs.onGetInputs(), this.itemForm.get('item').valueChanges)
+    this.inputList = combineLatest(this.dbs.onGetInputs(), this.itemForm.get('item').valueChanges.pipe(startWith("")))
       .pipe(map(([inputList, inputForm])=> this.onFilterInputs(inputList, inputForm)),
             startWith(''));
     
@@ -130,6 +130,8 @@ export class EditNewRecipeDialogComponent implements OnInit {
   //Change to update
   onUploadRecipe(){
     let recipe: Recipe = this.data;
+
+    recipe.price = this.productForm.get('price').value;
 
     recipe.inputs = [];
 

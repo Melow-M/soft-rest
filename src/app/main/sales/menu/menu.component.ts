@@ -376,7 +376,7 @@ export class MenuComponent implements OnInit {
 
 
   firstOrder(type: string, price: number, name: string) {
-  
+
     let plates = this.plates.filter(el => el['menuType'] == type)
     this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
     this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
@@ -387,7 +387,7 @@ export class MenuComponent implements OnInit {
     let selectSecond = this.second.map(el => el['sold'])
     let selectDessert = this.dessert.map(el => el['sold'])
 
-    
+
     let newDish = {
       type: type,
       price: price,
@@ -399,20 +399,20 @@ export class MenuComponent implements OnInit {
     }
 
     this.order.push(newDish)
-    
+
     this.selectablePlate = newDish
     this.selectIndex = this.order.length - 1
     this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
 
     if (type == 'executive') {
-      this.plates.filter(el => el['id'] == newDish['appetizer']['id'])[0]['sold']++
-      this.plates.filter(el => el['id'] == newDish['mainDish']['id'])[0]['sold']++
-      this.plates.filter(el => el['id'] == newDish['dessert']['id'])[0]['sold']++
+      this.changeDishStok(newDish['appetizer'], 'aum')
+      this.changeDishStok(newDish['mainDish'], 'aum')
+      this.changeDishStok(newDish['dessert'], 'aum')
     } else if (type == 'simple') {
-      this.plates.filter(el => el['id'] == newDish['appetizer']['id'])[0]['sold']++
-      this.plates.filter(el => el['id'] == newDish['mainDish']['id'])[0]['sold']++
+      this.changeDishStok(newDish['appetizer'], 'aum')
+      this.changeDishStok(newDish['mainDish'], 'aum')
     } else {
-      this.plates.filter(el => el['id'] == newDish['mainDish']['id'])[0]['sold']++
+      this.changeDishStok(newDish['mainDish'], 'aum')
     }
 
 
@@ -428,17 +428,17 @@ export class MenuComponent implements OnInit {
       this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
 
       if (!dish['type']) {
-        this.others.filter(el => el['id'] == this.order[index]['id'])[0]['stock']++
+        this.others.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
       } else {
         if (dish['type'] == 'executive') {
-          this.changeDishStok(dish['appetizer'],'aum')
-          this.changeDishStok(dish['mainDish'],'aum')
-          this.changeDishStok(dish['dessert'],'aum')
+          this.changeDishStok(dish['appetizer'], 'dis')
+          this.changeDishStok(dish['mainDish'], 'dis')
+          this.changeDishStok(dish['dessert'], 'dis')
         } else if (dish['type'] == 'simple') {
-          this.changeDishStok(dish['appetizer'],'aum')
-          this.changeDishStok(dish['mainDish'],'aum')
+          this.changeDishStok(dish['appetizer'], 'dis')
+          this.changeDishStok(dish['mainDish'], 'dis')
         } else {
-          this.changeDishStok(dish['dessert'],'aum')
+          this.changeDishStok(dish['dessert'], 'dis')
         }
       }
     }
@@ -448,17 +448,17 @@ export class MenuComponent implements OnInit {
     this.order[index][type] = ''
   }
 
-  changeDishStok(plate, change){
-    if(change=='aum'){
-      this.plates = this.plates.map(el=>{
-        if(el['id']==plate['id']){
+  changeDishStok(plate, change) {
+    if (change == 'aum') {
+      this.plates = this.plates.map(el => {
+        if (el['id'] == plate['id']) {
           el['sold']++
         }
         return el
       })
     } else {
-      this.plates = this.plates.map(el=>{
-        if(el['id']==plate['id']){
+      this.plates = this.plates.map(el => {
+        if (el['id'] == plate['id']) {
           el['sold']--
         }
         return el
@@ -475,7 +475,8 @@ export class MenuComponent implements OnInit {
           typePlate = 'appetizer'
           if (this.order[i][typePlate] != plate) {
             this.plates.filter(el => el['id'] == this.order[i][typePlate]['id'])[0]['sold']--
-            this.plates.filter(el => el['id'] == plate['id'])[0]['sold']++
+            this.changeDishStok(plate,'aum')
+            //this.plates.filter(el => el['id'] == plate['id'])[0]['sold']++
             this.order[i][typePlate] = plate
           }
 

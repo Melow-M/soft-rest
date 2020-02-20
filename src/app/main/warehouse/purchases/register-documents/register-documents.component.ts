@@ -7,12 +7,12 @@ import { DatabaseService } from 'src/app/core/database.service';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { tap, map, debounceTime, take } from 'rxjs/operators';
 import { PurchasesCreateProviderDialogComponent } from '../purchases-create-provider-dialog/purchases-create-provider-dialog.component';
-import { CreateInputDialogComponent } from '../create-input-dialog/create-input-dialog.component';
 import { Payable, ItemModel, PayableLimited } from 'src/app/core/models/admin/payable.model';
 import { Household } from 'src/app/core/models/warehouse/household.model';
 import { Grocery } from 'src/app/core/models/warehouse/grocery.model';
 import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
 import { Input } from 'src/app/core/models/warehouse/input.model';
+import { CreateInputDialogComponent } from 'src/app/main/create-input-dialog/create-input-dialog.component';
 
 @Component({
   selector: 'app-register-documents',
@@ -49,7 +49,7 @@ export class RegisterDocumentsComponent implements OnInit {
   savingPurchase = new BehaviorSubject(false);
   savingPurchase$ = this.savingPurchase.asObservable();
 
-  types: String[] = ['Insumos', 'Otros', 'Postres', 'Menajes'];
+  types: String[] = ['INSUMOS', 'OTROS', 'POSTRES', 'INVENTARIO'];
 
   constructor(
     private fb: FormBuilder,
@@ -103,9 +103,9 @@ export class RegisterDocumentsComponent implements OnInit {
       }
     });
 
-    this.itemsListForm.get('item').valueChanges.subscribe((item: KitchenInput) => {
+    this.itemsListForm.get('item').valueChanges.subscribe((item: Input) => {
       if(item != null){
-        this.itemsListForm.get('cost').setValue(item.cost);
+        this.itemsListForm.get('cost').setValue(item.averageCost);
         this.itemsListForm.get('kitchenInputId').setValue(item.id);
       }
     })
@@ -153,7 +153,7 @@ export class RegisterDocumentsComponent implements OnInit {
         item: <(string | Household | Grocery | Dessert | Input)>(this.itemsListForm.get('item').value),
         sku: <string>(this.itemsListForm.get('item').value['sku']),
         quantity: <number>(this.itemsListForm.get('quantity').value),
-        cost: <number>(this.itemsListForm.get('cost').value),
+        cost: <number>(this.itemsListForm.get('cost').value*this.itemsListForm.get('quantity').value),
         unit: <string>(this.itemsListForm.get('item').value['unit']),
       }
     ];
@@ -181,7 +181,7 @@ export class RegisterDocumentsComponent implements OnInit {
     //   return (accumulator*100.0 + Math.round(currentValue['cost']*100.0))/100.0;
     // }, 0)
     return aux.reduce((accumulator, currentValue) => {
-      return (accumulator + currentValue['cost']*currentValue['quantity']);
+      return (accumulator + currentValue['cost']);
     }, 0)
   }
 
@@ -235,8 +235,8 @@ export class RegisterDocumentsComponent implements OnInit {
       creditDate: this.documentForm.get('documentDetails.creditExpirationDate').value == undefined ? null : this.documentForm.get('documentDetails.creditExpirationDate').value,
       paymentDate: null,
       totalAmount: this.documentForm.get('imports.totalImport').value,
-      subtotalAmount: this.documentForm.get('imports.subtotalImport').value == undefined ? null : this.documentForm.get('documentDetails.subtotalImport').value,
-      igvAmount: this.documentForm.get('imports.igvImport').value == undefined ? null : this.documentForm.get('documentDetails.igvImport').value,
+      subtotalAmount: this.documentForm.get('documentDetails.documentType').value == 'FACTURA' ? this.getSubtotal(): null,
+      igvAmount: this.documentForm.get('documentDetails.documentType').value == 'FACTURA' ? this.getIGV(): null,
       paymentType: this.documentForm.get('documentDetails.paymentType').value, // CREDITO, EFECTIVO, TARJETA
       paidAmount: this.documentForm.get('documentDetails.paymentType').value == 'CREDITO' ? this.documentForm.get('imports.paidImport').value : this.documentForm.get('imports.totalImport').value,
       indebtAmount: this.documentForm.get('documentDetails.paymentType').value == 'CREDITO' ? this.documentForm.get('imports.indebtImport').value : null,

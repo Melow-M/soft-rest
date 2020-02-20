@@ -11,11 +11,6 @@ import { PurchasesCreateProviderDialogComponent } from './purchases-create-provi
 import { PurchasesShowItemsDialogComponent } from './purchases-show-items-dialog/purchases-show-items-dialog.component';
 import { PurchasesShowPaymentsDialogComponent } from './purchases-show-payments-dialog/purchases-show-payments-dialog.component';
 import { PurchasesCancelDialogComponent } from './purchases-cancel-dialog/purchases-cancel-dialog.component';
-import { RegDocumentsCreateInputDialogComponent } from './register-documents/reg-documents-create-input-dialog/reg-documents-create-input-dialog.component';
-import { RegDocumentsCreateGroceryDialogComponent } from './register-documents/reg-documents-create-grocery-dialog/reg-documents-create-grocery-dialog.component';
-import { RegDocumentsCreateHouseholdDialogComponent } from './register-documents/reg-documents-create-household-dialog/reg-documents-create-household-dialog.component';
-import { RegDocumentsCreateDessertsDialogComponent } from './register-documents/reg-documents-create-desserts-dialog/reg-documents-create-desserts-dialog.component';
-import { CreateInputDialogComponent } from './create-input-dialog/create-input-dialog.component';
 import {LazyLoadImageModule, intersectionObserverPreset } from 'ng-lazyload-image';
 import { Ng2ImgMaxModule } from 'ng2-img-max';
 
@@ -28,11 +23,6 @@ import { Ng2ImgMaxModule } from 'ng2-img-max';
     PurchasesShowItemsDialogComponent,
     PurchasesShowPaymentsDialogComponent,
     PurchasesCancelDialogComponent,
-    RegDocumentsCreateInputDialogComponent,
-    RegDocumentsCreateGroceryDialogComponent,
-    RegDocumentsCreateHouseholdDialogComponent,
-    RegDocumentsCreateDessertsDialogComponent,
-    CreateInputDialogComponent
   ],
   imports: [
     CommonModule,
@@ -66,7 +56,6 @@ import { Ng2ImgMaxModule } from 'ng2-img-max';
     PurchasesShowItemsDialogComponent,
     PurchasesShowPaymentsDialogComponent,
     PurchasesCancelDialogComponent,
-    CreateInputDialogComponent
   ],
   providers: [
     

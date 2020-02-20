@@ -216,20 +216,7 @@ export class DatabaseService {
   onGetElements(types: string): Observable<KitchenInput[]> {
     let typ: string;
 
-    switch (types) {
-      case 'Insumos':
-        typ = 'warehouseInputs';
-        break;
-      case 'Otros':
-        typ = 'warehouseGrocery';
-        break;
-      case 'Postres':
-        typ = 'warehouseDesserts';
-        break;
-      case 'Menajes':
-        typ = 'warehouseHousehold';
-        break;
-    }
+    typ = this.getWarehouseType(types);
 
     return this.af.collection<KitchenInput>(`/db/deliciasTete/${typ}/`).valueChanges()
   }
@@ -362,26 +349,13 @@ export class DatabaseService {
         //Cost trends
         itemsList.forEach((item: ItemModel, index) => {
           
-            switch (item.type) {
-              case 'Insumos':
-                typ = 'warehouseInputs';
-                break;
-              case 'Otros':
-                typ = 'warehouseGrocery';
-                break;
-              case 'Postres':
-                typ = 'warehouseDesserts';
-                break;
-              case 'Menajes':
-                typ = 'warehouseHousehold';
-                break;
-            }
+            typ = this.getWarehouseType(item.type);
 
             itemRef = this.af.firestore.collection(`/db/deliciasTete/${typ}`).doc(item.id);
 
             costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/costTrend`).doc();
             costTrendData = {
-              cost: item.cost,
+              cost: Math.round(item.cost*100.0/item.quantity)/100.0,
               id: costTrendRef.id,
               createdAt: date
             };
@@ -391,8 +365,8 @@ export class DatabaseService {
               id: kardexRef.id,
               details: 'Compra: '+payableData.documentType +" "+payableData.documentSerial + "-"+payableData.documentCorrelative+". " +payableData.provider.name,
               insQuantity: item.quantity,
-              insPrice: item.cost,
-              insTotal: Math.round(item.cost * item.quantity * 100.0) / 100.0,
+              insPrice: costTrendData.cost,
+              insTotal: Math.round(costTrendData.cost * item.quantity * 100.0) / 100.0,
               outsQuantity: 0.00,
               outsPrice: 0.00,
               outsTotal: 0.00,
@@ -603,7 +577,7 @@ export class DatabaseService {
         return this.items$;
         break;
 
-      case 'MENAJES':
+      case 'INVENTARIO':
         this.householdsCollection = this.af.collection(`db/deliciasTete/warehouseHousehold`, ref => ref.orderBy('createdAt', 'desc'));
         this.items$ = this.householdsCollection.valueChanges().pipe(shareReplay(1));
         return this.items$;
@@ -635,7 +609,7 @@ export class DatabaseService {
       case 'INSUMOS':
         typ = 'warehouseInputs';
         break;
-      case 'MENAJES':
+      case 'INVENTARIO':
         typ = 'warehouseHousehold';
         break;
       case 'OTROS':
@@ -1522,7 +1496,7 @@ export class DatabaseService {
     switch (type) {
       case 'INSUMOS':
         return 'warehouseInputs';
-      case 'MENAJES':
+      case 'INVENTARIO':
         return 'warehouseHousehold';
       case 'OTROS':
         return 'warehouseGrocery';

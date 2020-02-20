@@ -213,7 +213,7 @@
                             <div *ngIf="others.length">
                                 <span class="header">Todos</span>
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                    <div class="box"  *ngFor="let plate of others" (click)="addOrder(plate)">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>

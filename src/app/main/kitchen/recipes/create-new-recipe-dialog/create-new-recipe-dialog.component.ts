@@ -9,7 +9,7 @@ import { Tool } from 'src/app/core/models/warehouse/tools.model';
 import { DatabaseService } from 'src/app/core/database.service';
 import { map, startWith, tap, debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
 import { MatTableDataSource, MatPaginator, MatSnackBar } from '@angular/material';
-import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
+import { Recipe, InputRecipe, InputRecipeTable } from 'src/app/core/models/kitchen/recipe.model';
 
 @Component({
   selector: 'app-create-new-recipe-dialog',
@@ -19,9 +19,9 @@ import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 })
 export class CreateNewRecipeDialogComponent implements OnInit {
   //Table
-  inputTableDataSource = new MatTableDataSource();
+  inputTableDataSource = new MatTableDataSource<InputRecipeTable>();
   inputTableDisplayedColumns: string[] = [
-    'index', 'itemName', 'itemUnit', 'quantity', 'cost', 'actions'
+    'index', 'itemName', 'itemUnit', 'quantity', 'averageCost', 'totalCost', 'actions'
   ]
   @ViewChild('inputTablePaginator', {static:false}) inputTablePaginator: MatPaginator;
   
@@ -37,6 +37,9 @@ export class CreateNewRecipeDialogComponent implements OnInit {
 
   inputList: Observable<string | Input[]>;
 
+  itemObservable$: Observable<number[]>;
+  itemList: InputRecipe[] = [];
+
   unit:string = 'KG'
   constructor(
     private fb: FormBuilder,
@@ -51,6 +54,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     this.inputTableDataSource.data = [];
   }
 
+  //Form
   initForms(){
     this.productForm = this.fb.group({
       productCategory: [null, Validators.required],
@@ -97,28 +101,76 @@ export class CreateNewRecipeDialogComponent implements OnInit {
 
   }
 
-
   displayFn(input: Input) {
     if (!input) return '';
     return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }
 
+  //Adding items
   onAddItem(){
-    let table = this.inputTableDataSource.data;
-    table.push({...this.itemForm.value, index: this.inputTableDataSource.data.length});
-    this.inputTableDataSource.data = table;
-    this.inputTableDataSource.paginator = this.inputTablePaginator;
-    this.itemForm.reset();
+    let aux: InputRecipeTable[] = [];
+    this.itemList.push({
+      name: (<Input>this.itemForm.get('item').value).name,
+      sku: (<Input>this.itemForm.get('item').value).sku,
+      quantity: <number>this.itemForm.get('quantity').value,
+      id: (<Input>this.itemForm.get('item').value).id,
+      unit: (<Input>this.itemForm.get('item').value).unit,
+      type: 'INSUMOS',
+    });
+    
+    this.itemObservable$ = this.dbs.gettingTotalRealCost(this.itemList).pipe(tap(res => {
+      this.itemList.forEach((itemRecipe, index) => {
+          aux.push(
+            {
+              ...itemRecipe,
+              index: index,
+              averageCost: res[index]/itemRecipe.quantity
+            }
+          )
+      });
+      this.inputTableDataSource.data = aux;
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.itemForm.reset();
+    }));
   }
 
-  onDeleteItem(item){
-    let table = this.inputTableDataSource.data;
-    table.splice(item.index, 1);
-    table.forEach((el, index) => {el['index'] = index})
-    this.inputTableDataSource.data = table;
-    this.inputTableDataSource.paginator = this.inputTablePaginator;
-    console.log(item);
+  onDeleteItem(item: InputRecipeTable){
+    let aux: InputRecipeTable[] = [];
+
+    this.itemList.splice(item.index, 1);
+
+    this.itemObservable$ = this.dbs.gettingTotalRealCost(this.itemList).pipe(tap(res => {
+      this.itemList.forEach((itemRecipe, index) => {
+          aux.push(
+            {
+              ...itemRecipe,
+              index: index,
+              averageCost: res[index]/itemRecipe.quantity
+            }
+          )
+      });
+      this.inputTableDataSource.data = aux;
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.itemForm.reset();
+    }));
   }
+
+  getCostoTotal(): number{
+    if(this.inputTableDataSource.data.length){
+      return this.inputTableDataSource.data.reduce((acc, curr)=> {
+        return acc + (curr.averageCost*curr.quantity)
+      }, 0);
+    }
+    return 0
+  }
+
+  getPercentage(){
+    if(!this.productForm.get('price').value || !this.getCostoTotal()){
+      return 0;
+    }
+    return ((this.getCostoTotal()-this.productForm.get('price').value)*100/this.getCostoTotal())
+  }
+
 
   onUploadRecipe(){
     let recipe: Recipe = {
@@ -138,15 +190,16 @@ export class CreateNewRecipeDialogComponent implements OnInit {
 
     this.inputTableDataSource.data.forEach(el => {
       recipe.inputs.push({
-        name: el['item']['name'],
-        sku: el['item']['sku'],
-        quantity: el['quantity'],
-        id: el['item']['id'],
-        unit: el['item']['unit'],
-        type: el['item']['type']
+        name: el.name,
+        sku: el.sku,
+        quantity: el.quantity,
+        id: el.id,        
+        unit: el.unit,
+        type: el.type
       });
     });
 
+    console.log(recipe);
     this.dbs.onUploadRecipe(recipe).pipe(tap((batch)=> {
       batch.commit().then(()=> {
         this.snackBar.open('La receta fue guardada satisfactoriamente', 'Aceptar');
@@ -170,25 +223,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     else return value;
   }
 
-  getCostoTotal(): number{
-    if(this.inputTableDataSource.data.length){
-      return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
-        return <number>acc + (curr['item']['averageCost']*curr['quantity'])
-      }, 0);
-    }
-    return 0
-  }
 
-  getRealPrice(){
-    return this.getCostoTotal().toFixed(2);
-  }
-
-  getPercentage(){
-    if(!this.productForm.get('price').value || !this.getCostoTotal()){
-      return 0;
-    }
-    return ((this.getCostoTotal()-this.productForm.get('price').value)*100/this.getCostoTotal()).toFixed(2)
-  }
 
 
   repeatedNameValidator(dbs: DatabaseService){

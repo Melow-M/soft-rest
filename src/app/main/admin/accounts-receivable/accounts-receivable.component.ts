@@ -50,29 +50,12 @@ export class AccountsReceivableComponent implements OnInit {
         this.filterFormControl.valueChanges.pipe(startWith<any>(''), debounceTime(300), distinctUntilChanged())
       ).pipe(
         map(([customers, filterKey]) => {
-          let array = customers.map(el => {
-            this.dbs.getListReceivable(el['id']).pipe(
-              map(list => {
-                return list.reduce((a, b) => a + b['amount'], 0)
-              }),
-              take(1)
-            ).subscribe(e => {
-              el['indebtAmount'] = e
-            })
-            return el
-          })
 
-          this.dataSource.data = array;
-          this.dataSource.filter
-          
-          
-          
-          
-          
-          = filterKey;
+          this.dataSource.data = customers;
+          this.dataSource.filter = filterKey;
           this.loadingCustomers.next(false);
 
-          return array;
+          return customers;
         })
       )
   }

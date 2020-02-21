@@ -9,6 +9,7 @@ export interface Transaction {
   ticketType: string;
   paymentType: string;
   expenseType?: string;
+  incomeType?: string;
   // departureType?: string;
   originAccount?: string;
   destinationAccount?: string;

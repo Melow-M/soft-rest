@@ -1,7 +1,6 @@
 import { Router } from '@angular/router';
 import { AuthService } from './../../../core/auth.service';
 import { Order } from './../../../core/models/sales/menu/order.model';
-import { Grocery } from './../../../core/models/warehouse/grocery.model';
 import { DatabaseService } from 'src/app/core/database.service';
 import { map, tap, startWith, take, distinctUntilChanged, debounceTime, filter } from 'rxjs/operators';
 import { Observable, combineLatest, of } from 'rxjs';
@@ -10,7 +9,6 @@ import { VoucherComponent } from './voucher/voucher.component';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { Meal } from 'src/app/core/models/sales/menu/meal.model';
-import { Customer } from 'src/app/core/models/third-parties/customer.model';
 
 @Component({
   selector: 'app-menu',
@@ -176,6 +174,8 @@ export class MenuComponent implements OnInit {
             sold: el['initialStock'] - el['stock']
           }
         })
+        console.log(this.plates.filter(el => el['menuType'] == 'executive'));
+
       })
     )
 
@@ -246,16 +246,72 @@ export class MenuComponent implements OnInit {
           tap(res => this.others = res)
         )
 
-    this.extras$ = this.dbs.onGetRecipes().pipe(
-      map(recipes => {
-        return recipes.filter(el => el['category'] == 'Extras')
+    this.extras$ = combineLatest(
+      this.dbs.onGetRecipes(),
+      this.dbs.onGetElements('INSUMOS')
+    ).pipe(
+      map(([recipes, inputs]) => {
+        let array = recipes.filter(el => el['category'] == 'Extras').map(el => {
+          let required = []
+          el['inputs'].forEach(plate => {
+            required.push(inputs.filter(input => {
+              return input['id'] == plate['id']
+            })
+              .map(al => Math.trunc(al['stock'] / plate['quantity']))[0])
+          })
+          el['stock'] = Math.min(...required)
+          return el
+        })
+        return array
       })
     )
+
     this.combo$ = this.dbs.onGetCombo()
-    this.drinks$ = this.dbs.getDrinks()
+
+    this.drinks$ = combineLatest(
+      this.dbs.onGetRecipes(),
+      this.dbs.onGetElements('INSUMOS')
+    ).pipe(
+      map(([recipes, inputs]) => {
+        let array = recipes.filter(el => el['category'] == 'Bebidas').map(el => {
+          let required = []
+          el['inputs'].forEach(plate => {
+            required.push(inputs.filter(input => {
+              return input['id'] == plate['id']
+            })
+              .map(al => Math.trunc(al['stock'] / plate['quantity']))[0])
+          })
+          el['stock'] = Math.min(...required)
+          return el
+        })
+        return array
+      })
+    )
+
     this.dessert$ = this.dbs.getDesserts()
+
     this.offers$ = this.dbs.onGetOffer()
-    this.appetizer$ = this.dbs.getAppetizers()
+
+    this.appetizer$ = combineLatest(
+      this.dbs.onGetRecipes(),
+      this.dbs.onGetElements('INSUMOS')
+    ).pipe(
+      map(([recipes, inputs]) => {
+        let array = recipes.filter(el => el['category'] == 'Piqueo').map(el => {
+          let required = []
+          el['inputs'].forEach(plate => {
+            required.push(inputs.filter(input => {
+              return input['id'] == plate['id']
+            })
+              .map(al => Math.trunc(al['stock'] / plate['quantity']))[0])
+          })
+          el['stock'] = Math.min(...required)
+          return el
+        })
+        return array
+      })
+    )
+
 
 
   }
@@ -330,6 +386,14 @@ export class MenuComponent implements OnInit {
   }
 
   cancelOrder() {
+    console.log(this.order.length);
+
+    this.order.forEach((el, i) => {
+      console.log(i);
+
+      this.deleteDish(i, true)
+    })
+
     this.entry = []
     this.soup = []
     this.second = []
@@ -346,8 +410,6 @@ export class MenuComponent implements OnInit {
   }
 
   goToCategories() {
-    console.log(this.plates);
-
     this.entry = []
     this.soup = []
     this.second = []
@@ -376,11 +438,11 @@ export class MenuComponent implements OnInit {
 
 
   firstOrder(type: string, price: number, name: string) {
-
     let plates = this.plates.filter(el => el['menuType'] == type)
     this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
     this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
     this.second = plates.filter(el => el['type'] == 'FONDO')
+
     this.dessert = plates.filter(el => el['type'] == 'POSTRE')
     this.selectMenu = type
     let selectEntry = plates.filter(el => el['type'] == 'ENTRADA').map(el => el['sold'])
@@ -420,16 +482,18 @@ export class MenuComponent implements OnInit {
   }
 
 
-  deleteDish(index) {
+  deleteDish(index, all) {
     if (index !== -1) {
       let dish = this.order[index]
+      if (!all) {
+        this.order.splice(index, 1);
+        this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
+      }
 
-      this.order.splice(index, 1);
-      this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
-
-      if (!dish['type']) {
+      if (dish['type'] == 'OTROS') {
         this.others.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
-      } else {
+
+      } else if (!dish['category']) {
         if (dish['type'] == 'executive') {
           this.changeDishStok(dish['appetizer'], 'dis')
           this.changeDishStok(dish['mainDish'], 'dis')
@@ -438,8 +502,11 @@ export class MenuComponent implements OnInit {
           this.changeDishStok(dish['appetizer'], 'dis')
           this.changeDishStok(dish['mainDish'], 'dis')
         } else {
-          this.changeDishStok(dish['dessert'], 'dis')
+          this.changeDishStok(dish['mainDish'], 'dis')
         }
+      } else {
+        console.log('extra');
+
       }
     }
   }
@@ -475,7 +542,7 @@ export class MenuComponent implements OnInit {
           typePlate = 'appetizer'
           if (this.order[i][typePlate] != plate) {
             this.plates.filter(el => el['id'] == this.order[i][typePlate]['id'])[0]['sold']--
-            this.changeDishStok(plate,'aum')
+            this.changeDishStok(plate, 'aum')
             //this.plates.filter(el => el['id'] == plate['id'])[0]['sold']++
             this.order[i][typePlate] = plate
           }
@@ -511,7 +578,6 @@ export class MenuComponent implements OnInit {
   }
 
   addOrder(other) {
-
     let newDish = {
       ...other,
       amount: 1,

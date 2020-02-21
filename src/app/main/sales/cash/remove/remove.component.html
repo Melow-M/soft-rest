@@ -2,7 +2,8 @@
     <h2 style="font-size:1.2em; font-family: Raleway; font-weight: bolder; border-bottom: 1px solid black; padding-bottom: 10px;"
         mat-dialog-title>
         <mat-icon style="vertical-align: middle;">remove_circle</mat-icon>
-        <span class="w3-margin-left">Retirar dinero</span>
+        <span *ngIf="!this.data.edit" class="w3-margin-left">Retirar dinero</span>
+        <span *ngIf="this.data.edit" class="w3-margin-left">Editar Egreso</span>
     </h2>
     <mat-dialog-content>
         <form *ngIf="!confirm" [formGroup]="removeForm">

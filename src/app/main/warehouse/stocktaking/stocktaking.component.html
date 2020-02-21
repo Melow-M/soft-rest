@@ -52,6 +52,8 @@
               <mat-icon>more_vert</mat-icon> Más acciones
             </button>
 
+            <mat-checkbox [formControl]="valoradoFormControl" style="margin-right: 16px" >Valorado</mat-checkbox>
+
             <span style="flex: auto 1 1"></span>
 
             <button *ngIf="user['role']['warehouseStocktakingDownloadAction']" (click)="downloadXls()"

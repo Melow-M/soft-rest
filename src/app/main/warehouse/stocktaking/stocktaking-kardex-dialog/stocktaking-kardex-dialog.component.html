@@ -7,7 +7,7 @@
   <mat-dialog-content class="w3-padding">
     <mat-progress-bar mode="indeterminate" *ngIf="loadingKardex$ | async"></mat-progress-bar>
     <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
-      <ng-container *ngIf="dateAndKardex$ | async as kardex">
+      <ng-container *ngIf="dateAndKardexAndValorado$ | async as kardex">
 
         <div style="display: flex; flex-wrap: wrap; align-items: baseline; margin: 12px 0px;">
           <!-- Date Range -->
@@ -19,7 +19,7 @@
           </mat-form-field>
 
           <!-- Select kardex type -->
-          <mat-checkbox [formControl]="kardexTypeFormControl"> Kardex valorado</mat-checkbox>
+          <mat-checkbox style="margin-right: 16px" [formControl]="valoradoFormControl">Kardex valorado</mat-checkbox>
 
 
           <span style="flex: auto 1 1"></span>

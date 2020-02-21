@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { MatTableDataSource, MatPaginator, MatDialog, MAT_DIALOG_DATA } from '@angular/material';
 import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
@@ -20,7 +20,7 @@ export class StocktakingKardexDialogComponent implements OnInit {
   dateFormControl = new FormControl({ begin: new Date(), end: new Date() });
   kardexTypeFormControl = new FormControl(true);
 
-  displayedColumns: string[] = ['index', 'createdAt', 'details', 'insQuantity', 'insPrice', 'insTotal', 'outsQuantity', 'outsPrice', 'outsTotal', 'balanceQuantity', 'balancePrice', 'balanceTotal'];
+  displayedColumns: string[] = [];
 
   dataSource = new MatTableDataSource();
 
@@ -32,6 +32,10 @@ export class StocktakingKardexDialogComponent implements OnInit {
 
   dateAndKardex$: Observable<Kardex[]>;
   kardex$: Observable<Kardex[]>;
+  dateAndKardexAndValorado$: Observable<any>;
+
+  valoradoFormControl: FormControl = new FormControl(false);
+  valorado$: Observable<boolean>;
 
   constructor(
     public dbs: DatabaseService,
@@ -44,15 +48,26 @@ export class StocktakingKardexDialogComponent implements OnInit {
     const view = this.dbs.getCurrentMonthOfViewDate();
     // this.dataFormGroup.get('date').setValue({begin: view.from, end: new Date()});
 
-    this.dateAndKardex$ =
-      this.dateFormControl.valueChanges
-        .pipe(
-          startWith<any>({ begin: view.from, end: new Date() }),
-          debounceTime(300),
-          switchMap(date => {
-            return this.observeKardex(date.begin, date.end);
-          })
-        );
+    this.valorado$ = this.valoradoFormControl.valueChanges.pipe(startWith(false), tap(valorado => {
+      if(valorado){
+        this.displayedColumns = ['index', 'createdAt', 'details', 'insQuantity', 'insPrice', 'insTotal', 'outsQuantity', 'outsPrice', 'outsTotal', 'balanceQuantity', 'balancePrice', 'balanceTotal'];
+      }
+      else{
+        this.displayedColumns = ['index', 'createdAt', 'details', 'insQuantity', 'outsQuantity', 'balanceQuantity'];
+      }
+    }))
+
+    this.dateAndKardex$ = 
+    this.dateFormControl.valueChanges
+      .pipe(
+        startWith<any>({ begin: view.from, end: new Date() }),
+        debounceTime(300),
+        switchMap(date => {
+          return this.observeKardex(date.begin, date.end);
+        })
+      );
+
+    this.dateAndKardexAndValorado$ = combineLatest(this.dateAndKardex$, this.valorado$);
   }
 
   observeKardex(from: Date, to: Date): Observable<Kardex[]> {

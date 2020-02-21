@@ -1,7 +1,6 @@
 import { Router } from '@angular/router';
 import { AuthService } from './../../../core/auth.service';
 import { Order } from './../../../core/models/sales/menu/order.model';
-import { Grocery } from './../../../core/models/warehouse/grocery.model';
 import { DatabaseService } from 'src/app/core/database.service';
 import { map, tap, startWith, take, distinctUntilChanged, debounceTime, filter } from 'rxjs/operators';
 import { Observable, combineLatest, of } from 'rxjs';
@@ -10,7 +9,6 @@ import { VoucherComponent } from './voucher/voucher.component';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { Meal } from 'src/app/core/models/sales/menu/meal.model';
-import { Customer } from 'src/app/core/models/third-parties/customer.model';
 
 @Component({
   selector: 'app-menu',
@@ -176,6 +174,8 @@ export class MenuComponent implements OnInit {
             sold: el['initialStock'] - el['stock']
           }
         })
+        console.log(this.plates.filter(el => el['menuType'] == 'executive'));
+
       })
     )
 
@@ -287,11 +287,11 @@ export class MenuComponent implements OnInit {
         return array
       })
     )
-    
+
     this.dessert$ = this.dbs.getDesserts()
 
     this.offers$ = this.dbs.onGetOffer()
-    
+
     this.appetizer$ = combineLatest(
       this.dbs.onGetRecipes(),
       this.dbs.onGetElements('INSUMOS')
@@ -386,6 +386,14 @@ export class MenuComponent implements OnInit {
   }
 
   cancelOrder() {
+    console.log(this.order.length);
+
+    this.order.forEach((el, i) => {
+      console.log(i);
+
+      this.deleteDish(i, true)
+    })
+
     this.entry = []
     this.soup = []
     this.second = []
@@ -402,7 +410,6 @@ export class MenuComponent implements OnInit {
   }
 
   goToCategories() {
-    console.log(this.plates);
     this.entry = []
     this.soup = []
     this.second = []
@@ -431,15 +438,10 @@ export class MenuComponent implements OnInit {
 
 
   firstOrder(type: string, price: number, name: string) {
-    console.log(this.plates);
-
-
     let plates = this.plates.filter(el => el['menuType'] == type)
-    console.log(plates);
     this.entry = plates.filter(el => el['type'] == 'ENTRADA' && !el['name'].includes('Caldo'))
     this.soup = plates.filter(el => el['type'] == 'ENTRADA' && el['name'].includes('Caldo'))
     this.second = plates.filter(el => el['type'] == 'FONDO')
-    console.log(this.second);
 
     this.dessert = plates.filter(el => el['type'] == 'POSTRE')
     this.selectMenu = type
@@ -480,14 +482,18 @@ export class MenuComponent implements OnInit {
   }
 
 
-  deleteDish(index) {
+  deleteDish(index, all) {
     if (index !== -1) {
       let dish = this.order[index]
+      if (!all) {
+        this.order.splice(index, 1);
+        this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
+      }
 
-      this.order.splice(index, 1);
-      this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
+      if (dish['type'] == 'OTROS') {
+        this.others.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
 
-      if (!dish['type']) {
+      } else if (!dish['category']) {
         if (dish['type'] == 'executive') {
           this.changeDishStok(dish['appetizer'], 'dis')
           this.changeDishStok(dish['mainDish'], 'dis')
@@ -496,11 +502,11 @@ export class MenuComponent implements OnInit {
           this.changeDishStok(dish['appetizer'], 'dis')
           this.changeDishStok(dish['mainDish'], 'dis')
         } else {
-          this.changeDishStok(dish['dessert'], 'dis')
+          this.changeDishStok(dish['mainDish'], 'dis')
         }
+      } else {
+        console.log('extra');
 
-      } else if (!dish['category']) {
-        this.others.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
       }
     }
   }
@@ -572,8 +578,6 @@ export class MenuComponent implements OnInit {
   }
 
   addOrder(other) {
-    console.log(other);
-
     let newDish = {
       ...other,
       amount: 1,
@@ -589,11 +593,6 @@ export class MenuComponent implements OnInit {
     }
     this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
     other['stock']--
-  }
-
-  addCombo(combo) {
-    console.log(combo);
-
   }
 
   printVoucher() {

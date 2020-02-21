@@ -6,6 +6,7 @@ import { AuthService } from './../../../../core/auth.service';
 import { DatabaseService } from './../../../../core/database.service';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-voucher',
@@ -14,9 +15,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 })
 export class VoucherComponent implements OnInit {
 
-  orders: Array<any>
-  others:Array<any>
-  countDishes: Array<any>
+  orders: Array<any> = []
+  others: Array<any> = []
+  countDishes: Array<any> = []
   print: Array<any>
 
   constructor(
@@ -28,7 +29,7 @@ export class VoucherComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    let dishes = this.data['orderList'].filter(el => el['type']).map(el => {
+    let dishes = this.data['orderList'].filter(el => el['type'] == 'simple' || el['type'] == 'executive' || el['type'] == 'second').map(el => {
       let array = []
       switch (el['type']) {
         case 'executive':
@@ -75,20 +76,25 @@ export class VoucherComponent implements OnInit {
       }
     })
 
-    this.countDishes = dishes.reduce((a, b) => a.concat(b), []).map((el, index, array) => {
-      let counter = 0
-      array.forEach(al => {
-        if (al['id'] == el['id']) {
-          counter++
-        }
-      })
-      return {
-        ...el,
-        amount: counter
-      }
-    }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
+    console.log(dishes);
 
-    this.others = this.data['orderList'].filter(el => !el['category']).map(el => {
+    if (dishes.length) {
+      this.countDishes = dishes.reduce((a, b) => a.concat(b), []).map((el, index, array) => {
+        let counter = 0
+        array.forEach(al => {
+          if (al['id'] == el['id']) {
+            counter++
+          }
+        })
+        return {
+          ...el,
+          amount: counter
+        }
+      }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
+    }
+
+
+    this.others = this.data['orderList'].filter(el => el['type'] == 'OTROS').map(el => {
       return {
         name: el['name'],
         id: el['id'],
@@ -98,7 +104,7 @@ export class VoucherComponent implements OnInit {
       }
     })
 
-    this.orders = this.data['orderList'].filter(el=>el['category'])
+    this.orders = this.data['orderList'].filter(el => el['category'])
 
     this.print = this.data['orderList'].map(el => {
       console.log(el);
@@ -125,8 +131,8 @@ export class VoucherComponent implements OnInit {
 
     console.log(this.orders);
     console.log(this.others);
-    
-    
+
+
   }
 
 
@@ -235,8 +241,9 @@ export class VoucherComponent implements OnInit {
           type: 'Ingreso',
           description: 'Venta ' + this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
           amount: this.data['total'],
-          status: this.data['receivable'] ? 'DEUDA' : 'PAGADO',
+          status: 'PAGADO',
           ticketType: this.data['documentType'],
+          incomeType: 'VENTA',
           paymentType: this.data['paymentType'].toUpperCase(),
           editedBy: user,
           editedAt: new Date(),
@@ -263,27 +270,32 @@ export class VoucherComponent implements OnInit {
 
           batch.set(receivableRef, receivableData)
 
-          batch.update(receivableUserRef,{
-            indebtAmount: this.data['total']
+          batch.update(receivableUserRef, {
+            indebtAmount: firebase.firestore.FieldValue.increment(this.data['total'])
           })
+        } else {
+          batch.set(transactionRef, transactionData)
         }
 
         batch.set(inputRef, inputData);
 
-        batch.set(transactionRef, transactionData)
 
+        if (this.countDishes.length) {
+          this.countDishes.forEach(dish => {
+            let dishRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(dish['id']);
+            console.log(dish);
 
-        this.countDishes.forEach(dish => {
-          let dishRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(dish['id']);
-
-          batch.update(dishRef, {
-            stock: dish['stock'] - dish['amount']
+            batch.update(dishRef, {
+              stock: firebase.firestore.FieldValue.increment(dish['amount'] * (-1))
+            })
           })
-        })
+        }
+
 
         this.others.forEach(order => {
           let groceryRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc(order['id']);
           let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/${order['id']}/kardex`).doc(inputRef.id)
+          console.log(order);
 
           let inputKardex = {
             id: inputRef.id,
@@ -303,15 +315,15 @@ export class VoucherComponent implements OnInit {
           }
 
           batch.update(groceryRef, {
-            stock: order['stock'] - order['amount']
+            stock: firebase.firestore.FieldValue.increment(order['amount'] * (-1))
           })
 
           batch.set(kardexRef, inputKardex)
         })
 
 
-        this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
-        
+        //this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
+
         batch.commit().then(() => {
           console.log('orden guardada');
           this.dialog.close()

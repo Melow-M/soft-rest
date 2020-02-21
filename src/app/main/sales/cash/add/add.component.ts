@@ -22,6 +22,8 @@ export class AddComponent implements OnInit {
 
   addForm: FormGroup
 
+  users$:Observable<any>
+
   constructor(
     public dbs: DatabaseService,
     public auth: AuthService,
@@ -30,11 +32,12 @@ export class AddComponent implements OnInit {
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data
   ) {
-    this.dbs.getUsers()
   }
 
   ngOnInit() {
     this.createForm()
+
+    this.users$ = this.dbs.getUsers()
   }
 
   createForm() {

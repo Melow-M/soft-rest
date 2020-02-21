@@ -28,12 +28,15 @@ export class StocktakingComponent implements OnInit {
 
   itemsTypeFormControl = new FormControl('INSUMOS');
   itemFormControl = new FormControl();
+  valoradoFormControl: FormControl = new FormControl(false);
 
   displayedColumns: string[] = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
 
   dataSource = new MatTableDataSource();
 
   defaultImage = "../../../../assets/images/default-image.jpg";
+
+  
 
   @ViewChild(MatPaginator, { static: false }) set content(paginator: MatPaginator) {
     this.dataSource.paginator = paginator;
@@ -72,19 +75,26 @@ export class StocktakingComponent implements OnInit {
 
   ngOnInit() {
 
-    this.typeAndItems$ =
-      this.itemsTypeFormControl.valueChanges
+    this.typeAndItems$ = combineLatest(this.itemsTypeFormControl.valueChanges.pipe(startWith('INSUMOS')), this.valoradoFormControl.valueChanges.pipe(startWith(false)))
         .pipe(
-          startWith<any>('INSUMOS'),
           debounceTime(300),
-          tap(type => {
-            if (type === 'INSUMOS' || type === 'INVENTARIO') {
-              this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'totalValue', 'description', 'createdBy', 'editedBy', 'actions'];
-            } else if (type === 'POSTRES' || type === 'OTROS') {
-              this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
+          tap(([type, valorado]) => {
+            if(valorado){
+              if (type === 'INSUMOS' || type === 'INVENTARIO') {
+                this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'totalValue', 'description', 'createdBy', 'editedBy', 'actions'];
+              } else if (type === 'POSTRES' || type === 'OTROS') {
+                this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
+              }
+            }
+            else{
+              if (type === 'INSUMOS' || type === 'INVENTARIO') {
+                this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'description', 'createdBy', 'editedBy', 'actions'];
+              } else if (type === 'POSTRES' || type === 'OTROS') {
+                this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'description', 'createdBy', 'editedBy', 'actions'];
+              }
             }
           }),
-          switchMap(type => {
+          switchMap(([type, valorado]) => {
             return this.observeItems(type);
           })
         );

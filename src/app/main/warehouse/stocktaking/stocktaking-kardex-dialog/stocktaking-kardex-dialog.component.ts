@@ -6,6 +6,9 @@ import { DatabaseService } from 'src/app/core/database.service';
 import { AuthService } from 'src/app/core/auth.service';
 import { startWith, debounceTime, switchMap, tap } from 'rxjs/operators';
 import { Kardex } from 'src/app/core/models/warehouse/kardex.model';
+import * as XLSX from 'xlsx';
+import { DatePipe } from '@angular/common';
+
 
 @Component({
   selector: 'app-stocktaking-kardex-dialog',
@@ -40,7 +43,8 @@ export class StocktakingKardexDialogComponent implements OnInit {
   constructor(
     public dbs: DatabaseService,
     public auth: AuthService,
-    @Inject(MAT_DIALOG_DATA) public data: { name: string, type: string, id: string }
+    @Inject(MAT_DIALOG_DATA) public data: { name: string, type: string, id: string },
+    private datePipe: DatePipe
   ) { }
 
   ngOnInit() {
@@ -109,6 +113,79 @@ export class StocktakingKardexDialogComponent implements OnInit {
 
     console.log(kardex);
     return kardex
+  }
+
+  downloadXls(): void {
+    let table_xlsx: any[] = [];
+    let dateRange;
+
+    let headerXlsx = this.valoradoFormControl.value ? 
+      [
+        'Fecha',
+        'Detalle',
+        'E. Cantidad',
+        'E. Pr./Uni',
+        'E. Total',
+        'S. Cantidad',
+        'S. Pr./Uni',
+        'S. Total',
+        'Sal. Cantidad',
+        'Sal. Pr./Uni',
+        'Sal. Total',
+      ]
+      :
+      [
+        'Fecha',
+        'Detalle',
+        'E. Cantidad',
+        'S. Cantidad',
+        'Sal. Cantidad',
+      ];
+
+    table_xlsx.push(headerXlsx);
+
+    this.dataSource.data.forEach((element: Kardex) => {
+
+      const temp = this.valoradoFormControl.value ?  
+      [
+        this.datePipe.transform(this.getDate(element['createdAt']['seconds']), 'dd/MM/yyyy'),        
+        element.details,
+        element.insQuantity,
+        element.insPrice,
+        element.insTotal,
+        element.outsQuantity,
+        element.outsPrice,
+        element.outsTotal,
+        element.balanceQuantity,
+        element.balancePrice,
+        element.balanceTotal
+      ]
+        :
+      [
+        this.datePipe.transform(this.getDate(element['createdAt']['seconds']), 'dd/MM/yyyy'),        
+        element.details,
+        element.insQuantity,
+        element.outsQuantity,
+        element.balanceQuantity,
+      ];
+
+      table_xlsx.push(temp);
+    })
+
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(table_xlsx);
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'kardex');
+
+    const name = 'kardex.xlsx';
+
+    XLSX.writeFile(wb, name);
+  }
+
+  getDate(seconds: number){
+    let date = new Date(1970);
+    date.setSeconds(seconds);
+    return date.valueOf();
   }
 
 }

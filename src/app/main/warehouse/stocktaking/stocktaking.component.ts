@@ -30,7 +30,7 @@ export class StocktakingComponent implements OnInit {
   itemFormControl = new FormControl();
   valoradoFormControl: FormControl = new FormControl(false);
 
-  displayedColumns: string[] = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
+  displayedColumns: string[] = [];
 
   dataSource = new MatTableDataSource();
 
@@ -48,19 +48,6 @@ export class StocktakingComponent implements OnInit {
     'POSTRES',
     'OTROS'
   ];
-
-    //Excel
-    headersXlsx: string[] = [
-      'Nombre',
-      'SKU',
-      'Medida',
-      'Stock',
-      'Costo promedio',
-      'Valor Total',
-      'Descripción',
-      'Creado por',
-      'Editado por'
-    ]
 
   items$: Observable<(any)[]>;
   typeAndItems$: Observable<(any)[]>;
@@ -190,11 +177,36 @@ export class StocktakingComponent implements OnInit {
     console.log(this.dataSource.data);
     let table_xlsx: any[] = [];
     let dateRange;
-    table_xlsx.push(this.headersXlsx);
+
+    let headerXlsx = this.valoradoFormControl.value ? 
+      [
+        'Nombre',
+        'SKU',
+        'Medida',
+        'Stock',
+        'Costo promedio',
+        'Valor Total',
+        'Descripción',
+        'Creado por',
+        'Editado por'
+      ]
+      :
+      [
+        'Nombre',
+        'SKU',
+        'Medida',
+        'Stock',
+        'Descripción',
+        'Creado por',
+        'Editado por'
+      ];
+
+    table_xlsx.push(headerXlsx);
 
     this.dataSource.data.forEach((element) => {
 
-      const temp = [
+      const temp = this.valoradoFormControl.value ?  
+      [
         element['name'],
         element['sku'],
         element['unit'],
@@ -204,7 +216,18 @@ export class StocktakingComponent implements OnInit {
         element['description'],
         element['createdBy']['displayName'],
         !!element['editedBy'] ? element['editedBy']['displayName'] : "",
+      ]
+        :
+      [
+        element['name'],
+        element['sku'],
+        element['unit'],
+        element['stock'],
+        element['description'],
+        element['createdBy']['displayName'],
+        !!element['editedBy'] ? element['editedBy']['displayName'] : "",
       ];
+
       table_xlsx.push(temp);
     })
 

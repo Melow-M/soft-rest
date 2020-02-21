@@ -35,10 +35,17 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="amount" stickyEnd>
-        <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Importe</th>
+      <ng-container matColumnDef="averageCost" stickyEnd>
+        <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>C.U. </th>
         <td mat-cell style="padding:0px 15px" *matCellDef="let raw">
-          {{raw.cost | currency : 'S/.'}}
+          {{raw.averageCost | currency : 'S/.'}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="totalCost" stickyEnd>
+        <th mat-header-cell style="padding:0px 15px" *matHeaderCellDef>Total</th>
+        <td mat-cell style="padding:0px 15px" *matCellDef="let raw">
+          {{raw.quantity * raw.averageCost | currency : 'S/.'}}
         </td>
       </ng-container>
 

@@ -180,13 +180,11 @@ export class PurchasesComponent implements OnInit {
     });
   }
   downloadXls(): void {
-    console.log(this.dataSource.data);
     let table_xlsx: any[] = [];
     let dateRange;
     table_xlsx.push(this.headersXlsx);
 
     this.dataSource.data.forEach((element) => {
-      console.log(element);
 
       const temp = [
         this.datePipe.transform(this.getDate(element['createdAt']['seconds']), 'dd/MM/yyyy'),
@@ -201,7 +199,7 @@ export class PurchasesComponent implements OnInit {
         element['paymentType'],
         element['status'],
         !!element['creditDate'] ? (this.datePipe.transform(this.getDate(element['creditDate']['seconds']), 'dd/MM/yyyy')) : '---',
-        !!element['creditDate'] ? (this.datePipe.transform(this.getDate(element['paymentDate']['seconds']), 'dd/MM/yyyy')) : '---',
+        !!element['paymentDate'] ? (this.datePipe.transform(this.getDate(element['paymentDate']['seconds']), 'dd/MM/yyyy')) : '---',
         !!element['paidAmount'] ? ("S/."+element['paidAmount']):'---',
         !!element['indebtAmount'] ? ("S/."+element['indebtAmount']):'---',
         !!element['createdBy'] ? element['createdBy']['displayName']:'---',

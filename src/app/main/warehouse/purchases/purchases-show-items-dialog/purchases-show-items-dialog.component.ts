@@ -9,7 +9,7 @@ import { Payable } from 'src/app/core/models/admin/payable.model';
 })
 export class PurchasesShowItemsDialogComponent implements OnInit {
 
-  displayedColumns: string[] = ['index', 'sku', 'name', 'quantity', 'amount'];
+  displayedColumns: string[] = ['index', 'sku', 'name', 'quantity', 'averageCost', 'totalCost'];
 
   dataSource = new MatTableDataSource();
 

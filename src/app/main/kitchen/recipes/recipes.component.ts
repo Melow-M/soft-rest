@@ -101,11 +101,11 @@ export class RecipesComponent implements OnInit {
   }
 
   onEditRecipe(){
-    this.dialog.open(EditNewRecipeDialogComponent, {
+    this.dialogRef = this.dialog.open(EditNewRecipeDialogComponent, {
       data: this.searchForm.get('productName').value,
       width: '550px',
     })
-    this.searchForm.reset();
+    this.dialogRef.afterClosed().subscribe(res => {this.searchForm.reset()});
   }
 
   onDeleteRecipe(){

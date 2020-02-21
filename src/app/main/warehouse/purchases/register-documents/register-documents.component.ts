@@ -22,10 +22,10 @@ import { CreateInputDialogComponent } from 'src/app/main/create-input-dialog/cre
 export class RegisterDocumentsComponent implements OnInit {
   //Table
   inputsTableDataSource = new MatTableDataSource<any>([]);
-  inputsTableDisplayedColumns = ['N°', 'Tipo', 'Producto', 'Medida', 'Cantidad', 'Costo', 'Acciones'];
-  footerSubtotalDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter', 'descriptionSub', 'subtotal', 'emptyFooter'];
-  footerIGVDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter', 'descriptionIGV', 'IGV', 'emptyFooter'];
-  footerTotalDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter', 'descriptionTotal', 'total', 'emptyFooter'];
+  inputsTableDisplayedColumns = ['N°', 'Tipo', 'Producto', 'Medida', 'Cantidad', 'averageCost', 'totalCost', 'Acciones'];
+  footerSubtotalDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter','emptyFooter',  'descriptionSub', 'subtotal', 'emptyFooter'];
+  footerIGVDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter','emptyFooter',  'descriptionIGV', 'IGV', 'emptyFooter'];
+  footerTotalDisplayedColumns = ['emptyFooter', 'emptyFooter', 'emptyFooter', 'emptyFooter','emptyFooter',  'descriptionTotal', 'total', 'emptyFooter'];
 
   //Paginators
   @ViewChild('inputsTablePaginator', {static: false}) inputsTablePaginator: MatPaginator;
@@ -153,7 +153,8 @@ export class RegisterDocumentsComponent implements OnInit {
         item: <(string | Household | Grocery | Dessert | Input)>(this.itemsListForm.get('item').value),
         sku: <string>(this.itemsListForm.get('item').value['sku']),
         quantity: <number>(this.itemsListForm.get('quantity').value),
-        cost: <number>(this.itemsListForm.get('cost').value*this.itemsListForm.get('quantity').value),
+        averageCost: <number>(this.itemsListForm.get('cost').value)/<number>(this.itemsListForm.get('quantity').value),
+        totalCost: <number>(this.itemsListForm.get('cost').value),
         unit: <string>(this.itemsListForm.get('item').value['unit']),
       }
     ];
@@ -177,17 +178,30 @@ export class RegisterDocumentsComponent implements OnInit {
 
   getTotalCost(){
     let aux = this.inputsTableDataSource.data;
-    // return aux.reduce((accumulator, currentValue) => {
-    //   return (accumulator*100.0 + Math.round(currentValue['cost']*100.0))/100.0;
-    // }, 0)
     return aux.reduce((accumulator, currentValue) => {
-      return (accumulator + currentValue['cost']);
+      return (accumulator + currentValue['totalCost']);
     }, 0)
   }
 
 
   onSubmitPurchase(){
     this.savingPurchase.next(true);
+
+    let aux: ItemModel[] = [];
+
+    this.inputsTableDataSource.data.forEach(el => {
+      aux.push({
+        id: el['id'],
+        type: el['type'],
+        item: el['item'],
+        sku: el['sku'],
+        quantity: el['quantity'],
+        averageCost: el['averageCost'],
+        unit: el['unit']
+      });
+    })
+
+
     if(this.documentForm.get('documentDetails.documentType').value == 'FACTURA'){
       this.documentForm.get('imports.subtotalImport').enable();
       this.documentForm.get('imports.igvImport').enable();
@@ -216,7 +230,7 @@ export class RegisterDocumentsComponent implements OnInit {
         name: this.documentForm.get('documentDetails.provider').value['name'],
         ruc: this.documentForm.get('documentDetails.provider').value['ruc'],
       },
-      itemsList: this.inputsTableDataSource.data,
+      itemsList: aux,
       payments: this.documentForm.get('documentDetails.paymentType').value == 'CREDITO' ? [{//SOLO CREDITO
         type: 'PARCIAL',
         paymentType: this.documentForm.get('documentDetails.paymentType').value,
@@ -244,7 +258,7 @@ export class RegisterDocumentsComponent implements OnInit {
     }
 
     //Uploading
-    this.dbs.onAddPurchase(payableDoc, this.inputsTableDataSource.data).subscribe(batch => {
+    this.dbs.onAddPurchase(payableDoc, aux).subscribe(batch => {
       batch.commit().then(() => {
         this.snackbar.open('Se registró la compra exitosamente', 'Aceptar', {duration: 6000});
         this.dialogRef.close();

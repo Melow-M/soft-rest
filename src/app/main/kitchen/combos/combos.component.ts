@@ -67,6 +67,15 @@ export class CombosComponent implements OnInit {
   onCreateNewCombo(){
     this.dialog.open(CreateNewComboDialogComponent, {
       width: '550px',
+      data: null
+    })
+  }
+
+  onEditCombo(combo: Combo){
+    console.log(combo);
+    this.dialog.open(CreateNewComboDialogComponent, {
+      width: '550px',
+      data: combo
     })
   }
 
@@ -107,7 +116,7 @@ export class CombosComponent implements OnInit {
       const temp = [
         this.datePipe.transform(this.getDate(element.createdAt['seconds']), 'dd/MM/yyyy'),
         element.name,
-        element.products.map(el => el.product.name).join(', '),
+        element.products.map(el => el.name).join(', '),
         element.state,
         dateRange,
         'S/.'+element.realPrice.toFixed(2),

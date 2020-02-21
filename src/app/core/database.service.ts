@@ -1,12 +1,12 @@
 import { Order } from './models/sales/menu/order.model';
 import { Meal } from './models/sales/menu/meal.model';
 import { Injectable } from '@angular/core';
-import { Observable, of, forkJoin } from 'rxjs';
+import { Observable, of, forkJoin, combineLatest } from 'rxjs';
 import { Customer } from './models/third-parties/customer.model';
 import { AngularFirestoreCollection, AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
 
-import { shareReplay, tap, combineLatest, startWith } from 'rxjs/operators';
+import { shareReplay, tap, startWith } from 'rxjs/operators';
 import { Provider } from './models/third-parties/provider.model';
 import { Payable, PayableLimited, ItemModel } from './models/admin/payable.model';
 import { Cash } from './models/sales/cash/cash.model';
@@ -24,7 +24,7 @@ import { Kardex } from './models/warehouse/kardex.model';
 import { Recipe } from './models/kitchen/recipe.model';
 import * as jsPDF from 'jspdf';
 import { Promo } from './models/sales/menu/promo.model';
-import { Combo } from './models/sales/menu/combo.model';
+import { Combo, elementCombo, recipeCombo, productCombo } from './models/sales/menu/combo.model';
 import { Role } from './models/general/role.model';
 import { ReceivableUser } from './models/admin/receivableUser.model';
 
@@ -355,7 +355,7 @@ export class DatabaseService {
 
             costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/costTrend`).doc();
             costTrendData = {
-              cost: Math.round(item.cost*100.0/item.quantity)/100.0,
+              cost: Math.round(item.averageCost*100.0)/100.0,
               id: costTrendRef.id,
               createdAt: date
             };
@@ -1321,16 +1321,16 @@ export class DatabaseService {
     }))
   }
 
-  onGetProductType(type: string): Observable<Array<Grocery | Meal | Dessert>> {
+  onGetProductType(type: string): Observable<Array<Grocery | Recipe | Dessert>> {
     switch (type) {
       case 'Otros':
         return this.af.collection<Grocery>(`/db/deliciasTete/warehouseGrocery`).valueChanges();
         break;
       case 'Postres':
-        return this.af.collection<Meal>(`/db/deliciasTete/warehouseDesserts`).valueChanges();
+        return this.af.collection<Dessert>(`/db/deliciasTete/warehouseDesserts`).valueChanges();
         break;
       case 'Platos':
-        return this.af.collection<Dessert>(`/db/deliciasTete/kitchenRecipes`).valueChanges();
+        return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`).valueChanges();
         break;
     }
   }
@@ -1348,6 +1348,23 @@ export class DatabaseService {
         promoData.id = promoRef.id;
         promoData.editedAt = null;
         promoData.editedBy = null;
+
+        batch.set(promoRef, promoData);
+
+        return batch;
+      }))
+  }
+
+  onEditOffer(promo: Promo): Observable<firebase.firestore.WriteBatch> {
+    let promoRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/offers`).doc(promo.id);
+    let promoData: Promo = {...promo};
+    let date = new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        promoData.editedAt = date;
+        promoData.editedBy = user;
 
         batch.set(promoRef, promoData);
 
@@ -1399,7 +1416,7 @@ export class DatabaseService {
 
   onCreateCombo(combo: Combo): Observable<firebase.firestore.WriteBatch> {
     let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc();
-    let comboData: Combo = combo;
+    let comboData: Combo = {...combo};
     let date = new Date();
     let batch = this.af.firestore.batch();
 
@@ -1416,6 +1433,24 @@ export class DatabaseService {
         return batch;
       }))
   }
+
+  onEditCombo(combo: Combo): Observable<firebase.firestore.WriteBatch> {
+    let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc(combo.id);
+    let comboData: Combo = {...combo};
+    let date = new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        comboData.editedAt = date;
+        comboData.editedBy = user;
+
+        batch.set(comboRef, comboData);
+
+        return batch;
+      }))
+  }
+
   changeComboState(combo: Combo, newState: string): Observable<firebase.firestore.WriteBatch> {
     let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc(combo.id);
     let comboData: Combo = combo;
@@ -1480,20 +1515,31 @@ export class DatabaseService {
       }))
   }
 
-  gettingTotalRealCost(itemsList: Recipe["inputs"]){
-    let itemList: Observable<Input|Household|Grocery|Dessert>[] = [];
-    let itemRef: Observable<Input|Household|Grocery|Dessert>;
+  gettingTotalRealCost(itemsList: elementCombo[]): Observable<number[]>{
+    let itemList: Observable<number>[] = [];
+    let itemRef: Observable<number>;
+    let recipeItemList: Observable<number>[];
 
     itemsList.forEach(item => {
-      itemRef = this.af.collection<Input>(`/db/deliciasTete/${this.getWarehouseType(item.type)}/${item.id}`).valueChanges().pipe(take(1), map((res)=>(res[0])));
-      itemList.push(itemRef);
+      if(!item.hasOwnProperty('inputs')){
+        itemRef = this.af.collection<Input|Household|Grocery|Dessert>(`/db/deliciasTete/${this.getWarehouseType((<productCombo>item).type)}`)
+            .doc(item.id).valueChanges().pipe(tap(console.log), map((res: Input|Household|Grocery|Dessert)=>(res.averageCost*item.quantity)));
+        itemList.push(itemRef);
+      }
+      //In the case it is a recipe, we calculate input of each
+      else{
+        itemList.push(this.gettingTotalRealCost((<recipeCombo>item).inputs).pipe(map((res: Array<number>)=> 
+          res.reduce((acc,curr)=> (acc + curr),0)
+        ))); 
+      }
     });
 
-    return forkJoin(itemList).pipe(take(1))
+    return combineLatest(...itemList)
   }
 
+
   getWarehouseType(type: string): string{
-    switch (type) {
+    switch (type.toUpperCase()) {
       case 'INSUMOS':
         return 'warehouseInputs';
       case 'INVENTARIO':

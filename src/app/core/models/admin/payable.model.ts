@@ -81,7 +81,7 @@ export interface ItemModel {
   sku: string;
   item: string | Household | Grocery | Dessert | Input;
   quantity: number;
-  cost: number;
+  averageCost: number;
   unit: string;
   kardexId?: string;
   costTrendId?: string

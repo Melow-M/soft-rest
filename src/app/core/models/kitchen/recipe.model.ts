@@ -7,17 +7,30 @@ export interface Recipe {
   description: string | null;
   picture?: string | null;
   category: string; //Platos, Piqueo, Extras Bebidas
-  inputs: Array<{
-    name: string;
-    sku: string;
-    quantity: number;
-    id: string;
-    unit: string;
-    type: string; //INSUMOS MENAJES OTROS POSTRES
-  }>;
+  inputs: Array<InputRecipe>;
   createdAt: Date;
   createdBy: User | null;
   editedAt: Date;
   editedBy: User | null;
   price: number;
+}
+
+export interface InputRecipe{
+  name: string;
+  sku: string;
+  quantity: number;
+  id: string;
+  unit: string;
+  type: string; //INSUMOS INVENTARIO OTROS POSTRES
+}
+
+export interface InputRecipeTable{
+  index: number;
+  averageCost: number;
+  name: string;
+  sku: string;
+  quantity: number;
+  id: string;
+  unit: string;
+  type: string; //INSUMOS INVENTARIO OTROS POSTRES
 }

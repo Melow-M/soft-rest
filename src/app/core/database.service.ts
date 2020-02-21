@@ -355,7 +355,7 @@ export class DatabaseService {
 
             costTrendRef = this.af.firestore.collection(`/db/deliciasTete/${typ}/${item.id}/costTrend`).doc();
             costTrendData = {
-              cost: Math.round(item.cost*100.0/item.quantity)/100.0,
+              cost: Math.round(item.averageCost*100.0)/100.0,
               id: costTrendRef.id,
               createdAt: date
             };

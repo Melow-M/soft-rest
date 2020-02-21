@@ -188,7 +188,7 @@
                     <div style="display: flex; flex-direction: row; width: 100%; justify-content: space-between;">
                         <!-- quantity -->
                         <mat-form-field appearance="outline" style="width: 45%;">
-                            <mat-label>Cantidad</mat-label>
+                            <mat-label>Cantidad {{itemsListForm.get('item').value == null ? null:itemsListForm.get('item').value['unit']}}</mat-label>
                             <input formControlName="quantity" matInput placeholder="Cantidad" type="number">
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
@@ -247,6 +247,13 @@
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Cantidad</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
                         {{element.quantity}}</td>
+                    <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+                <ng-container matColumnDef="averageCost">
+                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>C.U. (S/.)</th>
+                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                        <span>{{element.averageCost | currency: 'S/.'}}</span>
+                    </td>
                     <td mat-footer-cell *matFooterCellDef>
                         <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
                             style="margin: 0px 0px" class="animated fadeInRight w3-margin-top">Subtotal</p>
@@ -255,10 +262,10 @@
                         <p class="w3-margin-bottom" style="margin: 0px 0px">TOTAL</p>
                     </td>
                 </ng-container>
-                <ng-container matColumnDef="Costo">
+                <ng-container matColumnDef="totalCost">
                     <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Costo (S/.)</th>
                     <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
-                        <span>{{element.cost | currency: 'S/.'}}</span>
+                        <span>{{element.totalCost | currency: 'S/.'}}</span>
                     </td>
                     <td mat-footer-cell *matFooterCellDef>
                         <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"

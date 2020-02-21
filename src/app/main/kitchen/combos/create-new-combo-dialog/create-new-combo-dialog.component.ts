@@ -1,14 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MatSnackBar } from '@angular/material';
-import { Observable } from 'rxjs';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { MatTableDataSource, MatPaginator, MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
+import { Observable, of } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Grocery } from 'src/app/core/models/warehouse/grocery.model';
-import { Meal } from 'src/app/core/models/sales/menu/meal.model';
 import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
 import { DatabaseService } from 'src/app/core/database.service';
-import { switchMap, debounceTime, map } from 'rxjs/operators';
+import { switchMap, debounceTime, map, tap, filter } from 'rxjs/operators';
 import { Input } from 'src/app/core/models/warehouse/input.model';
-import { Combo, productComboTable, recipeComboTable, productCombo, recipeCombo } from 'src/app/core/models/sales/menu/combo.model';
+import { Combo, elementCombo, elementComboTable } from 'src/app/core/models/sales/menu/combo.model';
 import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 
 @Component({
@@ -19,7 +18,7 @@ import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 export class CreateNewComboDialogComponent implements OnInit {
 
   //Table
-  inputTableDataSource = new MatTableDataSource();
+  inputTableDataSource = new MatTableDataSource<elementComboTable>();
   inputTableDisplayedColumns: string[] = [
     'index', 'itemName', 'itemUnit', 'quantity', 'actions'
   ]
@@ -44,51 +43,113 @@ export class CreateNewComboDialogComponent implements OnInit {
   itemForm: FormGroup;
 
   productList$: Observable<Array<Grocery | Recipe | Dessert>>;
+
   productsObservable$: Observable<number[]>;
-  productsList: productCombo[] | recipeCombo[] = [];
+  productsList: elementCombo[] = [];
 
   constructor(
     private fb: FormBuilder,
     private dbs: DatabaseService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) public data: Combo
   ) { }
 
   ngOnInit() {
-    this.initForms();
     this.inputTableDataSource.data = [];
 
+    this.initForms(this.data);
+    
     this.productList$ = this.itemForm.get('product').valueChanges.pipe(
       switchMap((productName)=> {
-        return this.dbs.onGetProductType(this.itemForm.get('productCategory').value).pipe(
-          debounceTime(100), 
-          map((productList)=> {
-            return this.filterRecipe(productList, this.itemForm.get('product').value)
-          }))
+        if(this.itemForm.get('productCategory').value == null){
+          return of([]);
+        }
+        else{
+          return this.dbs.onGetProductType(this.itemForm.get('productCategory').value).pipe(
+            debounceTime(100), 
+            map((productList)=> {
+              return this.filterRecipe(productList, this.itemForm.get('product').value)
+            }))
+        }
       }));
     
   }
 
-  deb(event){
-    console.log(event);
+  initForms(combo: Combo){
+    if(combo == null){
+      this.comboForm = this.fb.group({
+        name: [null, Validators.required],
+        price: [0, Validators.required],
+        realPrice: [{value: 0, disabled: true}, Validators.required],
+        percentageDiscount: [{value: 0, disabled: true}, Validators.required],
+        validityPeriod: [null, Validators.required],
+        dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
+      })
+  
+      this.comboForm.get('dateRange').disable();
+  
+      this.itemForm = this.fb.group({
+        productCategory: [null, Validators.required],
+        product: [null, Validators.required],
+        quantity: [null, Validators.required]
+      })
+    }
+    else{
+      if(this.data.validityPeriod == 'Definido'){
+        let begin = new Date(1970);
+        begin.setSeconds(this.data.dateRange.begin['seconds']);
+        let end = new Date(1970);
+        end.setSeconds(this.data.dateRange.end['seconds'])
+
+        this.comboForm = this.fb.group({
+          name: [this.data.name, Validators.required],
+          price: [this.data.price, Validators.required],
+          realPrice: [{value: 0, disabled: true}, Validators.required],
+          percentageDiscount: [{value: 0, disabled: true}, Validators.required],
+          validityPeriod: [this.data.validityPeriod, Validators.required],
+          dateRange: [{begin: begin, end: end}, Validators.required],
+        })
+      }
+      else{
+        this.comboForm = this.fb.group({
+          name: [this.data.name, Validators.required],
+          price: [this.data.price, Validators.required],
+          realPrice: [{value: 0, disabled: true}, Validators.required],
+          percentageDiscount: [{value: 0, disabled: true}, Validators.required],
+          validityPeriod: [this.data.validityPeriod, Validators.required],
+          dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
+        })
+        this.comboForm.get('dateRange').disable();
+      }
+  
+      this.itemForm = this.fb.group({
+        productCategory: [null, Validators.required],
+        product: [null, Validators.required],
+        quantity: [null, Validators.required]
+      })
+
+      this.initTable();
+    }
   }
 
-  initForms(){
-    this.comboForm = this.fb.group({
-      name: [null, Validators.required],
-      price: [0, Validators.required],
-      realPrice: [{value: 0, disabled: true}, Validators.required],
-      percentageDiscount: [{value: 0, disabled: true}, Validators.required],
-      validityPeriod: [null, Validators.required],
-      dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
-    })
+  initTable(){
+    let aux: elementComboTable[] = [];
 
-    this.comboForm.get('dateRange').disable();
-
-    this.itemForm = this.fb.group({
-      productCategory: [null, Validators.required],
-      product: [null, Validators.required],
-      quantity: [null, Validators.required]
-    })
+    this.productsList = this.data.products;
+    
+    this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
+      this.productsList.forEach((elementCombo, index) => {
+          aux.push(
+            {
+              ...elementCombo,
+              index: index,
+              averageCost: res[index]/elementCombo.quantity
+            }
+          )
+      });
+      this.inputTableDataSource.data = [...aux];
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+    }));
 
   }
 
@@ -102,113 +163,127 @@ export class CreateNewComboDialogComponent implements OnInit {
     }
   }
 
+  //Table
   //Adding items
   onAddItem(){
-    let aux: productComboTable[] | recipeComboTable[] = [];
+    let aux: elementComboTable[] = [];
 
-    this.comboForm.get()
-
-    this.productsList.push({
-      name: (<Input>this.itemForm.get('item').value).name,
-      sku: (<Input>this.itemForm.get('item').value).sku,
-      quantity: <number>this.itemForm.get('quantity').value,
-      id: (<Input>this.itemForm.get('item').value).id,
-      unit: (<Input>this.itemForm.get('item').value).unit,
-      type: 'INSUMOS',
-    });
-    
-    this.itemObservable$ = this.dbs.gettingTotalRealCost(this.itemList).pipe(tap(res => {
-      this.itemList.forEach((itemRecipe, index) => {
-          aux.push(
-            {
-              ...itemRecipe,
-              index: index,
-              averageCost: res[index]
-            }
-          )
-      });
-      this.inputTableDataSource.data = aux;
-      this.inputTableDataSource.paginator = this.inputTablePaginator;
-      this.itemForm.reset();
-    }));
-  }
-
-  onDeleteItem(item: InputRecipeTable){
-    let aux: InputRecipeTable[] = [];
-
-    this.itemList.splice(item.index, 1);
-
-    this.itemObservable$ = this.dbs.gettingTotalRealCost(this.itemList).pipe(tap(res => {
-      this.itemList.forEach((itemRecipe, index) => {
-          aux.push(
-            {
-              ...itemRecipe,
-              index: index,
-              averageCost: res[index]
-            }
-          )
-      });
-      this.inputTableDataSource.data = aux;
-      this.inputTableDataSource.paginator = this.inputTablePaginator;
-      this.itemForm.reset();
-    }));
-  }
-
-  async onAddItem(){
-    let table = this.inputTableDataSource.data;
-    let aux = null;
-    if(this.itemForm.value['product'].hasOwnProperty('price')){
-      table.push({
-        ...this.itemForm.value, 
-        index: this.inputTableDataSource.data.length
+    //In the case it is an input, it wont have property inputs.
+    if(!this.itemForm.get('product').value.hasOwnProperty('inputs')){
+      this.productsList.push({
+        name: (<Input>this.itemForm.get('product').value).name,
+        sku: (<Input>this.itemForm.get('product').value).sku,
+        quantity: <number>this.itemForm.get('quantity').value,
+        id: (<Input>this.itemForm.get('product').value).id,
+        unit: (<Input>this.itemForm.get('product').value).unit,
+        type: this.itemForm.get('productCategory').value,
       });
     }
+    //In the case there is a recipe, it will have property inputs
     else{
-      aux = await this.dbs.calculateRecipeCost(this.itemForm.value['product']).toPromise();
-      this.itemForm.value['product']['price'] = aux;
-      table.push({
-        ...this.itemForm.value, 
-        index: this.inputTableDataSource.data.length,
+      this.productsList.push({
+        ...(<Recipe>this.itemForm.get('product').value),
+        quantity: <number>this.itemForm.get('quantity').value,
+        unit: 'UND'
       });
-      
     }
-    
-    this.inputTableDataSource.data = table;
-    this.inputTableDataSource.paginator = this.inputTablePaginator;
-    this.itemForm.get('product').setValue(''); this.itemForm.get('quantity').setValue('')
+
+    this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
+      this.productsList.forEach((elementCombo, index) => {
+          aux.push(
+            {
+              ...elementCombo,
+              index: index,
+              averageCost: res[index]/elementCombo.quantity
+            }
+          )
+      });
+      this.inputTableDataSource.data = [...aux];
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.itemForm.reset();
+    }));
   }
 
+  onDeleteItem(item: elementComboTable){
+    let aux: elementComboTable[] = [];
+
+    this.productsList.splice(item.index, 1);
+    
+    this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
+      this.productsList.forEach((elementCombo, index) => {
+          aux.push(
+            {
+              ...elementCombo,
+              index: index,
+              averageCost: res[index]/elementCombo.quantity
+            }
+          )
+      });
+      this.inputTableDataSource.data = [...aux];
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.itemForm.reset();
+    }));
+  }
+
+  getTotalCost(): number{
+    if(this.inputTableDataSource.data.length){
+      return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
+        return <number>acc + <number>(curr.averageCost*curr.quantity)
+      }, 0);
+
+    }
+    return 0
+  }
+
+  getPercentage(){
+    if(!this.comboForm.get('price').value || !this.getTotalCost()){
+      return 0;
+    }
+    return ((this.getTotalCost()-this.comboForm.get('price').value)*100/this.getTotalCost());
+  }
 
   onUploadCombo(){
-    let aux: {product: Grocery | Meal | Dessert, quantity: number}[] = [];
-    this.inputTableDataSource.data.forEach(el => {
-      aux.push({
-        quantity: el['quantity'],
-        product: el['product']
-      })
-    });
     
-    let recipe: Combo;
-    recipe = {
+    let combo: Combo;
+    combo = {
       name: <string>this.comboForm.get('name').value,
       price: <number>this.comboForm.get('price').value,
-      realPrice: <number>this.getTotal(),
+      realPrice: <number>this.getTotalCost(),
       validityPeriod: <string>this.comboForm.get('validityPeriod').value, //Indefinido, Definido
       dateRange: this.comboForm.get('validityPeriod').value == 'Definido' ? <{begin: Date, end: Date}>this.comboForm.get('dateRange').value: null,
-      products: aux,
+      products: this.productsList,
       state: 'Publicado',
       soldUnits: 0
     }
 
-    this.dbs.onCreateCombo(recipe).subscribe(batch => {
-      batch.commit().then(() => {
-        this.snackBar.open('Se almacenó el combo satisfactoriamente!', 'Aceptar');
+    if(this.data == null){
+      this.dbs.onCreateCombo(combo).subscribe(batch => {
+        batch.commit().then(() => {
+          this.snackBar.open('Se almacenó el combo satisfactoriamente!', 'Aceptar');
+        })
+        .catch((err)=> {
+          console.log(err);
+          this.snackBar.open('No se pudo guardar el combo. Por favor, vuelva a intentarlo.', 'Aceptar');
+        })
       })
-      .catch((err)=> {
-        console.log(err);
-        this.snackBar.open('No se pudo guardar el combo. Por favor, vuelva a intentarlo.', 'Aceptar');
+    }
+    else{
+      combo.id = this.data.id;
+      combo.createdAt = this.data.createdAt;
+      combo.createdBy = this.data.createdBy;
+
+      this.dbs.onEditCombo(combo).subscribe(batch => {
+        batch.commit().then(() => {
+          this.snackBar.open('Se actualizó el combo satisfactoriamente!', 'Aceptar');
+        })
+        .catch((err)=> {
+          console.log(err);
+          this.snackBar.open('No se pudo guardar el combo. Por favor, vuelva a intentarlo.', 'Aceptar');
+        })
       })
-    })
+
+    }
+    
 
   }
 
@@ -236,26 +311,7 @@ export class CreateNewComboDialogComponent implements OnInit {
     return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }
 
-  getTotal(): number{
-    if(this.inputTableDataSource.data.length){
-      return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
-        return <number>acc + <number>(curr['product']['price']*curr['quantity'])
-      }, 0);
 
-    }
-    return 0
-  }
-
-  getTotalPrice(){
-    return (this.getTotal()).toFixed(2)
-  }
-
-  getPercentage(){
-    if(!this.comboForm.get('price').value || !this.getTotal()){
-      return 0;
-    }
-    return ((this.getTotal()-this.comboForm.get('price').value)*100/this.getTotal()).toFixed(2)
-  }
 }
 
 

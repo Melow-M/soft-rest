@@ -117,7 +117,7 @@ export class EditNewRecipeDialogComponent implements OnInit {
             {
               ...itemRecipe,
               index: index,
-              averageCost: res[index]
+              averageCost: res[index]/itemRecipe.quantity
             }
           )
       });
@@ -145,7 +145,7 @@ export class EditNewRecipeDialogComponent implements OnInit {
             {
               ...itemRecipe,
               index: index,
-              averageCost: res[index]
+              averageCost: res[index]/itemRecipe.quantity
             }
           )
       });
@@ -166,7 +166,7 @@ export class EditNewRecipeDialogComponent implements OnInit {
             {
               ...itemRecipe,
               index: index,
-              averageCost: res[index]
+              averageCost: res[index]/itemRecipe.quantity
             }
           )
       });

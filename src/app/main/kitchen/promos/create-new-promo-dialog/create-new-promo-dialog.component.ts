@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, Inject, } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
 import { Observable, combineLatest } from 'rxjs';
@@ -8,9 +8,9 @@ import { Input } from 'src/app/core/models/warehouse/input.model';
 import { Tool } from 'src/app/core/models/warehouse/tools.model';
 import { DatabaseService } from 'src/app/core/database.service';
 import { map, startWith, tap, debounceTime, distinctUntilChanged, take, switchMap } from 'rxjs/operators';
-import { MatTableDataSource, MatPaginator, MatSnackBar } from '@angular/material';
+import { MatTableDataSource, MatPaginator, MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
 import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
-import { Promo } from 'src/app/core/models/sales/menu/promo.model';
+import { Promo, elementPromoTable, elementPromo } from 'src/app/core/models/sales/menu/promo.model';
 import { Meal } from 'src/app/core/models/sales/menu/meal.model';
 
 @Component({
@@ -21,7 +21,7 @@ import { Meal } from 'src/app/core/models/sales/menu/meal.model';
 })
 export class CreateNewPromoDialogComponent implements OnInit {
   //Table
-  inputTableDataSource = new MatTableDataSource();
+  inputTableDataSource = new MatTableDataSource<elementPromoTable>();
   inputTableDisplayedColumns: string[] = [
     'index', 'itemName', 'itemUnit', 'quantity', 'actions'
   ]
@@ -45,67 +45,114 @@ export class CreateNewPromoDialogComponent implements OnInit {
   promoForm: FormGroup;
   itemForm: FormGroup;
 
-  productList$: Observable<Array<Grocery | Meal | Dessert>>;
+  productList$: Observable<Array<Grocery | Recipe | Dessert>>;
+
+  productsObservable$: Observable<number[]>;
+  productsList: elementPromo[] = [];
 
   constructor(
     private fb: FormBuilder,
     private dbs: DatabaseService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) public data: Promo
   ) { }
 
   ngOnInit() {
-    this.initForms();
-    // this.inputList$= combineLatest(this.dbs.onGetInputs(), this.itemForm.get('item').valueChanges)
-    //   .pipe(map(([inputList, inputForm])=> this.onFilterInputs(inputList, inputForm)),
-    //         startWith(''));
     this.inputTableDataSource.data = [];
+    this.initForms(this.data);
 
     this.productList$ = this.itemForm.get('product').valueChanges.pipe(
-      //First tap to initialize table data
-      /*tap((productName: Recipe | string)=>{
-        if(typeof productName=='string'){
-          this.inputTableDataSource.data = [];
-        }
-        else{
-          this.inputTableDataSource.data = productName.inputs;
-        }
-      }),*/
-      //switchMap to get filtered data of options available
       switchMap((productName)=> {
         return this.dbs.onGetProductType(this.itemForm.get('productCategory').value).pipe(
           debounceTime(100), 
           map((productList)=> {
-            console.log(productList);
             return this.filterRecipe(productList, this.itemForm.get('product').value)
           }))
       }));
     
   }
 
-  deb(event){
-    console.log(event);
+  initForms(promo: Promo){
+    if(promo == null){
+      this.promoForm = this.fb.group({
+        name: [null, Validators.required],
+        quantity: [null, Validators.required],
+        units: [ {value: null, disabled: true}, Validators.required],
+        promoPrice: [0, Validators.required],
+        realPrice: [{value: 0, disabled: true}, Validators.required],
+        percentageDiscount: [{value: 0, disabled: true}, Validators.required],
+        validityPeriod: [null, Validators.required],
+        dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
+      })
+  
+      this.promoForm.get('dateRange').disable();
+  
+      this.itemForm = this.fb.group({
+        productCategory: [null, Validators.required],
+        product: [null, Validators.required],
+        quantity: [null, Validators.required]
+      })
+    }
+    else{
+      if(this.data.validityPeriod == 'Definido'){
+        let begin = new Date(1970);
+        begin.setSeconds(this.data.dateRange.begin['seconds']);
+        let end = new Date(1970);
+        end.setSeconds(this.data.dateRange.end['seconds'])
+
+        this.promoForm = this.fb.group({
+          name: [this.data.name, Validators.required],
+          quantity: [this.data.quantity, Validators.required],
+          units: [ {value: this.data.units, disabled: true}, Validators.required],
+          promoPrice: [this.data.price, Validators.required],
+          realPrice: [{value: 0, disabled: true}, Validators.required],
+          percentageDiscount: [{value: 0, disabled: true}, Validators.required],
+          validityPeriod: [this.data.validityPeriod, Validators.required],
+          dateRange: [{begin: begin, end: end}, Validators.required],
+        })
+      }
+      else{
+        this.promoForm = this.fb.group({
+          name: [this.data.name, Validators.required],
+          quantity: [this.data.quantity, Validators.required],
+          units: [ {value: this.data.units, disabled: true}, Validators.required],
+          promoPrice: [this.data.price, Validators.required],
+          realPrice: [{value: 0, disabled: true}, Validators.required],
+          percentageDiscount: [{value: 0, disabled: true}, Validators.required],
+          validityPeriod: [this.data.validityPeriod, Validators.required],
+          dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
+        })
+        this.promoForm.get('dateRange').disable();
+      }
+  
+      this.itemForm = this.fb.group({
+        productCategory: [null, Validators.required],
+        product: [null, Validators.required],
+        quantity: [null, Validators.required]
+      })
+
+      this.initTable();
+    }
   }
 
-  initForms(){
-    this.promoForm = this.fb.group({
-      name: [null, Validators.required],
-      quantity: [null, Validators.required],
-      units: [ {value: null, disabled: true}, Validators.required],
-      promoPrice: [null, Validators.required],
-      realPrice: [{value: null, disabled: true}, Validators.required],
-      percentageDiscount: [{value: null, disabled: true}, Validators.required],
-      validityPeriod: [null, Validators.required],
-      dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
-    })
+  initTable(){
+    let aux: elementPromoTable[] = [];
 
-    this.promoForm.get('dateRange').disable();
-
-    this.itemForm = this.fb.group({
-      productCategory: [null, Validators.required],
-      product: [null, Validators.required],
-      quantity: [null, Validators.required]
-    })
-
+    this.productsList = this.data.products;
+    
+    this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
+      this.productsList.forEach((elementPromo, index) => {
+          aux.push(
+            {
+              ...elementPromo,
+              index: index,
+              averageCost: res[index]/elementPromo.quantity
+            }
+          )
+      });
+      this.inputTableDataSource.data = [...aux];
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+    }));
   }
 
   onFilterInputs(inputList: Input[], inputForm: string | Input){
@@ -118,80 +165,129 @@ export class CreateNewPromoDialogComponent implements OnInit {
     }
   }
 
-  async onAddItem(){
-    let table = this.inputTableDataSource.data;
-    let aux = null;
-    if(this.itemForm.value['product'].hasOwnProperty('price')){
-      table.push({
-        ...this.itemForm.value, 
-        index: this.inputTableDataSource.data.length
+  //Table
+  //Adding Items
+
+  onAddItem(){
+    let aux: elementPromoTable[] = [];
+
+    //In the case it is an input, it wont have property inputs.
+    if(!this.itemForm.get('product').value.hasOwnProperty('inputs')){
+      this.productsList.push({
+        name: (<Input>this.itemForm.get('product').value).name,
+        sku: (<Input>this.itemForm.get('product').value).sku,
+        quantity: <number>this.itemForm.get('quantity').value,
+        id: (<Input>this.itemForm.get('product').value).id,
+        unit: (<Input>this.itemForm.get('product').value).unit,
+        type: this.itemForm.get('productCategory').value,
       });
     }
+    //In the case there is a recipe, it will have property inputs
     else{
-      aux = await this.dbs.calculateRecipeCost(this.itemForm.value['product']).toPromise();
-      this.itemForm.value['product']['price'] = aux;
-      table.push({
-        ...this.itemForm.value, 
-        index: this.inputTableDataSource.data.length,
+      this.productsList.push({
+        ...(<Recipe>this.itemForm.get('product').value),
+        quantity: <number>this.itemForm.get('quantity').value,
+        unit: 'UND'
       });
-      aux = null;
     }
-    this.inputTableDataSource.data = table;
-    this.inputTableDataSource.paginator = this.inputTablePaginator;
-    this.itemForm.get('product').setValue(''); this.itemForm.get('quantity').setValue('')
+
+    this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
+      this.productsList.forEach((elementPromo, index) => {
+          aux.push(
+            {
+              ...elementPromo,
+              index: index,
+              averageCost: res[index]/elementPromo.quantity
+            }
+          )
+      });
+      this.inputTableDataSource.data = [...aux];
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.itemForm.reset();
+    }));
   }
 
-  onDeleteItem(item){
-    let table = this.inputTableDataSource.data;
-    table.splice(item.index, 1);
-    table.forEach((el, index) => {el['index'] = index})
-    this.inputTableDataSource.data = table;
-    this.inputTableDataSource.paginator = this.inputTablePaginator;
-    console.log(item);
+  onDeleteItem(item: elementPromoTable){
+    let aux: elementPromoTable[] = [];
+
+    this.productsList.splice(item.index, 1);
+    
+    this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
+      this.productsList.forEach((elementPromo, index) => {
+          aux.push(
+            {
+              ...elementPromo,
+              index: index,
+              averageCost: res[index]/elementPromo.quantity
+            }
+          )
+      });
+      this.inputTableDataSource.data = [...aux];
+      this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.itemForm.reset();
+    }));
   }
 
-  getTotal(): number{
+  getTotalCost(): number{
     if(this.inputTableDataSource.data.length){
       return this.inputTableDataSource.data.reduce<number>((acc, curr)=> {
-        return <number>acc + (curr['product']['price']*curr['quantity'])
+        return <number>acc + <number>(curr.averageCost*curr.quantity)
       }, 0);
 
     }
     return 0
   }
 
+  getPercentage(){
+    if(!this.promoForm.get('price').value || !this.getTotalCost()){
+      return 0;
+    }
+    return ((this.getTotalCost()-this.promoForm.get('price').value)*100/this.getTotalCost());
+  }
+
   onUploadOffer(){
-    let aux: {product: Grocery | Meal | Dessert, quantity: number}[] = [];
-    this.inputTableDataSource.data.forEach(el => {
-      aux.push({
-        quantity: el['quantity'],
-        product: el['product']
-      })
-    });
-    
-    let recipe: Promo;
-    recipe = {
+
+    let promo: Promo;
+    promo = {
       name: <string>this.promoForm.get('name').value,
       quantity: <string>this.promoForm.get('quantity').value, //Indefinido, Definido
       units: this.promoForm.get('quantity').value == 'Definido' ? <number>this.promoForm.get('units').value: null,
-      promoPrice: <number>this.promoForm.get('promoPrice').value,
-      realPrice: <number>this.getTotal(),
+      price: <number>this.promoForm.get('promoPrice').value,
+      realPrice: <number>this.getTotalCost(),
       validityPeriod: <string>this.promoForm.get('validityPeriod').value, //Indefinido, Definido
       dateRange: this.promoForm.get('validityPeriod').value == 'Definido' ? <{begin: Date, end: Date}>this.promoForm.get('dateRange').value: null,
-      products: aux,
+      products: this.productsList,
       state: 'Publicado',
       soldUnits: 0
     }
 
-    this.dbs.onCreateOffer(recipe).subscribe(batch => {
-      batch.commit().then(() => {
-        this.snackBar.open('Se almacenó la oferta satisfactoriamente!', 'Aceptar');
+    if(this.data == null){
+      this.dbs.onCreateOffer(promo).subscribe(batch => {
+        batch.commit().then(() => {
+          this.snackBar.open('Se almacenó la oferta satisfactoriamente!', 'Aceptar');
+        })
+        .catch((err)=> {
+          console.log(err);
+          this.snackBar.open('No se pudo guardar la oferta. Por favor, vuelva a intentarlo.', 'Aceptar');
+        })
       })
-      .catch((err)=> {
-        console.log(err);
-        this.snackBar.open('No se pudo guardar la oferta. Por favor, vuelva a intentarlo.', 'Aceptar');
+    }
+    else{
+      promo.id = this.data.id;
+      promo.createdAt = this.data.createdAt;
+      promo.createdBy = this.data.createdBy;
+
+      this.dbs.onEditOffer(promo).subscribe(batch => {
+        batch.commit().then(() => {
+          this.snackBar.open('Se actualizó la oferta satisfactoriamente!', 'Aceptar');
+        })
+        .catch((err)=> {
+          console.log(err);
+          this.snackBar.open('No se pudo guardar la oferta. Por favor, vuelva a intentarlo.', 'Aceptar');
+        })
       })
-    })
+    }
+    
 
   }
 
@@ -205,7 +301,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
     else return value;
   }
 
-  filterRecipe(recipeList: Array<Grocery | Meal | Dessert>, recipeName: Grocery | Meal | Dessert | string){
+  filterRecipe(recipeList: Array<Grocery | Recipe | Dessert>, recipeName: Grocery | Recipe | Dessert | string){
     if(typeof recipeName != 'string'){
       return recipeList.filter(recipe => recipe.name.toUpperCase().includes(recipeName.name.toUpperCase()))
     }
@@ -219,16 +315,6 @@ export class CreateNewPromoDialogComponent implements OnInit {
     return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }
 
-  getRealPrice(){
-    return this.getTotal().toFixed(2);
-  }
-
-  getPercentage(){
-    if(!this.promoForm.get('promoPrice').value || !this.getTotal()){
-      return 0;
-    }
-    return ((this.getTotal()-this.promoForm.get('promoPrice').value)*100/this.getTotal()).toFixed(2)
-  }
 }
 
 

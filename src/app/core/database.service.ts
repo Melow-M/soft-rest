@@ -24,7 +24,7 @@ import { Kardex } from './models/warehouse/kardex.model';
 import { Recipe } from './models/kitchen/recipe.model';
 import * as jsPDF from 'jspdf';
 import { Promo } from './models/sales/menu/promo.model';
-import { Combo } from './models/sales/menu/combo.model';
+import { Combo, elementCombo, recipeCombo, productCombo } from './models/sales/menu/combo.model';
 import { Role } from './models/general/role.model';
 import { ReceivableUser } from './models/admin/receivableUser.model';
 
@@ -1355,6 +1355,23 @@ export class DatabaseService {
       }))
   }
 
+  onEditOffer(promo: Promo): Observable<firebase.firestore.WriteBatch> {
+    let promoRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/offers`).doc(promo.id);
+    let promoData: Promo = {...promo};
+    let date = new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        promoData.editedAt = date;
+        promoData.editedBy = user;
+
+        batch.set(promoRef, promoData);
+
+        return batch;
+      }))
+  }
+
   onGetOffer(): Observable<Promo[]> {
     return this.af.collection<Promo>(`/db/deliciasTete/offers`).valueChanges().pipe(shareReplay(1));
   }
@@ -1399,7 +1416,7 @@ export class DatabaseService {
 
   onCreateCombo(combo: Combo): Observable<firebase.firestore.WriteBatch> {
     let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc();
-    let comboData: Combo = combo;
+    let comboData: Combo = {...combo};
     let date = new Date();
     let batch = this.af.firestore.batch();
 
@@ -1416,6 +1433,24 @@ export class DatabaseService {
         return batch;
       }))
   }
+
+  onEditCombo(combo: Combo): Observable<firebase.firestore.WriteBatch> {
+    let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc(combo.id);
+    let comboData: Combo = {...combo};
+    let date = new Date();
+    let batch = this.af.firestore.batch();
+
+    return this.auth.user$.pipe(take(1),
+      map(user => {
+        comboData.editedAt = date;
+        comboData.editedBy = user;
+
+        batch.set(comboRef, comboData);
+
+        return batch;
+      }))
+  }
+
   changeComboState(combo: Combo, newState: string): Observable<firebase.firestore.WriteBatch> {
     let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc(combo.id);
     let comboData: Combo = combo;
@@ -1480,20 +1515,20 @@ export class DatabaseService {
       }))
   }
 
-  gettingTotalRealCost(itemsList: Recipe["inputs"] | Recipe[]): Observable<number[]>{
+  gettingTotalRealCost(itemsList: elementCombo[]): Observable<number[]>{
     let itemList: Observable<number>[] = [];
     let itemRef: Observable<number>;
     let recipeItemList: Observable<number>[];
 
     itemsList.forEach(item => {
       if(!item.hasOwnProperty('inputs')){
-        itemRef = this.af.collection<Input|Household|Grocery|Dessert>(`/db/deliciasTete/${this.getWarehouseType(item.type)}`)
-            .doc(item.id).valueChanges().pipe(map((res: Input|Household|Grocery|Dessert)=>(res.averageCost*item.quantity)));
+        itemRef = this.af.collection<Input|Household|Grocery|Dessert>(`/db/deliciasTete/${this.getWarehouseType((<productCombo>item).type)}`)
+            .doc(item.id).valueChanges().pipe(tap(console.log), map((res: Input|Household|Grocery|Dessert)=>(res.averageCost*item.quantity)));
         itemList.push(itemRef);
       }
       //In the case it is a recipe, we calculate input of each
       else{
-        itemList.push(this.gettingTotalRealCost(item.inputs).pipe(map((res: Array<number>)=> 
+        itemList.push(this.gettingTotalRealCost((<recipeCombo>item).inputs).pipe(map((res: Array<number>)=> 
           res.reduce((acc,curr)=> (acc + curr),0)
         ))); 
       }
@@ -1504,7 +1539,7 @@ export class DatabaseService {
 
 
   getWarehouseType(type: string): string{
-    switch (type) {
+    switch (type.toUpperCase()) {
       case 'INSUMOS':
         return 'warehouseInputs';
       case 'INVENTARIO':

@@ -124,7 +124,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
             {
               ...itemRecipe,
               index: index,
-              averageCost: res[index]
+              averageCost: res[index]/itemRecipe.quantity
             }
           )
       });
@@ -145,7 +145,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
             {
               ...itemRecipe,
               index: index,
-              averageCost: res[index]
+              averageCost: res[index]/itemRecipe.quantity
             }
           )
       });
@@ -199,6 +199,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
       });
     });
 
+    console.log(recipe);
     this.dbs.onUploadRecipe(recipe).pipe(tap((batch)=> {
       batch.commit().then(()=> {
         this.snackBar.open('La receta fue guardada satisfactoriamente', 'Aceptar');

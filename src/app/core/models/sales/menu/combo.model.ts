@@ -15,7 +15,7 @@ export interface Combo {
     begin: Date,
     end: Date
   }
-  products: productCombo[] | recipeCombo[];
+  products: elementCombo[];
   createdAt?: Date;
   createdBy?: User;
   editedAt?: Date;
@@ -37,21 +37,32 @@ export interface recipeCombo extends Recipe{
   unit: string;
 }
 
-export interface productComboTable{
+export interface productComboTable extends productCombo{
   index: number;
   averageCost: number;
-  name: string;
-  sku: string;
-  quantity: number;
-  id: string;
-  unit: string;
-  type?: string; //OTROS POSTRES
 }
 
 
-export interface recipeComboTable extends Recipe{
+export interface recipeComboTable extends recipeCombo{
   index: number;
   averageCost: number;
-  quantity: number;
-  unit: string;
 }
+
+export type elementCombo = productCombo|recipeCombo;
+
+export type elementComboTable = productComboTable|recipeComboTable;
+
+// export interface Recipe {
+//   id: string;
+//   name: string;
+//   sku: string;
+//   description: string | null;
+//   picture?: string | null;
+//   category: string; //Platos, Piqueo, Extras Bebidas
+//   inputs: Array<InputRecipe>;
+//   createdAt: Date;
+//   createdBy: User | null;
+//   editedAt: Date;
+//   editedBy: User | null;
+//   price: number;
+// }

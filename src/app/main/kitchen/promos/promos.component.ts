@@ -67,6 +67,14 @@ export class PromosComponent implements OnInit {
   onCreateNewPromo(){
     this.dialog.open(CreateNewPromoDialogComponent, {
       width: '550px',
+      data: null
+    })
+  }
+
+  onEditPromo(promo: Promo){
+    this.dialog.open(CreateNewPromoDialogComponent, {
+      width: '550px',
+      data: promo
     })
   }
 
@@ -110,12 +118,12 @@ export class PromosComponent implements OnInit {
       const temp = [
         this.datePipe.transform(this.getDate(element.createdAt['seconds']), 'dd/MM/yyyy'),
         element.name,
-        element.products.map(el => el.product.name).join(', '),
+        element.products.map(el => el.name).join(', '),
         element.state,
         dateRange,
         'S/.'+element.realPrice.toFixed(2),
-        'S/.'+element.promoPrice.toFixed(2),
-        ((element.realPrice-element.promoPrice)/element.realPrice*100.0).toFixed(2) + "%",
+        'S/.'+element.price.toFixed(2),
+        ((element.realPrice-element.price)/element.realPrice*100.0).toFixed(2) + "%",
         element.soldUnits,
         availableUnits,
         element.createdBy.displayName

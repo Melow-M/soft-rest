@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, Inject, } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable, combineLatest, of } from 'rxjs';
 import { Grocery } from 'src/app/core/models/warehouse/grocery.model';
 import { Household } from 'src/app/core/models/warehouse/household.model';
 import { Input } from 'src/app/core/models/warehouse/input.model';
@@ -63,11 +63,16 @@ export class CreateNewPromoDialogComponent implements OnInit {
 
     this.productList$ = this.itemForm.get('product').valueChanges.pipe(
       switchMap((productName)=> {
-        return this.dbs.onGetProductType(this.itemForm.get('productCategory').value).pipe(
-          debounceTime(100), 
-          map((productList)=> {
-            return this.filterRecipe(productList, this.itemForm.get('product').value)
-          }))
+        if(this.itemForm.get('productCategory').value == null){
+          return of([]);
+        }
+        else{
+          return this.dbs.onGetProductType(this.itemForm.get('productCategory').value).pipe(
+            debounceTime(100), 
+            map((productList)=> {
+              return this.filterRecipe(productList, this.itemForm.get('product').value)
+            }))
+        }
       }));
     
   }
@@ -239,10 +244,10 @@ export class CreateNewPromoDialogComponent implements OnInit {
   }
 
   getPercentage(){
-    if(!this.promoForm.get('price').value || !this.getTotalCost()){
+    if(!this.promoForm.get('promoPrice').value || !this.getTotalCost()){
       return 0;
     }
-    return ((this.getTotalCost()-this.promoForm.get('price').value)*100/this.getTotalCost());
+    return ((this.getTotalCost()-this.promoForm.get('promoPrice').value)*100/this.getTotalCost());
   }
 
   onUploadOffer(){

@@ -640,8 +640,8 @@ export class DatabaseService {
     this.others$ = this.othersCollection.valueChanges().pipe(shareReplay(1));
     return this.others$;
   }
-  onGetDishes() {
 
+  onGetDishes() {
     this.dishesCollection = this.af.collection('db/deliciasTete/kitchenDishes', ref => ref.orderBy('createdAt', 'desc'));
     this.dishes$ = this.dishesCollection.valueChanges().pipe(shareReplay(1));
     return this.dishes$;
@@ -1398,21 +1398,6 @@ export class DatabaseService {
     return this.af.collection<Combo>(`/db/deliciasTete/combos`).valueChanges().pipe(shareReplay(1));
   }
 
-  getDrinks(): Observable<any> {
-    return this.af.collection<Combo>(`/db/deliciasTete/kitchenDrinks`).valueChanges().pipe(shareReplay(1));
-  }
-
-  getDesserts(): Observable<any> {
-    return this.af.collection<Combo>(`/db/deliciasTete/kitchenDesserts`).valueChanges().pipe(shareReplay(1));
-  }
-
-  getAppetizers(): Observable<any> {
-    return this.af.collection<Combo>(`/db/deliciasTete/kitchenAppetizers`).valueChanges().pipe(shareReplay(1));
-  }
-
-  getExtras(): Observable<any> {
-    return this.af.collection<Combo>(`/db/deliciasTete/kitchenExtras`).valueChanges().pipe(shareReplay(1));
-  }
 
   onCreateCombo(combo: Combo): Observable<firebase.firestore.WriteBatch> {
     let comboRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/combos`).doc();
@@ -1494,6 +1479,10 @@ export class DatabaseService {
     return listCollection.valueChanges().pipe(shareReplay(1))
   }
 
+  getPaysReceivable(user) {
+    let listCollection = this.af.collection<ReceivableUser>('db/deliciasTete/receivableUsers/' + user + '/payments', ref => ref.orderBy('createdAt', 'desc'));
+    return listCollection.valueChanges().pipe(shareReplay(1))
+  }
   changeBalance(user: ReceivableUser, amount: number): Observable<firebase.firestore.WriteBatch> {
     let receivableUserRef = this.af.firestore.collection('db/deliciasTete/receivableUsers').doc(user.id);
     let receivableUserData;

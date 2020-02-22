@@ -17,6 +17,9 @@ export class VoucherComponent implements OnInit {
 
   orders: Array<any> = []
   others: Array<any> = []
+  combos: Array<any> = []
+  desserts: Array<any> = []
+  extras: Array<any> = []
   countDishes: Array<any> = []
   print: Array<any>
 
@@ -29,54 +32,53 @@ export class VoucherComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    let dishes = this.data['orderList'].filter(el => el['type'] == 'simple' || el['type'] == 'executive' || el['type'] == 'second').map(el => {
-      let array = []
-      switch (el['type']) {
-        case 'executive':
-          array.push({
-            name: el['appetizer']['name'],
-            id: el['appetizer']['id'],
-            stock: el['appetizer']['stock']
-          })
-          array.push({
-            name: el['mainDish']['name'],
-            id: el['mainDish']['id'],
-            stock: el['mainDish']['stock']
-          })
-          array.push({
-            name: el['dessert']['name'],
-            id: el['dessert']['id'],
-            stock: el['dessert']['stock']
-          })
-          return array
-          break;
-        case 'simple':
-          array.push({
-            name: el['appetizer']['name'],
-            id: el['appetizer']['id'],
-            stock: el['appetizer']['stock']
-          })
-          array.push({
-            name: el['mainDish']['name'],
-            id: el['mainDish']['id'],
-            stock: el['mainDish']['stock']
-          })
-          return array
-          break;
-        case 'second':
-          array.push({
-            name: el['mainDish']['name'],
-            id: el['mainDish']['id'],
-            stock: el['mainDish']['stock']
-          })
-          return array
-          break;
-        default:
-          break;
-      }
-    })
-
-    console.log(dishes);
+    let dishes = this.data['orderList'].filter(el => el['type'])
+      .filter(el => el['type'] == 'simple' || el['type'] == 'executive' || el['type'] == 'second').map(el => {
+        let array = []
+        switch (el['type']) {
+          case 'executive':
+            array.push({
+              name: el['appetizer']['name'],
+              id: el['appetizer']['id'],
+              stock: el['appetizer']['stock']
+            })
+            array.push({
+              name: el['mainDish']['name'],
+              id: el['mainDish']['id'],
+              stock: el['mainDish']['stock']
+            })
+            array.push({
+              name: el['dessert']['name'],
+              id: el['dessert']['id'],
+              stock: el['dessert']['stock']
+            })
+            return array
+            break;
+          case 'simple':
+            array.push({
+              name: el['appetizer']['name'],
+              id: el['appetizer']['id'],
+              stock: el['appetizer']['stock']
+            })
+            array.push({
+              name: el['mainDish']['name'],
+              id: el['mainDish']['id'],
+              stock: el['mainDish']['stock']
+            })
+            return array
+            break;
+          case 'second':
+            array.push({
+              name: el['mainDish']['name'],
+              id: el['mainDish']['id'],
+              stock: el['mainDish']['stock']
+            })
+            return array
+            break;
+          default:
+            break;
+        }
+      })
 
     if (dishes.length) {
       this.countDishes = dishes.reduce((a, b) => a.concat(b), []).map((el, index, array) => {
@@ -93,21 +95,61 @@ export class VoucherComponent implements OnInit {
       }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
     }
 
-
-    this.others = this.data['orderList'].filter(el => el['type'] == 'OTROS').map(el => {
+    this.others = this.data['orderList'].filter(el => el['type']).filter(el => el['type'].toLowerCase() == 'otros').map(el => {
       return {
         name: el['name'],
         id: el['id'],
         amount: el['amount'],
-        stock: el['stock'],
         price: el['price'],
       }
     })
 
-    this.orders = this.data['orderList'].filter(el => el['category'])
+    this.desserts = this.data['orderList'].filter(el => el['type']).filter(el => el['type'].toLowerCase() == 'postres').map(el => {
+      return {
+        name: el['name'],
+        id: el['id'],
+        amount: el['amount'],
+        price: el['price'],
+      }
+    })
+
+    this.combos = this.data['orderList'].filter(el => el['category']).filter(el => el['category'].toLowerCase() == 'combos' || el['category'].toLowerCase() == 'offers')
+
+    if (this.combos.length > 0) {
+      this.combos.forEach(combo => {
+        combo['products'].forEach(product => {
+          if (product['type']) {
+            if (product['type'].toLowerCase() == 'otros') {
+              this.others.push({
+                name: product['name'],
+                id: product['id'],
+                amount: product['quantity'] * combo['amount'],
+                price: 0
+
+              })
+            }
+
+            if (product['type'].toLowerCase() == 'postres') {
+              this.desserts.push({
+                name: product['name'],
+                id: product['id'],
+                amount: product['quantity'],
+                price: 0
+
+              })
+            }
+          }
+        })
+      })
+    }
+
+    this.extras = this.data['orderList'].filter(el => el['category'])
+      .filter(el => el['category'].toLowerCase() == 'extras' || el['category'].toLowerCase() == 'piqueo' || el['category'].toLowerCase() == 'bebidas')
+      .forEach()
+
+    console.log(this.extras);
 
     this.print = this.data['orderList'].map(el => {
-      console.log(el);
       return {
         quantity: el['amount'],
         description: el['name'],
@@ -128,10 +170,6 @@ export class VoucherComponent implements OnInit {
 
       return el
     }).filter((dish, index, array) => array.findIndex(el => el['description'] === dish['description']) === index)
-
-    console.log(this.orders);
-    console.log(this.others);
-
 
   }
 
@@ -266,6 +304,7 @@ export class VoucherComponent implements OnInit {
             editedAt: new Date(),
             createdAt: new Date(),
             createdBy: user,
+            debt: true
           }
 
           batch.set(receivableRef, receivableData)
@@ -283,7 +322,6 @@ export class VoucherComponent implements OnInit {
         if (this.countDishes.length) {
           this.countDishes.forEach(dish => {
             let dishRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(dish['id']);
-            console.log(dish);
 
             batch.update(dishRef, {
               stock: firebase.firestore.FieldValue.increment(dish['amount'] * (-1))
@@ -295,7 +333,6 @@ export class VoucherComponent implements OnInit {
         this.others.forEach(order => {
           let groceryRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc(order['id']);
           let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/${order['id']}/kardex`).doc(inputRef.id)
-          console.log(order);
 
           let inputKardex = {
             id: inputRef.id,
@@ -321,7 +358,43 @@ export class VoucherComponent implements OnInit {
           batch.set(kardexRef, inputKardex)
         })
 
+        this.desserts.forEach(order => {
+          let dessertRef = this.af.firestore.collection(`/db/deliciasTete/warehouseDesserts/`).doc(order['id']);
+          let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseDesserts/${order['id']}/kardex`).doc(inputRef.id)
 
+          let inputKardex = {
+            id: inputRef.id,
+            details: this.data['documentType'] + ': ' + this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
+            insQuantity: 0,
+            insPrice: 0,
+            insTotal: 0,
+            outsQuantity: order['amount'],
+            outsPrice: order['price'],
+            outsTotal: order['amount'] * order['price'],
+            balanceQuantity: 0,
+            balancePrice: 0,
+            balanceTotal: 0,
+            type: 'SALIDA',
+            createdAt: new Date(),
+            createdBy: user
+          }
+
+          batch.update(dessertRef, {
+            stock: firebase.firestore.FieldValue.increment(order['amount'] * (-1))
+          })
+
+          batch.set(kardexRef, inputKardex)
+        })
+
+        this.combos.forEach(combo => {
+          let ref = this.af.firestore.collection(`/db/deliciasTete/${combo['category']}/`).doc(combo['id'])
+
+          batch.update(ref, {
+            soldUnits: firebase.firestore.FieldValue.increment(combo['amount'])
+          })
+        })
+
+        
         //this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
 
         batch.commit().then(() => {

@@ -31,7 +31,7 @@ export class ListComponent implements OnInit {
 
     this.list$ = this.dbs.getListReceivable(this.data).pipe(
       tap(res => {
-        this.dataSource.data = res
+        this.dataSource.data = res.filter(el=>el['debt'])
       })
     )
   }

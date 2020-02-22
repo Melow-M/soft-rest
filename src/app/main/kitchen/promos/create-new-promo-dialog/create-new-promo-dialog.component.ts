@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, Inject, } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
-import { Observable, combineLatest, of } from 'rxjs';
+import { Observable, combineLatest, of, BehaviorSubject } from 'rxjs';
 import { Grocery } from 'src/app/core/models/warehouse/grocery.model';
 import { Household } from 'src/app/core/models/warehouse/household.model';
 import { Input } from 'src/app/core/models/warehouse/input.model';
@@ -20,6 +20,10 @@ import { Meal } from 'src/app/core/models/sales/menu/meal.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateNewPromoDialogComponent implements OnInit {
+  //Loading 
+  loadingTable = new BehaviorSubject(false);
+  loadingTable$ = this.loadingTable.asObservable();
+
   //Table
   inputTableDataSource = new MatTableDataSource<elementPromoTable>();
   inputTableDisplayedColumns: string[] = [
@@ -78,6 +82,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
   }
 
   initForms(promo: Promo){
+    this.loadingTable.next(true);
     if(promo == null){
       this.promoForm = this.fb.group({
         name: [null, Validators.required],
@@ -97,6 +102,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
         product: [null, Validators.required],
         quantity: [null, Validators.required]
       })
+      this.loadingTable.next(false);
     }
     else{
       if(this.data.validityPeriod == 'Definido'){
@@ -138,6 +144,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
 
       this.initTable();
     }
+    
   }
 
   initTable(){
@@ -157,6 +164,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
       });
       this.inputTableDataSource.data = [...aux];
       this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.loadingTable.next(false);
     }));
   }
 
@@ -174,7 +182,7 @@ export class CreateNewPromoDialogComponent implements OnInit {
   //Adding Items
 
   onAddItem(){
-    let aux: elementPromoTable[] = [];
+
 
     //In the case it is an input, it wont have property inputs.
     if(!this.itemForm.get('product').value.hasOwnProperty('inputs')){
@@ -196,6 +204,10 @@ export class CreateNewPromoDialogComponent implements OnInit {
       });
     }
 
+    this.itemForm.reset();
+    this.loadingTable.next(true);
+    let aux: elementPromoTable[] = [];
+
     this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
       this.productsList.forEach((elementPromo, index) => {
           aux.push(
@@ -208,29 +220,43 @@ export class CreateNewPromoDialogComponent implements OnInit {
       });
       this.inputTableDataSource.data = [...aux];
       this.inputTableDataSource.paginator = this.inputTablePaginator;
-      this.itemForm.reset();
+      this.loadingTable.next(false);
     }));
   }
 
   onDeleteItem(item: elementPromoTable){
+    this.itemForm.reset();
+    this.loadingTable.next(true);
     let aux: elementPromoTable[] = [];
+    
 
     this.productsList.splice(item.index, 1);
     
-    this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
-      this.productsList.forEach((elementPromo, index) => {
-          aux.push(
-            {
-              ...elementPromo,
-              index: index,
-              averageCost: res[index]/elementPromo.quantity
-            }
-          )
-      });
-      this.inputTableDataSource.data = [...aux];
+    if(this.productsList.length)
+    {
+      this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
+        this.productsList.forEach((elementPromo, index) => {
+            aux.push(
+              {
+                ...elementPromo,
+                index: index,
+                averageCost: res[index]/elementPromo.quantity
+              }
+            )
+        });
+  
+        this.inputTableDataSource.data = [...aux];
+        this.inputTableDataSource.paginator = this.inputTablePaginator;
+  
+        this.loadingTable.next(false);
+      }));
+    }
+    else{
+      this.inputTableDataSource.data = [];
       this.inputTableDataSource.paginator = this.inputTablePaginator;
-      this.itemForm.reset();
-    }));
+      this.loadingTable.next(false);
+    }
+
   }
 
   getTotalCost(): number{

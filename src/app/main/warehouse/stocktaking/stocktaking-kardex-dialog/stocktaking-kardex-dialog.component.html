@@ -34,17 +34,18 @@
         <ng-container *ngIf="kardex.length; else default">
           <div class="mat-elevation-z8" style="border-radius: 10px 10px 10px 10px">
             <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
-              <table mat-table [dataSource]="dataSource" matSort style="width:100%">
+              <table *ngIf="!topColumns.length; else collapsedTable"
+                mat-table [dataSource]="dataSource" matSort style="width:100%">
 
                 <ng-container matColumnDef="index" sticky>
-                  <th mat-header-cell style="padding:0px 25px; border-right: 1px solid gainsboro;" *matHeaderCellDef>N°</th>
+                  <th mat-header-cell style="padding:0px 25px; border-right: 1px solid gainsboro; text-align:center" *matHeaderCellDef>N°</th>
                   <td mat-cell style="padding:0px 25px; border-right: 1px solid gainsboro;" *matCellDef="let raw; let i = index">
                     {{i+1}}
                   </td>
                 </ng-container>
 
                 <ng-container matColumnDef="createdAt">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro;" *matHeaderCellDef>
+                  <th mat-header-cell [attr.colspan]="1" style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;" *matHeaderCellDef>
                     Fecha</th>
                   <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
                     {{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}
@@ -52,7 +53,7 @@
                 </ng-container>
 
                 <ng-container matColumnDef="details">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro;"
+                  <th mat-header-cell [attr.colspan]="1" style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"
                     *matHeaderCellDef>
                     Detalle</th>
                   <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
@@ -61,92 +62,189 @@
                 </ng-container>
 
                 <ng-container matColumnDef="insQuantity">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px;" *matHeaderCellDef>
-                    E. Cantidad</th>
+                  <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center;" *matHeaderCellDef>
+                    Entrada Cantidad</th>
                   <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                     <span [ngStyle]="{'color' : raw.insQuantity ? 'darkslategray' : 'lightgray'}"
                       style="font-weight: bold;">{{raw.insQuantity | number : '.2'}}</span>
                   </td>
                 </ng-container>
 
-                <ng-container matColumnDef="insPrice">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>
-                    E. Pr./Uni</th>
-                  <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                    <span [ngStyle]="{'color' : raw.insPrice ? 'darkslategray' : 'lightgray'}"
-                      style="font-weight: bold;">{{raw.insPrice | number : '.2'}}</span>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="insTotal">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro;"
-                    *matHeaderCellDef>
-                    E. Total</th>
-                  <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
-                    <span [ngStyle]="{'color' : raw.insTotal ? 'darkslategray' : 'lightgray'}"
-                      style="font-weight: bold;">{{raw.insTotal | number : '.2'}}</span>
-                  </td>
-                </ng-container>
-
                 <ng-container matColumnDef="outsQuantity">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>
-                    S. Cantidad</th>
+                  <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center" *matHeaderCellDef>
+                    Salida Cantidad</th>
                   <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                     <span [ngStyle]="{'color' : raw.outsQuantity ? 'darkslategray' : 'lightgray'}"
                       style="font-weight: bold;">{{raw.outsQuantity | number : '.2'}}</span>
                   </td>
                 </ng-container>
 
-                <ng-container matColumnDef="outsPrice">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>
-                    S. Pr./Uni</th>
-                  <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                    <span [ngStyle]="{'color' : raw.outsPrice ? 'darkslategray' : 'lightgray'}"
-                      style="font-weight: bold;">{{raw.outsPrice | number : '.2'}}</span>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="outsTotal">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro;"
-                    *matHeaderCellDef>
-                    S. Total</th>
-                  <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
-                    <span [ngStyle]="{'color' : raw.outsTotal ? 'darkslategray' : 'lightgray'}"
-                      style="font-weight: bold;">{{raw.outsTotal | number : '.2'}}</span>
-                  </td>
-                </ng-container>
-
                 <ng-container matColumnDef="balanceQuantity">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>
-                    Sal. Cantidad</th>
+                  <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center" *matHeaderCellDef>
+                    Saldo Cantidad</th>
                   <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
                     <span [ngStyle]="{'color' : raw.balanceTotal ? 'darkslategray' : 'lightgray'}"
                       style="font-weight: bold;">{{raw.balanceQuantity | number : '.2'}}</span>
                   </td>
                 </ng-container>
 
-                <ng-container matColumnDef="balancePrice">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>
-                    Sal. Pr./Uni</th>
-                  <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                    <span [ngStyle]="{'color' : raw.balanceTotal ? 'darkslategray' : 'lightgray'}"
-                      style="font-weight: bold;">{{raw.balancePrice | number : '.2'}}</span>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="balanceTotal">
-                  <th mat-header-cell style="padding:0px 8px; min-width:65px" *matHeaderCellDef>
-                    Sal. Total</th>
-                  <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
-                    <span [ngStyle]="{'color' : raw.balanceTotal ? 'darkslategray' : 'lightgray'}"
-                      style="font-weight: bold;">{{raw.balanceTotal | number : '.2'}}</span>
-                  </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
               </table>
+
+              <ng-template #collapsedTable>
+                <table 
+                  mat-table [dataSource]="dataSource" matSort style="width:100%">
+
+                  <!-- N° -->
+                  <ng-container matColumnDef="index" sticky>
+                    <th mat-header-cell style="border-bottom-style:none; vertical-align:bottom ;padding:0px 25px; border-right: 1px solid gainsboro; text-align:center" *matHeaderCellDef>N°</th>
+                    <td mat-cell style="padding:0px 25px; border-right: 1px solid gainsboro;" *matCellDef="let raw; let i = index">
+                      {{i+1}}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="createdAt">
+                    <th mat-header-cell [attr.colspan]="1" style="border-bottom-style:none; vertical-align:bottom; padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;" *matHeaderCellDef>
+                      Fecha</th>
+                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
+                      {{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="details">
+                    <th mat-header-cell [attr.colspan]="1" style="border-bottom-style:none; vertical-align:bottom; padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"
+                      *matHeaderCellDef>
+                      Detalle</th>
+                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
+                      {{raw.details}}
+                    </td>
+                  </ng-container>
+
+                  <!-- entrada  -->
+                  <ng-container matColumnDef="ins">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="3" style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"> Entradas </th>
+                  </ng-container>
+                  <ng-container matColumnDef="insQuantity">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center;" *matHeaderCellDef>
+                      Cantidad</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.insQuantity ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.insQuantity | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="insPrice">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center" *matHeaderCellDef>
+                      Pr./Uni</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.insPrice ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.insPrice | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="insTotal">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"
+                      *matHeaderCellDef>
+                      Total</th>
+                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.insTotal ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.insTotal | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+                  <!-- salida -->
+                  <ng-container matColumnDef="outs">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="3" style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"> Salidas </th>
+                  </ng-container>
+                  <ng-container matColumnDef="outsQuantity">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center" *matHeaderCellDef>
+                      Cantidad</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.outsQuantity ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.outsQuantity | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="outsPrice">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center" *matHeaderCellDef>
+                      Pr./Uni</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.outsPrice ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.outsPrice | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="outsTotal">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"
+                      *matHeaderCellDef>
+                      Total</th>
+                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.outsTotal ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.outsTotal | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+
+                  <!-- Saldo -->
+                  <ng-container matColumnDef="balance">
+                    <th mat-header-cell *matHeaderCellDef [attr.colspan]="3" style="padding:0px 8px; min-width:65px; text-align:center;"> Balance </th>
+                  </ng-container>
+                  <ng-container matColumnDef="balanceQuantity">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center" *matHeaderCellDef>
+                      Sal. Cantidad</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.balanceTotal ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.balanceQuantity | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="balancePrice">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center" *matHeaderCellDef>
+                      Sal. Pr./Uni</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.balanceTotal ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.balancePrice | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="balanceTotal">
+                    <th mat-header-cell style="padding:0px 8px; min-width:65px; text-align:center" *matHeaderCellDef>
+                      Sal. Total</th>
+                    <td mat-cell style="padding:0px 8px" *matCellDef="let raw">
+                      <span [ngStyle]="{'color' : raw.balanceTotal ? 'darkslategray' : 'lightgray'}"
+                        style="font-weight: bold;">{{raw.balanceTotal | number : '.2'}}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="invisibleIndex" sticky>
+                    <th mat-header-cell *matHeaderCellDef style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"></th>
+                    <td mat-cell style="padding:0px 25px; border-right: 1px solid gainsboro;" *matCellDef="let raw; let i = index">
+                      {{i+1}}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="invisibleCreatedAt">
+                    <th mat-header-cell *matHeaderCellDef style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"></th>
+                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
+                      {{raw.createdAt.seconds * 1000 | date : 'dd/MM/yyyy'}}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="invisibleDetails">
+                    <th mat-header-cell *matHeaderCellDef style="padding:0px 8px; min-width:65px; border-right: 1px solid gainsboro; text-align:center;"></th>
+                    <td mat-cell style="padding:0px 8px; border-right: 1px solid gainsboro;" *matCellDef="let raw">
+                      {{raw.details}}
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="topColumns"></tr>
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                </table>
+              </ng-template>
             </div>
             <mat-paginator style="border-radius: 0px 0px 10px 10px" [pageSizeOptions]="[5, 10, 20]"
               showFirstLastButtons></mat-paginator>

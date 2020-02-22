@@ -8,6 +8,7 @@ import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { ConfirmPromoDialogComponent } from './confirm-promo-dialog/confirm-promo-dialog.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { ConfirmPromoDialogComponent } from './confirm-promo-dialog/confirm-prom
     MatTableModule,
     MatPaginatorModule,
     CommonModule,
-    MatMenuModule
+    MatMenuModule,
+    MatProgressSpinnerModule
   ],
   entryComponents: [
     CreateNewPromoDialogComponent,

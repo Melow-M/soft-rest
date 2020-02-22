@@ -7,13 +7,13 @@
             Menú
         </h1>
         <div style="display: flex; border-top: 1px solid;">
-            <div class="ticket" *ngIf="plate$ | async">
+            <div class="ticket" >
                 <div class="header flex-div" *ngIf="numberOrder$ | async as number">
                     <span>Pedido</span>
                     <span style="flex: 1 1 auto;"></span>
                     <span>#{{("0000"+number).slice(-5)}}</span>
                 </div>
-                <div class="order-list">
+                <div class="order-list"  *ngIf="plate$ | async">
                     <ol>
                         <li class="order" *ngFor="let plate of order; let i = index" (click)="selectPlate(plate, i)"
                             [ngStyle]="{'border':selectablePlate==plate?'1px solid black':'none'}">
@@ -27,31 +27,29 @@
                                     (click)="deleteDish(i,false)">
                                     delete</mat-icon>
                             </div>
-                            <div *ngIf="plate['mainDish']">
-                                <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                    *ngIf="plate['appetizer']">
-                                    <span style="width: 7%;"></span>
-                                    <span style="width: 80%;">{{plate['appetizer']['name'] | titlecase}}</span>
-                                    <mat-icon style="cursor: pointer; margin-left:5px"
-                                        (click)="deleteSubDish(i,'appetizer')">delete
-                                    </mat-icon>
-                                </div>
-                                <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                    *ngIf="plate['mainDish']">
-                                    <span style="width: 7%;"></span>
-                                    <span style="width: 80%;">{{plate['mainDish']['name'] | titlecase}}</span>
-                                    <mat-icon style="cursor: pointer; margin-left:5px"
-                                        (click)="deleteSubDish(i,'mainDish')">delete
-                                    </mat-icon>
-                                </div>
-                                <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                    *ngIf="plate['dessert']">
-                                    <span style="width: 7%;"></span>
-                                    <span style="width: 80%;">{{plate['dessert']['name'] | titlecase}}</span>
-                                    <mat-icon style="cursor: pointer; margin-left:5px"
-                                        (click)="deleteSubDish(i,'dessert')">delete
-                                    </mat-icon>
-                                </div>
+                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                *ngIf="plate['appetizer']">
+                                <span style="width: 7%;"></span>
+                                <span style="width: 80%;">{{plate['appetizer']['name'] | titlecase}}</span>
+                                <mat-icon style="cursor: pointer; margin-left:5px"
+                                    (click)="deleteSubDish(i,'appetizer')">delete
+                                </mat-icon>
+                            </div>
+                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                *ngIf="plate['mainDish']">
+                                <span style="width: 7%;"></span>
+                                <span style="width: 80%;">{{plate['mainDish']['name'] | titlecase}}</span>
+                                <mat-icon style="cursor: pointer; margin-left:5px"
+                                    (click)="deleteSubDish(i,'mainDish')">delete
+                                </mat-icon>
+                            </div>
+                            <div class="flex-div" style="justify-content: space-between; width: 100%;"
+                                *ngIf="plate['dessert']">
+                                <span style="width: 7%;"></span>
+                                <span style="width: 80%;">{{plate['dessert']['name'] | titlecase}}</span>
+                                <mat-icon style="cursor: pointer; margin-left:5px" (click)="deleteSubDish(i,'dessert')">
+                                    delete
+                                </mat-icon>
                             </div>
                             <div *ngIf="plate['products']">
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
@@ -124,8 +122,8 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="MenuList" style="width:100%;" >
-                <div style="height: 74vh;">
+            <div *ngIf="MenuList" style="width:100%;">
+                <div style="height: 74vh;" >
                     <div class="type">
                         <span class="header">Tipo</span>
                         <div class="flex-div" style="height: 19vh; overflow-x: auto;">
@@ -239,8 +237,7 @@
                         <div *ngIf="appetizer$ | async as piqueos">
                             <div *ngIf="piqueos.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of piqueos"
-                                        (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of piqueos" (click)="addOrder(plate)">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>

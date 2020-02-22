@@ -83,8 +83,10 @@ export class AccountsReceivableComponent implements OnInit {
     this.dialog.open(PartialPayComponent)
   }
 
-  totalPay() {
-    this.dialog.open(TotalPayComponent)
+  totalPay(debt) {
+    this.dialog.open(TotalPayComponent, {
+      data: debt
+    })
   }
 
   list(id) {

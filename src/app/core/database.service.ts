@@ -640,8 +640,8 @@ export class DatabaseService {
     this.others$ = this.othersCollection.valueChanges().pipe(shareReplay(1));
     return this.others$;
   }
-  onGetDishes() {
 
+  onGetDishes() {
     this.dishesCollection = this.af.collection('db/deliciasTete/kitchenDishes', ref => ref.orderBy('createdAt', 'desc'));
     this.dishes$ = this.dishesCollection.valueChanges().pipe(shareReplay(1));
     return this.dishes$;

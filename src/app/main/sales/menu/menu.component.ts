@@ -99,7 +99,10 @@ export class MenuComponent implements OnInit {
     public auth: AuthService,
     private router: Router,
     private snackbar: MatSnackBar
-  ) { }
+  ) {
+
+    this.dbs.onGetDishes()
+  }
 
   ngOnInit() {
     this.createForm()
@@ -165,8 +168,8 @@ export class MenuComponent implements OnInit {
       })
     );
 
-    this.plate$ = this.dbs.onGetDishes().pipe(
-      tap(dishes => {
+    this.plate$ = this.dbs.dishes$.pipe(
+      map(dishes => {
         let plates = dishes.filter(el => el['status'] == 'DISPONIBLE')
         this.plates = plates.map(el => {
           return {
@@ -174,7 +177,8 @@ export class MenuComponent implements OnInit {
             sold: el['initialStock'] - el['stock']
           }
         })
-        console.log(this.plates.filter(el => el['menuType'] == 'executive'));
+
+        return plates
 
       })
     )
@@ -386,11 +390,8 @@ export class MenuComponent implements OnInit {
   }
 
   cancelOrder() {
-    console.log(this.order.length);
 
     this.order.forEach((el, i) => {
-      console.log(i);
-
       this.deleteDish(i, true)
     })
 
@@ -407,6 +408,8 @@ export class MenuComponent implements OnInit {
     this.ticketForm.reset()
     this.billForm.reset()
     this.pay.reset()
+    this.showReceivable = false
+    this.receivable = false
   }
 
   goToCategories() {
@@ -424,6 +427,7 @@ export class MenuComponent implements OnInit {
 
       this.selectablePlate = plate
       this.selectIndex = i
+      this.selectMenu = plate['type']
       this.MenuList = true
       this.otherList = false
 
@@ -476,9 +480,6 @@ export class MenuComponent implements OnInit {
     } else {
       this.changeDishStok(newDish['mainDish'], 'aum')
     }
-
-
-
   }
 
 
@@ -488,6 +489,13 @@ export class MenuComponent implements OnInit {
       if (!all) {
         this.order.splice(index, 1);
         this.total = this.order.map(el => el['price'] * el['amount']).reduce((a, b) => a + b, 0);
+      }
+
+      if (this.selectMenu == dish['type']) {
+        this.entry = []
+        this.soup = []
+        this.dessert = []
+        this.second = []
       }
 
       if (dish['type'] == 'OTROS') {
@@ -512,7 +520,18 @@ export class MenuComponent implements OnInit {
   }
 
   deleteSubDish(index, type) {
-    this.order[index][type] = ''
+
+    if (index !== -1) {
+      let dish = this.order[index]
+
+      let subDish = this.order[index][type]
+      this.changeDishStok(subDish, 'dis')
+      this.order[index][type] = ''
+      if (!dish['appetizer'] && !dish['mainDish'] && !dish['dessert']) {
+        this.deleteDish(index, false)
+      }
+    }
+
   }
 
   changeDishStok(plate, change) {

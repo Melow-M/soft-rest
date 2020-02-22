@@ -93,7 +93,6 @@ export class VoucherComponent implements OnInit {
       }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
     }
 
-
     this.others = this.data['orderList'].filter(el => el['type'] == 'OTROS').map(el => {
       return {
         name: el['name'],
@@ -107,7 +106,6 @@ export class VoucherComponent implements OnInit {
     this.orders = this.data['orderList'].filter(el => el['category'])
 
     this.print = this.data['orderList'].map(el => {
-      console.log(el);
       return {
         quantity: el['amount'],
         description: el['name'],
@@ -128,10 +126,6 @@ export class VoucherComponent implements OnInit {
 
       return el
     }).filter((dish, index, array) => array.findIndex(el => el['description'] === dish['description']) === index)
-
-    console.log(this.orders);
-    console.log(this.others);
-
 
   }
 
@@ -283,7 +277,6 @@ export class VoucherComponent implements OnInit {
         if (this.countDishes.length) {
           this.countDishes.forEach(dish => {
             let dishRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(dish['id']);
-            console.log(dish);
 
             batch.update(dishRef, {
               stock: firebase.firestore.FieldValue.increment(dish['amount'] * (-1))
@@ -295,7 +288,6 @@ export class VoucherComponent implements OnInit {
         this.others.forEach(order => {
           let groceryRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc(order['id']);
           let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/${order['id']}/kardex`).doc(inputRef.id)
-          console.log(order);
 
           let inputKardex = {
             id: inputRef.id,

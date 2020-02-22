@@ -53,10 +53,10 @@
                             </div>
                             <div *ngIf="plate['products']">
                                 <div class="flex-div" style="justify-content: space-between; width: 100%;"
-                                    *ngFor="let plate of plate['products']">
+                                    *ngFor="let product of plate['products']">
                                     <span style="width: 7%;"></span>
-                                    <span style="width: 7%;">{{plate['quantity']}}</span>
-                                    <span style="width: 80%;">{{plate['product']['name'] | titlecase}}</span>
+                                    <span style="width: 7%;">{{product['quantity']}}</span>
+                                    <span style="width: 80%;">{{product['name'] | titlecase}}</span>
                                 </div>
                             </div>
                         </li>
@@ -285,10 +285,10 @@
                         </div>
                     </div>
                     <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Postres'">
-                        <div *ngIf="dessert$ | async as others">
-                            <div *ngIf="others.length">
+                        <div *ngIf="dessert$ | async">
+                            <div *ngIf="othersDesserts.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of othersDesserts" (click)="addOrder(plate)">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>
@@ -322,14 +322,12 @@
                         <div *ngIf="combo$ | async as others">
                             <div *ngIf="others.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of others" [ngStyle]="{'display': plate['state']=='Publicado'?'block':'none'}" (click)="addOrder(plate)">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>
                                         <span class="price" *ngIf="plate['price']">S/.
                                             {{plate['price'] | number: '.2'}}</span>
-                                        <span class="price" *ngIf="plate['promoPrice']">S/.
-                                            {{plate['promoPrice'] | number: '.2'}}</span>
                                     </div>
                                 </div>
                             </div>

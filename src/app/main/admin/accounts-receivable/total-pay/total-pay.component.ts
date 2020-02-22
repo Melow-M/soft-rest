@@ -132,11 +132,23 @@ export class TotalPayComponent implements OnInit {
             createdBy: user,
             paidAmount: this.data['indebtAmount'],
             cash: this.dataFormGroup.value['cash'],
-            transactionId: transactionRef.id
+            transactionId: transactionRef.id,
+            type: 'Pago Total'
           }
 
           batch.set(receivablePayRef, data)
           batch.set(transactionRef, transaction)
+
+          this.dbs.getListReceivable(this.data['id']).pipe(
+            take(1)
+          ).subscribe(res => {
+            res.forEach(el => {
+              const ref = this.af.firestore.collection(`/db/deliciasTete/receivableUsers/${this.data['id']}/payments`).doc(el.id)
+              batch.update(ref, {
+                debt: false
+              })
+            })
+          })
 
           batch.commit()
             .then(() => {

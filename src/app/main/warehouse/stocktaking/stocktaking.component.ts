@@ -28,12 +28,15 @@ export class StocktakingComponent implements OnInit {
 
   itemsTypeFormControl = new FormControl('INSUMOS');
   itemFormControl = new FormControl();
+  valoradoFormControl: FormControl = new FormControl(false);
 
-  displayedColumns: string[] = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
+  displayedColumns: string[] = [];
 
   dataSource = new MatTableDataSource();
 
   defaultImage = "../../../../assets/images/default-image.jpg";
+
+  
 
   @ViewChild(MatPaginator, { static: false }) set content(paginator: MatPaginator) {
     this.dataSource.paginator = paginator;
@@ -45,19 +48,6 @@ export class StocktakingComponent implements OnInit {
     'POSTRES',
     'OTROS'
   ];
-
-    //Excel
-    headersXlsx: string[] = [
-      'Nombre',
-      'SKU',
-      'Medida',
-      'Stock',
-      'Costo promedio',
-      'Valor Total',
-      'Descripción',
-      'Creado por',
-      'Editado por'
-    ]
 
   items$: Observable<(any)[]>;
   typeAndItems$: Observable<(any)[]>;
@@ -72,19 +62,26 @@ export class StocktakingComponent implements OnInit {
 
   ngOnInit() {
 
-    this.typeAndItems$ =
-      this.itemsTypeFormControl.valueChanges
+    this.typeAndItems$ = combineLatest(this.itemsTypeFormControl.valueChanges.pipe(startWith('INSUMOS')), this.valoradoFormControl.valueChanges.pipe(startWith(false)))
         .pipe(
-          startWith<any>('INSUMOS'),
           debounceTime(300),
-          tap(type => {
-            if (type === 'INSUMOS' || type === 'INVENTARIO') {
-              this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'totalValue', 'description', 'createdBy', 'editedBy', 'actions'];
-            } else if (type === 'POSTRES' || type === 'OTROS') {
-              this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
+          tap(([type, valorado]) => {
+            if(valorado){
+              if (type === 'INSUMOS' || type === 'INVENTARIO') {
+                this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'totalValue', 'description', 'createdBy', 'editedBy', 'actions'];
+              } else if (type === 'POSTRES' || type === 'OTROS') {
+                this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'averageCost', 'price', 'totalValue', 'utility', 'description', 'createdBy', 'editedBy', 'actions'];
+              }
+            }
+            else{
+              if (type === 'INSUMOS' || type === 'INVENTARIO') {
+                this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'description', 'createdBy', 'editedBy', 'actions'];
+              } else if (type === 'POSTRES' || type === 'OTROS') {
+                this.displayedColumns = ['index', 'picture', 'name', 'sku', 'unit', 'stock', 'description', 'createdBy', 'editedBy', 'actions'];
+              }
             }
           }),
-          switchMap(type => {
+          switchMap(([type, valorado]) => {
             return this.observeItems(type);
           })
         );
@@ -180,11 +177,36 @@ export class StocktakingComponent implements OnInit {
     console.log(this.dataSource.data);
     let table_xlsx: any[] = [];
     let dateRange;
-    table_xlsx.push(this.headersXlsx);
+
+    let headerXlsx = this.valoradoFormControl.value ? 
+      [
+        'Nombre',
+        'SKU',
+        'Medida',
+        'Stock',
+        'Costo promedio',
+        'Valor Total',
+        'Descripción',
+        'Creado por',
+        'Editado por'
+      ]
+      :
+      [
+        'Nombre',
+        'SKU',
+        'Medida',
+        'Stock',
+        'Descripción',
+        'Creado por',
+        'Editado por'
+      ];
+
+    table_xlsx.push(headerXlsx);
 
     this.dataSource.data.forEach((element) => {
 
-      const temp = [
+      const temp = this.valoradoFormControl.value ?  
+      [
         element['name'],
         element['sku'],
         element['unit'],
@@ -194,7 +216,18 @@ export class StocktakingComponent implements OnInit {
         element['description'],
         element['createdBy']['displayName'],
         !!element['editedBy'] ? element['editedBy']['displayName'] : "",
+      ]
+        :
+      [
+        element['name'],
+        element['sku'],
+        element['unit'],
+        element['stock'],
+        element['description'],
+        element['createdBy']['displayName'],
+        !!element['editedBy'] ? element['editedBy']['displayName'] : "",
       ];
+
       table_xlsx.push(temp);
     })
 

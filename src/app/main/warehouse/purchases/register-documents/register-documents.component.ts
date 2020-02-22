@@ -105,7 +105,6 @@ export class RegisterDocumentsComponent implements OnInit {
 
     this.itemsListForm.get('item').valueChanges.subscribe((item: Input) => {
       if(item != null){
-        this.itemsListForm.get('cost').setValue(item.averageCost);
         this.itemsListForm.get('kitchenInputId').setValue(item.id);
       }
     })

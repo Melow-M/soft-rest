@@ -35,8 +35,8 @@ export class PromosComponent implements OnInit {
     'Productos',
     'Estado',
     'Rango de Fechas',
-    'Precio de Venta',
-    'Precio Promocional',
+    'Precio de Venta (S/.)',
+    'Precio Promocional (S/.)',
     '% DCTO',
     'Unidades Disponibles',
     'Unidades Vendidas',
@@ -121,11 +121,11 @@ export class PromosComponent implements OnInit {
         element.products.map(el => el.name).join(', '),
         element.state,
         dateRange,
-        'S/.'+element.realPrice.toFixed(2),
-        'S/.'+element.price.toFixed(2),
-        ((element.realPrice-element.price)/element.realPrice*100.0).toFixed(2) + "%",
+        element.realPrice.toFixed(2),
+        element.price.toFixed(2),
+        ((element.realPrice-element.price)/element.realPrice*100.0).toFixed(2),
+        element.quantity == 'Definido' ? element.units: 'Ilimitado',
         element.soldUnits,
-        availableUnits,
         element.createdBy.displayName
       ];
       table_xlsx.push(temp);

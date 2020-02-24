@@ -23,6 +23,7 @@ export class StocktakingKardexDialogComponent implements OnInit {
   dateFormControl = new FormControl({ begin: new Date(), end: new Date() });
   kardexTypeFormControl = new FormControl(true);
 
+  topColumns: string[] = [];
   displayedColumns: string[] = [];
 
   dataSource = new MatTableDataSource();
@@ -47,6 +48,10 @@ export class StocktakingKardexDialogComponent implements OnInit {
     private datePipe: DatePipe
   ) { }
 
+  showTop(){
+    return !!this.topColumns.length ? 'initial' : 'none';
+  }
+
   ngOnInit() {
 
     const view = this.dbs.getCurrentMonthOfViewDate();
@@ -54,10 +59,15 @@ export class StocktakingKardexDialogComponent implements OnInit {
 
     this.valorado$ = this.valoradoFormControl.valueChanges.pipe(startWith(false), tap(valorado => {
       if(valorado){
-        this.displayedColumns = ['index', 'createdAt', 'details', 'insQuantity', 'insPrice', 'insTotal', 'outsQuantity', 'outsPrice', 'outsTotal', 'balanceQuantity', 'balancePrice', 'balanceTotal'];
+        this.topColumns = ['index', 'createdAt', 'details', 'ins', 'outs', 'balance'];
+        this.displayedColumns = ['invisibleIndex', 'invisibleCreatedAt', 'invisibleDetails', 'insQuantity', 'insPrice', 'insTotal', 'outsQuantity', 'outsPrice', 'outsTotal', 'balanceQuantity', 'balancePrice', 'balanceTotal'];
+        console.log(this.topColumns.length)
+
       }
       else{
+        this.topColumns = [];
         this.displayedColumns = ['index', 'createdAt', 'details', 'insQuantity', 'outsQuantity', 'balanceQuantity'];
+        console.log(this.topColumns.length)
       }
     }))
 

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { MatTableDataSource, MatPaginator, MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
-import { Observable, of } from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Grocery } from 'src/app/core/models/warehouse/grocery.model';
 import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
@@ -16,6 +16,9 @@ import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
   styleUrls: ['./create-new-combo-dialog.component.css']
 })
 export class CreateNewComboDialogComponent implements OnInit {
+  //Loading 
+  loadingTable = new BehaviorSubject(false);
+  loadingTable$ = this.loadingTable.asObservable();
 
   //Table
   inputTableDataSource = new MatTableDataSource<elementComboTable>();
@@ -76,6 +79,7 @@ export class CreateNewComboDialogComponent implements OnInit {
   }
 
   initForms(combo: Combo){
+    this.loadingTable.next(true);
     if(combo == null){
       this.comboForm = this.fb.group({
         name: [null, Validators.required],
@@ -93,6 +97,8 @@ export class CreateNewComboDialogComponent implements OnInit {
         product: [null, Validators.required],
         quantity: [null, Validators.required]
       })
+      this.loadingTable.next(false);
+
     }
     else{
       if(this.data.validityPeriod == 'Definido'){
@@ -149,6 +155,8 @@ export class CreateNewComboDialogComponent implements OnInit {
       });
       this.inputTableDataSource.data = [...aux];
       this.inputTableDataSource.paginator = this.inputTablePaginator;
+      this.loadingTable.next(false);
+
     }));
 
   }
@@ -166,7 +174,7 @@ export class CreateNewComboDialogComponent implements OnInit {
   //Table
   //Adding items
   onAddItem(){
-    let aux: elementComboTable[] = [];
+
 
     //In the case it is an input, it wont have property inputs.
     if(!this.itemForm.get('product').value.hasOwnProperty('inputs')){
@@ -188,6 +196,10 @@ export class CreateNewComboDialogComponent implements OnInit {
       });
     }
 
+    this.itemForm.reset();
+    this.loadingTable.next(true);
+    let aux: elementComboTable[] = [];
+
     this.productsObservable$ = this.dbs.gettingTotalRealCost(this.productsList).pipe(tap(res => {
       this.productsList.forEach((elementCombo, index) => {
           aux.push(
@@ -200,11 +212,13 @@ export class CreateNewComboDialogComponent implements OnInit {
       });
       this.inputTableDataSource.data = [...aux];
       this.inputTableDataSource.paginator = this.inputTablePaginator;
-      this.itemForm.reset();
+
     }));
   }
 
   onDeleteItem(item: elementComboTable){
+    this.itemForm.reset();
+    this.loadingTable.next(true);
     let aux: elementComboTable[] = [];
 
     this.productsList.splice(item.index, 1);
@@ -221,7 +235,8 @@ export class CreateNewComboDialogComponent implements OnInit {
       });
       this.inputTableDataSource.data = [...aux];
       this.inputTableDataSource.paginator = this.inputTablePaginator;
-      this.itemForm.reset();
+
+      this.loadingTable.next(false);
     }));
   }
 

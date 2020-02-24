@@ -66,7 +66,7 @@ export class CombosComponent implements OnInit {
 
   onCreateNewCombo(){
     this.dialog.open(CreateNewComboDialogComponent, {
-      width: '550px',
+      width: '600px',
       data: null
     })
   }
@@ -74,7 +74,7 @@ export class CombosComponent implements OnInit {
   onEditCombo(combo: Combo){
     console.log(combo);
     this.dialog.open(CreateNewComboDialogComponent, {
-      width: '550px',
+      width: '600px',
       data: combo
     })
   }

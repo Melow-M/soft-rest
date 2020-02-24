@@ -217,44 +217,44 @@
             <table mat-table [dataSource]="inputsTableDataSource" class="mat-elevation-z8 w3-margin-top"
                 style="width:100%; max-height: 30vh; overflow:auto">
                 <!-- Cantidad -->
-                <ng-container matColumnDef="N°">
-                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>N°</th>
-                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element; let i = index">
+                <ng-container matColumnDef="N°" >
+                    <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: left;">N°</th>
+                    <td class="w3-center w3-border-left" mat-cell *matCellDef="let element;  let i = index" style="text-align: left;">
                         {{i+1}}</td>
-                    <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef style="text-align: left;"></td>
                 </ng-container>
 
-                <ng-container matColumnDef="Tipo">
-                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Tipo</th>
-                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                <ng-container matColumnDef="Tipo" >
+                    <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: center;">Tipo</th>
+                    <td class="w3-center w3-border-left" mat-cell *matCellDef="let element" style="text-align: center;">
                         {{element.type}}</td>
-                    <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef style="text-align: center;"></td>
                 </ng-container>
 
-                <ng-container matColumnDef="Producto">
-                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Producto</th>
-                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                <ng-container matColumnDef="Producto" >
+                    <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: center;">Producto</th>
+                    <td class="w3-center w3-border-left" mat-cell *matCellDef="let element" style="text-align: center;">
                         {{element.item.name}}</td>
-                    <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef style="text-align: center;"></td>
                 </ng-container>
-                <ng-container matColumnDef="Medida">
-                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Medida</th>
-                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                <ng-container matColumnDef="Medida" >
+                    <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: center;">Medida</th>
+                    <td class="w3-center w3-border-left" mat-cell *matCellDef="let element" style="text-align: center;">
                         {{element.unit}}</td>
-                    <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef style="text-align: center;"></td>
                 </ng-container>
-                <ng-container matColumnDef="Cantidad">
-                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Cantidad</th>
-                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                <ng-container matColumnDef="Cantidad" >
+                    <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: center;">Cantidad</th>
+                    <td class="w3-center w3-border-left" mat-cell *matCellDef="let element" style="text-align: center;">
                         {{element.quantity}}</td>
-                    <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef style="text-align: center;"></td>
                 </ng-container>
-                <ng-container matColumnDef="averageCost">
-                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>C.U. (S/.)</th>
-                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                <ng-container matColumnDef="averageCost" >
+                    <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: center;">C.U. (S/.)</th>
+                    <td class="w3-center w3-border-left" mat-cell *matCellDef="let element" style="text-align: center;">
                         <span>{{element.averageCost | currency: 'S/.'}}</span>
                     </td>
-                    <td mat-footer-cell *matFooterCellDef>
+                    <td mat-footer-cell *matFooterCellDef style="text-align: center;">
                         <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
                             style="margin: 0px 0px" class="animated fadeInRight w3-margin-top">Subtotal</p>
                         <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
@@ -262,12 +262,12 @@
                         <p class="w3-margin-bottom" style="margin: 0px 0px">TOTAL</p>
                     </td>
                 </ng-container>
-                <ng-container matColumnDef="totalCost">
-                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Costo (S/.)</th>
-                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                <ng-container matColumnDef="totalCost" >
+                    <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: center;">Costo (S/.)</th>
+                    <td class="w3-center w3-border-left" mat-cell *matCellDef="let element" style="text-align: center;">
                         <span>{{element.totalCost | currency: 'S/.'}}</span>
                     </td>
-                    <td mat-footer-cell *matFooterCellDef>
+                    <td mat-footer-cell *matFooterCellDef style="text-align: center;">
                         <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
                             class="animated fadeInRight" style="margin: 0px 0px" class="animated fadeInRight w3-margin-top">{{getSubtotal() | currency: 'S/.'}}</p>
                         <p *ngIf="this.documentForm.get('documentDetails').get('documentType').value === 'FACTURA'"
@@ -275,14 +275,14 @@
                         <p class="animated fadeInRight" style="margin: 0px 0px" class="animated fadeInRight w3-margin-bottom">{{getTotalCost() | currency: 'S/.'}}</p>
                     </td>
                 </ng-container>
-                <ng-container matColumnDef="Acciones">
-                    <th class="w3-center w3-border-left w3-padding" mat-header-cell *matHeaderCellDef>Acciones</th>
-                    <td class="w3-center w3-border-left w3-padding" mat-cell *matCellDef="let element">
+                <ng-container matColumnDef="Acciones" >
+                    <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: center; padding-right:0;">Acciones</th>
+                    <td class="w3-center w3-border-left" mat-cell *matCellDef="let element" style="text-align: center; padding-right:0;">
                         <button mat-button (click)="onDeleteInput(element)">
                             <mat-icon>delete</mat-icon>
                         </button>
                     </td>
-                    <td mat-footer-cell *matFooterCellDef></td>
+                    <td mat-footer-cell *matFooterCellDef style="text-align: center; padding-right:0;"></td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="inputsTableDisplayedColumns"></tr>

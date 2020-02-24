@@ -95,7 +95,7 @@ export class RecipesComponent implements OnInit {
   onCreateProduct(){
     this.dialog.open(CreateNewRecipeDialogComponent,
       {
-        width: '550px'
+        width: '600px'
       });
     console.log('creating');
   }
@@ -103,7 +103,7 @@ export class RecipesComponent implements OnInit {
   onEditRecipe(){
     this.dialogRef = this.dialog.open(EditNewRecipeDialogComponent, {
       data: this.searchForm.get('productName').value,
-      width: '550px',
+      width: '600px',
     })
     this.dialogRef.afterClosed().subscribe(res => {this.searchForm.reset()});
   }

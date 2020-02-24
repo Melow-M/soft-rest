@@ -66,14 +66,14 @@ export class PromosComponent implements OnInit {
 
   onCreateNewPromo(){
     this.dialog.open(CreateNewPromoDialogComponent, {
-      width: '550px',
+      width: '600px',
       data: null
     })
   }
 
   onEditPromo(promo: Promo){
     this.dialog.open(CreateNewPromoDialogComponent, {
-      width: '550px',
+      width: '600px',
       data: promo
     })
   }

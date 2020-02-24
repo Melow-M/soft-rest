@@ -86,3 +86,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   background-color: #B70705;
   color: #fff;
 }
+
+/* Mat form field idableds */
+.mat-form-field-disabled {
+  opacity: 1.0 !important;
+  font-weight: bold !important;
+  color: black !important;
+}

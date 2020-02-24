@@ -1469,6 +1469,7 @@ export class DatabaseService {
     return orderRef.valueChanges();
   }
 
+
   getMenu() {
     return this.af.collection(`/db/deliciasTete/menuConfiguration`, ref => ref.orderBy('name', 'asc')).valueChanges().pipe(shareReplay(1));
   }

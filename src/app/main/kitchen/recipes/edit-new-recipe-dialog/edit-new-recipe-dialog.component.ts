@@ -189,7 +189,7 @@ export class EditNewRecipeDialogComponent implements OnInit {
     if(!this.productForm.get('price').value || !this.getCostoTotal()){
       return 0;
     }
-    return ((this.getCostoTotal()-this.productForm.get('price').value)*100/this.getCostoTotal())
+    return (-this.getCostoTotal()+this.productForm.get('price').value)
   }
 
 

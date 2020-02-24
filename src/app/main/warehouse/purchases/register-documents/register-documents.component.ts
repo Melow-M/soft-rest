@@ -68,18 +68,17 @@ export class RegisterDocumentsComponent implements OnInit {
     this.providersList$ = this.dbs.getProviders();
     this.inputList = of([]);
 
-    this.inputList$ = combineLatest(this.itemsListForm.get('type').valueChanges, this.itemsListForm.get('item').valueChanges.pipe(startWith(''))).pipe(
+    this.inputList$ = combineLatest(this.itemsListForm.get('type').valueChanges.pipe(startWith('INSUMOS')), this.itemsListForm.get('item').valueChanges.pipe(startWith(''))).pipe(
       map(([type, item])=> (item)),
-      startWith(''),
       switchMap((productName)=> {
         if(this.itemsListForm.get('type').value == null){
           return of([]);
         }
         else{
           return this.dbs.onGetProductType(this.itemsListForm.get('type').value).pipe(
-            debounceTime(100), 
+            debounceTime(300), 
             map((inputList)=> {
-                return this.filterRecipe(inputList, productName)
+                return this.filterRecipe(inputList, this.itemsListForm.get('item').value)
             }))
         }
       }));
@@ -338,7 +337,6 @@ export class RegisterDocumentsComponent implements OnInit {
   }
 
   displayFn(input: Input) {
-    console.log(input);
     if (!input || input.name == undefined) return '';
     return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }

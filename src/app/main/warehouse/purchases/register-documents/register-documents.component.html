@@ -178,6 +178,9 @@
                             <input 
                                 type="text" placeholder="Seleccione Item" matInput formControlName="item" [matAutocomplete]="autoInput">
                             <mat-autocomplete [displayWith]="displayFn.bind(this)" #autoInput="matAutocomplete">
+                                <mat-option (click)="onCreateInput()" [value]="">
+                                    <mat-icon>add</mat-icon>Crear Item
+                                </mat-option>
                             <mat-option *ngFor="let input of inputList$ | async" [value]="input">
                                 {{input.name | titlecase }}
                             </mat-option>
@@ -223,7 +226,7 @@
                 <ng-container matColumnDef="N°" >
                     <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: left;">N°</th>
                     <td class="w3-center w3-border-left" mat-cell *matCellDef="let element;  let i = index" style="text-align: left;">
-                        {{i+1}}</td>
+                        {{1+i + (inputsTablePaginator.pageIndex * inputsTablePaginator.pageSize)}}</td>
                     <td mat-footer-cell *matFooterCellDef style="text-align: left;"></td>
                 </ng-container>
 

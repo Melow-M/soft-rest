@@ -226,7 +226,7 @@
                 <ng-container matColumnDef="N°" >
                     <th class="w3-center w3-border-left" mat-header-cell *matHeaderCellDef style="text-align: left;">N°</th>
                     <td class="w3-center w3-border-left" mat-cell *matCellDef="let element;  let i = index" style="text-align: left;">
-                        {{i+1}}</td>
+                        {{1+i + (inputsTablePaginator.pageIndex * inputsTablePaginator.pageSize)}}</td>
                     <td mat-footer-cell *matFooterCellDef style="text-align: left;"></td>
                 </ng-container>
 

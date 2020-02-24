@@ -178,6 +178,9 @@
                             <input 
                                 type="text" placeholder="Seleccione Item" matInput formControlName="item" [matAutocomplete]="autoInput">
                             <mat-autocomplete [displayWith]="displayFn.bind(this)" #autoInput="matAutocomplete">
+                                <mat-option (click)="onCreateInput()" [value]="">
+                                    <mat-icon>add</mat-icon>Crear Item
+                                </mat-option>
                             <mat-option *ngFor="let input of inputList$ | async" [value]="input">
                                 {{input.name | titlecase }}
                             </mat-option>

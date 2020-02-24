@@ -145,7 +145,7 @@ export class VoucherComponent implements OnInit {
 
     this.extras = this.data['orderList'].filter(el => el['category'])
       .filter(el => el['category'].toLowerCase() == 'extras' || el['category'].toLowerCase() == 'piqueo' || el['category'].toLowerCase() == 'bebidas')
-      .forEach()
+      //.forEach()
 
     console.log(this.extras);
 

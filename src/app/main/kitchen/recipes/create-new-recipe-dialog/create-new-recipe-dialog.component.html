@@ -211,5 +211,6 @@
 
 <mat-dialog-actions align="end">
     <button mat-raised-button class="w3-margin-right" color="PRIMARY" mat-dialog-close type="button">Cancelar</button>
-    <button mat-raised-button class="w3-margin-right" color="secondary" mat-dialog-close type="button" (click)="onUploadRecipe()">Crear</button>
+    <button [disabled]="!inputTableDataSource.data.length || productForm.status != 'VALID'"
+        mat-raised-button class="w3-margin-right" color="secondary" mat-dialog-close type="button" (click)="onUploadRecipe()">Crear</button>
 </mat-dialog-actions>

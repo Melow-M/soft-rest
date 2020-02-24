@@ -57,7 +57,7 @@ export class PurchasesComponent implements OnInit {
     'Editado Por'
   ]
 
-  @ViewChild(MatPaginator, { static: false }) set content(paginator: MatPaginator) {
+  @ViewChild('purchasePaginator', { static: false }) set content(paginator: MatPaginator) {
     this.dataSource.paginator = paginator;
   }
 

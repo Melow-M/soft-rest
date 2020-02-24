@@ -66,7 +66,7 @@
                                             style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; "
                                             class="w3-center w3-padding w3-border-right">N°</th>
                                         <td mat-cell style="color:#2b2b2b; padding:0px 25px" *matCellDef="let raw; let i = index">
-                                            {{i+1}}
+                                            {{1+i + (purchasePaginator.pageIndex * purchasePaginator.pageSize)}}
                                         </td>
                                     </ng-container>
 
@@ -339,7 +339,8 @@
 
                                 </table>
                             </div>
-                            <mat-paginator style="border-radius: 0px 0px 10px 10px; text-align-last: center;" [pageSizeOptions]="[5, 10, 20]"
+                            <mat-paginator #purchasePaginator
+                                style="border-radius: 0px 0px 10px 10px; text-align-last: center;" [pageSizeOptions]="[5, 10, 20]"
                                 showFirstLastButtons></mat-paginator>
                         </div>
                     </ng-container>

@@ -53,14 +53,21 @@ export class OrdersComponent implements OnInit {
 
 
   ngOnInit() {
-    this.initForm();
+
+    const newDate = new Date();
+
+    this.searchForm = this.fb.group({
+      dateRange: [{ begin: new Date(newDate.setHours(0, 0, 0, 0)), end: new Date(newDate.setHours(23, 59, 59, 0)) }],
+      filterControl: [null]
+    })
 
     this.ordersData$ =
       this.searchForm.get('dateRange').valueChanges
         .pipe(
-          startWith<any>({ begin: new Date().setHours(0, 0, 0, 0), end: new Date() }),
+          startWith<any>({ begin: new Date(newDate.setHours(0, 0, 0, 0)), end: new Date(newDate.setHours(23, 59, 59, 0)) }),
           debounceTime(300),
           switchMap(date => {
+
             return combineLatest(
               this.dbs.getOrdersKitchen(date.begin, date.end),
               this.dbs.getCustomers(),
@@ -71,7 +78,7 @@ export class OrdersComponent implements OnInit {
                   return {
                     ...el,
                     customerName: customer ? customer['type'] == 'NATURAL' ? customer['name'] : customer['businessName'] : '',
-                    index: index
+                    index: index + 1
                   }
                 })
                 return array
@@ -83,12 +90,7 @@ export class OrdersComponent implements OnInit {
 
   }
 
-  initForm() {
-    this.searchForm = this.fb.group({
-      dateRange: [{ begin: new Date().setHours(0, 0, 0, 0), end: new Date() }],
-      filterControl: [null]
-    })
-  }
+
 
 
   filter() {

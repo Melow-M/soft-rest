@@ -4,6 +4,7 @@ import { AuthService } from './../../../../core/auth.service';
 import { DatabaseService } from './../../../../core/database.service';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-cancel',
@@ -13,6 +14,11 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 export class CancelComponent implements OnInit {
   orders: Array<any>
   countDishes: Array<any>
+  others: Array<any> = []
+  combos: Array<any> = []
+  desserts: Array<any> = []
+  extras: Array<any> = []
+  inputExtras: Array<any> = []
 
   constructor(
     public dbs: DatabaseService,
@@ -23,7 +29,6 @@ export class CancelComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log(this.data);
     let dishes = this.data['orderList'].filter(el => el['type']).map(el => {
       let array = []
       switch (el['type']) {
@@ -83,18 +88,86 @@ export class CancelComponent implements OnInit {
       }
     }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
 
-    this.orders = this.data['orderList'].filter(el => el['id']).map(el => {
+
+    this.others = this.data['orderList'].filter(el => el['type']).filter(el => el['type'].toLowerCase() == 'otros').map(el => {
       return {
         name: el['name'],
         id: el['id'],
         amount: el['amount'],
-        stock: el['stock'],
-        price: el['price']
+        price: el['price'],
       }
     })
 
+    this.desserts = this.data['orderList'].filter(el => el['type']).filter(el => el['type'].toLowerCase() == 'postres').map(el => {
+      return {
+        name: el['name'],
+        id: el['id'],
+        amount: el['amount'],
+        price: el['price'],
+      }
+    })
+
+    this.extras = this.data['orderList'].filter(el => el['category'])
+      .filter(el => el['category'].toLowerCase() == 'extras' || el['category'].toLowerCase() == 'piqueo' || el['category'].toLowerCase() == 'bebidas')
+    //.forEach()
+
+    this.combos = this.data['orderList'].filter(el => el['category']).filter(el => el['category'].toLowerCase() == 'combos' || el['category'].toLowerCase() == 'offers')
+
+    if (this.combos.length > 0) {
+      this.combos.forEach(combo => {
+        combo['products'].forEach(product => {
+          if (product['type']) {
+            if (product['type'].toLowerCase() == 'otros') {
+              this.others.push({
+                name: product['name'],
+                id: product['id'],
+                amount: product['quantity'] * combo['amount'],
+                price: 0
+
+              })
+            }
+
+            if (product['type'].toLowerCase() == 'postres') {
+              this.desserts.push({
+                name: product['name'],
+                id: product['id'],
+                amount: product['quantity'],
+                price: 0
+
+              })
+            }
+          }
+          if (product['category']) {
+            this.extras.push(product)
+          }
+        })
+      })
+    }
+
+
+    this.inputExtras = this.extras.map(el => {
+      return el['inputs'].map(al => {
+        return {
+          ...al,
+          required: al['quantity'] * el['amount']
+        }
+      })
+    }).reduce((a, b) => a.concat(b), [])
+      .map((el, index, array) => {
+        let counter = 0
+        array.forEach(al => {
+          if (al['id'] == el['id']) {
+            counter += al['quantity']
+          }
+        })
+        return {
+          ...el,
+          amount: counter
+        }
+      }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
 
   }
+
   cancel() {
     let batch = this.af.firestore.batch();
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/orders/`).doc(this.data['id']);
@@ -122,16 +195,51 @@ export class CancelComponent implements OnInit {
           let dishRef = this.af.firestore.collection(`/db/deliciasTete/kitchenDishes/`).doc(dish['id']);
 
           batch.update(dishRef, {
-            stock: dish['stock'] 
+            stock: dish['stock']
           })
         })
 
-        this.orders.forEach(order => {
+        this.others.forEach(order => {
           let groceryRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/`).doc(order['id']);
           let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseGrocery/${order['id']}/kardex`).doc(this.data['id'])
 
           batch.update(groceryRef, {
-            stock: order['stock'] 
+            stock: firebase.firestore.FieldValue.increment(order['amount'])
+          })
+
+          batch.update(kardexRef, {
+            type: 'ANULADO'
+          })
+        })
+
+        this.desserts.forEach(order => {
+          let dessertRef = this.af.firestore.collection(`/db/deliciasTete/warehouseDesserts/`).doc(order['id']);
+          let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseDesserts/${order['id']}/kardex`).doc(this.data['id'])
+
+          batch.update(dessertRef, {
+            stock: firebase.firestore.FieldValue.increment(order['amount'])
+          })
+
+          batch.update(kardexRef, {
+            type: 'ANULADO'
+          })
+        })
+
+        this.combos.forEach(combo => {
+          let ref = this.af.firestore.collection(`/db/deliciasTete/${combo['category']}/`).doc(combo['id'])
+
+          batch.update(ref, {
+            soldUnits: firebase.firestore.FieldValue.increment(combo['amount'] * -1)
+          })
+        })
+
+        this.inputExtras.forEach(input => {
+          let ref = this.af.firestore.collection(`/db/deliciasTete/warehouseInputs/`).doc(input['id'])
+          let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseInputs/${input['id']}/kardex`).doc(this.data['id'])
+
+
+          batch.update(ref, {
+            stock: firebase.firestore.FieldValue.increment(input['amount'])
           })
 
           batch.update(kardexRef, {

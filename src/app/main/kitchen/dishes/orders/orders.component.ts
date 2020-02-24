@@ -7,7 +7,7 @@ import { element } from 'protractor';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { AuthService } from './../../../../core/auth.service';
 import { tap, filter, take, map } from 'rxjs/operators';
-import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
+import { MatTableDataSource, MatPaginator, MatDialog, MatSnackBar } from '@angular/material';
 import { Observable, combineLatest } from 'rxjs';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -31,6 +31,8 @@ export class OrdersComponent implements OnInit {
 
   dishes$: Observable<any>
   dishes: Array<any>
+
+  otherPublic: boolean
 
   displayedOrderColumns: string[] = ['index', 'date', 'document', 'menu', 'inputs', 'user', 'actions'];
   dataOrderSource = new MatTableDataSource();
@@ -60,6 +62,7 @@ export class OrdersComponent implements OnInit {
     public auth: AuthService,
     private af: AngularFirestore,
     public datePipe: DatePipe,
+    private snackBar: MatSnackBar,
     private dialog: MatDialog
   ) { }
 
@@ -68,11 +71,13 @@ export class OrdersComponent implements OnInit {
     this.orders$ =
       combineLatest(
         this.dbs.onGetKitchenOrders(),
-        this.dbs.onGetDishes()
+        this.dbs.onGetDishes(),
+        this.dbs.onGetElements('Insumos')
       )
         .pipe(
-          map(([orders, dishes]) => {
+          map(([orders, dishes, inputs]) => {
             this.dishes = dishes
+            this.otherPublic = orders.filter(el => el['status'] == 'publicado').length > 0
             let array = orders.map(order => {
               order['menu'] = order['menu'].map((menu, index) => {
                 let exist = false
@@ -93,6 +98,20 @@ export class OrdersComponent implements OnInit {
                   dishId: dishId
                 }
               })
+
+              let verified = inputs.map(el => {
+                let missing = 1
+                order['inputs'].forEach(al => {
+                  if (el['id'] == al['id']) {
+                    missing = el['stock'] - al['required']
+                  }
+                })
+                return missing
+              })
+
+
+              order['missing'] = verified.filter(el => el < 0).length > 0
+
               return order
             })
             return array
@@ -192,13 +211,13 @@ export class OrdersComponent implements OnInit {
     this.dialog.open(ToPostComponent, {
       data: element
     })
-    
+
   }
 
 
 
   finish(element) {
-    
+
     const batch = this.af.firestore.batch();
     this.auth.user$.pipe(
       take(1)
@@ -221,7 +240,9 @@ export class OrdersComponent implements OnInit {
       })
 
       batch.commit().then(() => {
-        console.log('finalizado');
+        this.snackBar.open('Menú finalizado', 'Aceptar', {
+          duration: 6000
+        });
 
       })
     })

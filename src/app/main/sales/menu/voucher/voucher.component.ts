@@ -140,6 +140,10 @@ export class VoucherComponent implements OnInit {
               })
             }
           }
+
+          if (product['category']) {
+            this.extras.push(product)
+          }
         })
       })
     }
@@ -253,7 +257,7 @@ export class VoucherComponent implements OnInit {
     let batch = this.af.firestore.batch();
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/orders/`).doc();
     let transactionRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/${this.data['cashId']}/openings/${this.data['openingId']}/transactions`).doc(inputRef.id);
-    
+
     let inputData: Order;
     let transactionData: Transaction;
 
@@ -443,7 +447,7 @@ export class VoucherComponent implements OnInit {
           batch.set(kardexRef, inputKardex)
         })
 
-        
+
         //this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
 
         batch.commit().then(() => {

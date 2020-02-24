@@ -19,7 +19,7 @@ import { AuthService } from 'src/app/core/auth.service';
 })
 export class SalesRecordComponent implements OnInit {
 
-  orders$:Observable<any>
+  orders$: Observable<any>
 
   data$: Observable<Order[]>
   displayedColumns: string[] = ['index', 'date', 'documentType', 'numberDocument', 'client', 'cashSale', 'products', 'user', 'actions'];
@@ -56,17 +56,17 @@ export class SalesRecordComponent implements OnInit {
     const view = this.dbs.getCurrentMonthOfViewDate();
 
     this.search = this.fb.group({
-      date: [{begin: view.from, end: new Date()}],
+      date: [{ begin: view.from, end: new Date() }],
       users: ['']
     })
 
-    
+
     // this.dataFormGroup.get('date').setValue({begin: view.from, end: new Date()});
 
     this.orders$ =
       this.search.get('date').valueChanges
         .pipe(
-          startWith<any>({begin: view.from, end: new Date()}),
+          startWith<any>({ begin: view.from, end: new Date() }),
           debounceTime(300),
           switchMap(date => {
             return this.dbs.onGetOrders(date.begin, date.end);
@@ -92,7 +92,12 @@ export class SalesRecordComponent implements OnInit {
           return array.filter(el => user['displayName'] ? el['createdBy']['displayName'] == user['displayName'] : true).reverse()
         }),
         tap(res => {
-          this.dataSource.data = res
+          this.dataSource.data = res.map((el, i) => {
+            return {
+              ...el,
+              index: i + 1
+            }
+          })
           this.data_xls = res
         })
       )

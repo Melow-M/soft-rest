@@ -70,7 +70,8 @@ export class OrdersComponent implements OnInit {
                   let customer = el['customerId'] ? customers.filter(al => al['id'] == el['customerId'])[0] : ''
                   return {
                     ...el,
-                    customerName: customer ? customer['type'] == 'NATURAL' ? customer['name'] : customer['businessName'] : ''
+                    customerName: customer ? customer['type'] == 'NATURAL' ? customer['name'] : customer['businessName'] : '',
+                    index: index
                   }
                 })
                 return array

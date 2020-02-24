@@ -1,7 +1,7 @@
 import { AuthService } from './../../../../core/auth.service';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { MissingInputsComponent } from './../missing-inputs/missing-inputs.component';
-import { MatTableDataSource, MatDialog } from '@angular/material';
+import { MatTableDataSource, MatDialog, MatSnackBar } from '@angular/material';
 import { startWith, distinctUntilChanged, debounceTime, map, filter, tap, take } from 'rxjs/operators';
 import { FormBuilder, FormControl, FormGroup, Validators, AsyncValidatorFn, AbstractControl } from '@angular/forms';
 import { DatabaseService } from 'src/app/core/database.service';
@@ -48,7 +48,7 @@ export class PlanningComponent implements OnInit {
       },
       {
         name: 'Sopas',
-        value: 'ENTRADA'
+        value: 'SOPA'
       },
       {
         name: 'Segundo',
@@ -120,6 +120,7 @@ export class PlanningComponent implements OnInit {
     public dbs: DatabaseService,
     private dialog: MatDialog,
     public auth: AuthService,
+    private snackBar: MatSnackBar,
     private af: AngularFirestore
   ) { }
 
@@ -135,7 +136,6 @@ export class PlanningComponent implements OnInit {
         if (res) {
           this.selectMenu = res
           let index = this.list.findIndex(el => el['name'] == this.selectMenu['name'])
-          this.list[index]['view'] = true
           if (res['value'] == 'second') {
             this.menuForm.get('category').setValue(this.categories['simple'][2])
           }
@@ -309,6 +309,7 @@ export class PlanningComponent implements OnInit {
     let index = this.list.findIndex(el => el['name'] == this.selectMenu['name'])
     this.menuList[this.menuList.length - 1]['missing'] = prueba.filter(el => el['here']).filter(al => al['stock'] < 0).length > 0
     this.list[index]['list'] = this.menuList.filter(el => el['menuType'] == this.selectMenu.value)
+    this.list[index]['view'] = true
     this.menuForm.reset()
 
     if (this.selectMenu.value == 'second') {
@@ -430,12 +431,16 @@ export class PlanningComponent implements OnInit {
           createdAt: new Date(),
           createdBy: user,
           editedAt: new Date(),
-          editedBy: user
+          editedBy: user,
+          missing: this.inputsMissing.length > 0
         }
 
         batch.set(inputRef, inputData);
 
         batch.commit().then(() => {
+          this.snackBar.open('Se guardó orden del día', 'Aceptar', {
+            duration: 6000
+          });
           this.cancel()
         })
       })

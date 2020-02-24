@@ -28,18 +28,32 @@ export class UsersPermitDialogEditComponent implements OnInit {
     { name: 'Crear Combo', value: 'kitchenCombosCreateAction' },
     { name: 'Descargar Combo', value: 'kitchenCombosDownloadAction' },
     { name: 'Cambio de estado de Combo', value: 'kitchenCombosActions' },
+    { name: 'Editar Combo', value: 'kitchenCombosEditActions' },
+
+
     { name: 'Recetas', value: 'kitchenRecipes' },
     { name: 'Crear Receta', value: 'kitchenRecipesCreateAction' },
     { name: 'Descargar Receta', value: 'kitchenRecipesDownloadAction' },
     { name: 'Editar Receta', value: 'kitchenRecipesEditAction' },
     { name: 'Eliminar Receta', value: 'kitchenRecipesDeleteAction' },
+    { name: 'Platos/Varios', value: 'kitchenDishes' },
+    { name: 'Planificacion', value: 'kitchenDishesPlanning' },
+    { name: 'Ordenes de Cocina', value: 'kitchenDishesOrders' },
+    { name: 'Finalizar Ordenes de Cocina', value: 'kitchenDishesOrdersFinishAction' },
+    { name: 'Anular Ordenes de Cocina', value: 'kitchenDishesOrdersDisableAction' },
+    { name: 'Publicar Ordenes de Cocina', value: 'kitchenDishesOrdersPublishAction' },
+    { name: 'Configuración', value: 'kitchenDishesConfiguration' },
+    { name: 'Guardar Configuración', value: 'kitchenDishesConfigurationSaveAction' },
+    { name: 'Editar Configuración de Menú', value: 'kitchenDishesConfigurationEditAction' },
     { name: 'Pedidos', value: 'kitchenOrders' },
     { name: 'Descargar Pedido', value: 'kitchenOrdersDownloadAction' },
     { name: 'Detalles de Pedido', value: 'kitchenOrdersDetailsAction' },
+    { name: 'Detalles de Insumo', value: 'kitchenOrdersInputDetailsAction' },
     { name: 'Promociones', value: 'kitchenPromos' },
     { name: 'Crear Promoción', value: 'kitchenPromosCreateAction' },
     { name: 'Descargar Promoción', value: 'kitchenPromosDownloadAction' },
-    { name: 'Cambio de estado de Promoción', value: 'kitchenPromosActions' },
+    { name: 'Editar Promoción', value: 'kitchenPromosEditAction' },
+    { name: 'Cambio de estado de Promoción', value: 'kitchenPromosStateActions' },
   ]
 
   warehouseSelection = new SelectionModel<any>(true, []);
@@ -76,17 +90,25 @@ export class UsersPermitDialogEditComponent implements OnInit {
   adminSelection = new SelectionModel<any>(true, []);
   adminKeys: Array<any> = [
     { name: 'Cuentas por Pagar', value: 'adminAccountsPayable' },
-    { name: 'Lista de Items', value: 'adminAccountsPayableListAction' },
-    { name: 'Pagos a cuenta', value: 'adminAccountsPayablePaysAction' },
+    { name: 'Lista de Items', value: 'adminAccountsPayableListButton' },
+    { name: 'Lista de Pagos a cuenta', value: 'adminAccountsPayablePaysButton' },
     { name: 'Pago total', value: 'adminAccountsPayableTotalPayAction' },
     { name: 'Pago parcial', value: 'adminAccountsPayablePartialPayAction' },
 
     { name: 'Cuentas por Cobrar', value: 'adminAccountsReceivable' },
+    { name: 'Crear Cuenta por Cobrar', value: 'adminAccountsReceivableCreateAction' },
+    { name: 'Lista de Items', value: 'adminAccountsReceivableItemButton' },
+    { name: 'Lista de Pagos', value: 'adminAccountsReceivablePaymentButton' },
+    { name: 'Pago total', value: 'adminAccountsReceivableTotalPayAction' },
+    { name: 'Pago parcial', value: 'adminAccountsReceivablePartialPayAction' },
 
     { name: 'Admin. Cajas', value: 'adminManageCash' },
     { name: 'Crear', value: 'adminManageCashCreateAction' },
     { name: 'Editar', value: 'adminManageCashEditAction' },
     { name: 'Borrar', value: 'adminManageCashDeleteAction' },
+
+    { name: 'Ver Historial', value: 'adminManageCashHistoryButton' },
+    { name: 'Descargar Historial', value: 'adminManageCashHistoryDownloadButton' },
 
   ]
 
@@ -111,6 +133,7 @@ export class UsersPermitDialogEditComponent implements OnInit {
   configurationKeys: Array<any> = [
     { name: 'Usuarios', value: 'configurationUsers' },
   ];
+
 
   constructor(
     private fb: FormBuilder,
@@ -150,6 +173,7 @@ export class UsersPermitDialogEditComponent implements OnInit {
       kitchenCombosCreateAction: this.data['kitchenCombosCreateAction'] ? this.data['kitchenCombosCreateAction'] : false,
       kitchenCombosDownloadAction: this.data['kitchenCombosDownloadAction'] ? this.data['kitchenCombosDownloadAction'] : false,
       kitchenCombosActions: this.data['kitchenCombosActions'] ? this.data['kitchenCombosActions'] : false,
+      kitchenCombosEditActions: this.data['kitchenCombosEditActions'] ? this.data['kitchenCombosEditActions'] : false,
 
       
       kitchenRecipes: this.data['kitchenRecipes'] ? this.data['kitchenRecipes'] : false,
@@ -158,16 +182,29 @@ export class UsersPermitDialogEditComponent implements OnInit {
       kitchenRecipesEditAction: this.data['kitchenRecipesEditAction'] ? this.data['kitchenRecipesEditAction'] : false,
       kitchenRecipesDeleteAction: this.data['kitchenRecipesDeleteAction'] ? this.data['kitchenRecipesDeleteAction'] : false,
 
+      kitchenDishes: this.data['kitchenDishes'] ? this.data['kitchenDishes'] : false,
+      kitchenDishesPlanning: this.data['kitchenDishesPlanning'] ? this.data['kitchenDishesPlanning'] : false,
+      kitchenDishesOrders: this.data['kitchenDishesOrders'] ? this.data['kitchenDishesOrders'] : false,
+      kitchenDishesOrdersFinishAction: this.data['kitchenDishesOrdersFinishAction'] ? this.data['kitchenDishesOrdersFinishAction'] : false,
+      kitchenDishesOrdersDisableAction: this.data['kitchenDishesOrdersDisableAction'] ? this.data['kitchenDishesOrdersDisableAction'] : false,
+      kitchenDishesOrdersPublishAction: this.data['kitchenDishesOrdersPublishAction'] ? this.data['kitchenDishesOrdersPublishAction'] : false,
+      kitchenDishesConfiguration: this.data['kitchenDishesConfiguration'] ? this.data['kitchenDishesConfiguration'] : false,
+      kitchenDishesConfigurationSaveAction: this.data['kitchenDishesConfigurationSaveAction'] ? this.data['kitchenDishesConfigurationSaveAction'] : false,
+      kitchenDishesConfigurationEditAction: this.data['kitchenDishesConfigurationEditAction'] ? this.data['kitchenDishesConfigurationEditAction'] : false,
+
       
       kitchenOrders: this.data['kitchenOrders'] ? this.data['kitchenOrders'] : false,
       kitchenOrdersDownloadAction: this.data['kitchenOrdersDownloadAction'] ? this.data['kitchenOrdersDownloadAction'] : false,
       kitchenOrdersDetailsAction: this.data['kitchenOrdersDetailsAction'] ? this.data['kitchenOrdersDetailsAction'] : false,
+      kitchenOrdersInputDetailsAction: this.data['kitchenOrdersInputDetailsAction'] ? this.data['kitchenOrdersInputDetailsAction'] : false,
 
       
       kitchenPromos: this.data['kitchenPromos'] ? this.data['kitchenPromos'] : false,
       kitchenPromosCreateAction: this.data['kitchenPromosCreateAction'] ? this.data['kitchenPromosCreateAction'] : false,
       kitchenPromosDownloadAction: this.data['kitchenPromosDownloadAction'] ? this.data['kitchenPromosDownloadAction'] : false,
-      kitchenPromosActions: this.data['kitchenPromosActions'] ? this.data['kitchenPromosActions'] : false,
+      kitchenPromosEditAction: this.data['kitchenPromosEditAction'] ? this.data['kitchenPromosEditAction'] : false,
+      kitchenPromosStateActions: this.data['kitchenPromosStateActions'] ? this.data['kitchenPromosStateActions'] : false,
+
 
 
       warehouseSection: this.data['warehouseSection'] ? this.data['warehouseSection'] : false,
@@ -208,19 +245,26 @@ export class UsersPermitDialogEditComponent implements OnInit {
       
       adminSection: this.data['adminSection'] ? this.data['adminSection'] : false,
       adminAccountsPayable: this.data['adminAccountsPayable'] ? this.data['adminAccountsPayable'] : false,
-      adminAccountsPayableListAction: this.data['adminAccountsPayableListAction'] ? this.data['adminAccountsPayableListAction'] : false,
-      adminAccountsPayablePaysAction: this.data['adminAccountsPayablePaysAction'] ? this.data['adminAccountsPayablePaysAction'] : false,
+      adminAccountsPayableListButton: this.data['adminAccountsPayableListButton'] ? this.data['adminAccountsPayableListButton'] : false,
+      adminAccountsPayablePaysButton: this.data['adminAccountsPayablePaysButton'] ? this.data['adminAccountsPayablePaysButton'] : false,
       adminAccountsPayableTotalPayAction: this.data['adminAccountsPayableTotalPayAction'] ? this.data['adminAccountsPayableTotalPayAction'] : false,
       adminAccountsPayablePartialPayAction: this.data['adminAccountsPayablePartialPayAction'] ? this.data['adminAccountsPayablePartialPayAction'] : false,
 
       
       adminAccountsReceivable: this.data['adminAccountsReceivable'] ? this.data['adminAccountsReceivable'] : false,
+      adminAccountsReceivableCreateAction: this.data['adminAccountsReceivableCreateAction'] ? this.data['adminAccountsReceivableCreateAction'] : false,
+      adminAccountsReceivableItemButton: this.data['adminAccountsReceivableItemButton'] ? this.data['adminAccountsReceivableItemButton'] : false,
+      adminAccountsReceivablePaymentButton: this.data['adminAccountsReceivablePaymentButton'] ? this.data['adminAccountsReceivablePaymentButton'] : false,
+      adminAccountsReceivableTotalPayAction: this.data['adminAccountsReceivableTotalPayAction'] ? this.data['adminAccountsReceivableTotalPayAction'] : false,
+      adminAccountsReceivablePartialPayAction: this.data['adminAccountsReceivablePartialPayAction'] ? this.data['adminAccountsReceivablePartialPayAction'] : false,
 
       
       adminManageCash: this.data['adminManageCash'] ? this.data['adminManageCash'] : false,
       adminManageCashCreateAction: this.data['adminManageCashCreateAction'] ? this.data['adminManageCashCreateAction'] : false,
       adminManageCashEditAction: this.data['adminManageCashEditAction'] ? this.data['adminManageCashEditAction'] : false,
       adminManageCashDeleteAction: this.data['adminManageCashDeleteAction'] ? this.data['adminManageCashDeleteAction'] : false,
+      adminManageCashHistoryButton: this.data['adminManageCashHistoryButton'] ? this.data['adminManageCashHistoryButton'] : false,
+      adminManageCashHistoryDownloadButton: this.data['adminManageCashHistoryDownloadButton'] ? this.data['adminManageCashHistoryDownloadButton'] : false,
 
       
       thirdPartiesSection: this.data['thirdPartiesSection'] ? this.data['thirdPartiesSection'] : false,

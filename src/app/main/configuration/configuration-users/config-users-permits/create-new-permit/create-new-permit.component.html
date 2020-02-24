@@ -62,7 +62,7 @@
             <mat-checkbox formControlName="salesSection" (change)="$event ? masterSalesToggle() : null"
               [checked]="salesSelection.hasValue() && isAllSalesSelected()"
               [indeterminate]="salesSelection.hasValue() && !isAllSalesSelected()">
-              <strong>Mantenimiento</strong></mat-checkbox><br>
+              <strong>VEntas</strong></mat-checkbox><br>
             <ng-container *ngFor="let key of salesKeys">
               <mat-checkbox formControlName="{{key['value']}}" (click)="$event.stopPropagation()"
                 (change)="$event ? salesSelection.toggle(key['value']):null"

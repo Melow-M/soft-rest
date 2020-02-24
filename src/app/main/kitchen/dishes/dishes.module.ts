@@ -15,7 +15,8 @@ import {
   MatCheckboxModule,
   MatDatepickerModule,
   MatTabsModule,
-  MatAutocompleteModule
+  MatAutocompleteModule,
+  MatProgressBarModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -60,7 +61,8 @@ import { ToPostComponent } from './orders/to-post/to-post.component';
     MatTabsModule,
     MatAutocompleteModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatProgressBarModule
   ],
   entryComponents: [
     MissingInputsComponent,

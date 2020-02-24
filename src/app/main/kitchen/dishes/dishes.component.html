@@ -12,17 +12,24 @@
                 </mat-icon>
                 Menú del día
             </h1>
-            <mat-tab-group>
-                <mat-tab label="Planificación">
-                    <app-planning></app-planning>
-                </mat-tab>
-                <mat-tab label="Ordenes Cocina">
-                    <app-orders></app-orders>
-                </mat-tab>
-                <mat-tab label="Configuración Menús">
-                    <app-configuration></app-configuration>
-                </mat-tab>
-            </mat-tab-group>
+
+            <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
+                <mat-tab-group>
+                    <mat-tab label="Planificación">
+                        <app-planning *ngIf="user['role']['kitchenDishesPlanning']"></app-planning>
+                    </mat-tab>
+                    <mat-tab label="Ordenes Cocina">
+                        <app-orders *ngIf="user['role']['kitchenDishesOrders']"></app-orders>
+                    </mat-tab>
+                    <mat-tab label="Configuración Menús">
+                        <app-configuration *ngIf="user['role']['kitchenDishesConfiguration']"></app-configuration>
+                    </mat-tab>
+                </mat-tab-group>
+            </ng-container>
+            <ng-template #defaultUser>
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                <p class="mat-h2" style="font-family: Raleway; color: #2b2b2b">Cargando credenciales ...</p>
+            </ng-template>
 
         </div>
         <div class="w3-col s0 m1 l1">

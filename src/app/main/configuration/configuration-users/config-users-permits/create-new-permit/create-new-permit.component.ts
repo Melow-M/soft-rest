@@ -28,18 +28,37 @@ export class CreateNewPermitComponent implements OnInit {
     { name: 'Crear Combo', value: 'kitchenCombosCreateAction' },
     { name: 'Descargar Combo', value: 'kitchenCombosDownloadAction' },
     { name: 'Cambio de estado de Combo', value: 'kitchenCombosActions' },
+    { name: 'Editar Combo', value: 'kitchenCombosEditActions' },
+
+
     { name: 'Recetas', value: 'kitchenRecipes' },
     { name: 'Crear Receta', value: 'kitchenRecipesCreateAction' },
     { name: 'Descargar Receta', value: 'kitchenRecipesDownloadAction' },
     { name: 'Editar Receta', value: 'kitchenRecipesEditAction' },
     { name: 'Eliminar Receta', value: 'kitchenRecipesDeleteAction' },
+
+    { name: 'Platos/Varios', value: 'kitchenDishes' },
+    { name: 'Planificacion', value: 'kitchenDishesPlanning' },
+    { name: 'Ordenes de Cocina', value: 'kitchenDishesOrders' },
+    { name: 'Finalizar Ordenes de Cocina', value: 'kitchenDishesOrdersFinishAction' },
+    { name: 'Anular Ordenes de Cocina', value: 'kitchenDishesOrdersDisableAction' },
+    { name: 'Publicar Ordenes de Cocina', value: 'kitchenDishesOrdersPublishAction' },
+    { name: 'Configuración', value: 'kitchenDishesConfiguration' },
+    { name: 'Guardar Configuración', value: 'kitchenDishesConfigurationSaveAction' },
+    { name: 'Editar Configuración de Menú', value: 'kitchenDishesConfigurationEditAction' },
+
+    //ACa me quede
+
     { name: 'Pedidos', value: 'kitchenOrders' },
     { name: 'Descargar Pedido', value: 'kitchenOrdersDownloadAction' },
     { name: 'Detalles de Pedido', value: 'kitchenOrdersDetailsAction' },
+    { name: 'Detalles de Insumo', value: 'kitchenOrdersInputDetailsAction' },
+
     { name: 'Promociones', value: 'kitchenPromos' },
     { name: 'Crear Promoción', value: 'kitchenPromosCreateAction' },
     { name: 'Descargar Promoción', value: 'kitchenPromosDownloadAction' },
-    { name: 'Cambio de estado de Promoción', value: 'kitchenPromosActions' },
+    { name: 'Editar Promoción', value: 'kitchenPromosEditAction' },
+    { name: 'Cambio de estado de Promoción', value: 'kitchenPromosStateActions' },
   ]
 
   warehouseSelection = new SelectionModel<any>(true, []);
@@ -76,17 +95,25 @@ export class CreateNewPermitComponent implements OnInit {
   adminSelection = new SelectionModel<any>(true, []);
   adminKeys: Array<any> = [
     { name: 'Cuentas por Pagar', value: 'adminAccountsPayable' },
-    { name: 'Lista de Items', value: 'adminAccountsPayableListAction' },
-    { name: 'Pagos a cuenta', value: 'adminAccountsPayablePaysAction' },
+    { name: 'Lista de Items', value: 'adminAccountsPayableListButton' },
+    { name: 'Lista de Pagos a cuenta', value: 'adminAccountsPayablePaysButton' },
     { name: 'Pago total', value: 'adminAccountsPayableTotalPayAction' },
     { name: 'Pago parcial', value: 'adminAccountsPayablePartialPayAction' },
 
     { name: 'Cuentas por Cobrar', value: 'adminAccountsReceivable' },
+    { name: 'Crear Cuenta por Cobrar', value: 'adminAccountsReceivableCreateAction' },
+    { name: 'Lista de Items', value: 'adminAccountsReceivableItemButton' },
+    { name: 'Lista de Pagos', value: 'adminAccountsReceivablePaymentButton' },
+    { name: 'Pago total', value: 'adminAccountsReceivableTotalPayAction' },
+    { name: 'Pago parcial', value: 'adminAccountsReceivablePartialPayAction' },
 
     { name: 'Admin. Cajas', value: 'adminManageCash' },
     { name: 'Crear', value: 'adminManageCashCreateAction' },
     { name: 'Editar', value: 'adminManageCashEditAction' },
     { name: 'Borrar', value: 'adminManageCashDeleteAction' },
+
+    { name: 'Ver Historial', value: 'adminManageCashHistoryButton' },
+    { name: 'Descargar Historial', value: 'adminManageCashHistoryDownloadButton' },
 
   ]
 
@@ -149,6 +176,7 @@ export class CreateNewPermitComponent implements OnInit {
       kitchenCombosCreateAction: false,
       kitchenCombosDownloadAction: false,
       kitchenCombosActions: false,
+      kitchenCombosEditActions: false,
 
       
       kitchenRecipes: false,
@@ -157,16 +185,29 @@ export class CreateNewPermitComponent implements OnInit {
       kitchenRecipesEditAction: false,
       kitchenRecipesDeleteAction: false,
 
+
+      kitchenDishes: false,
+      kitchenDishesPlanning: false,
+      kitchenDishesOrders: false,
+      kitchenDishesOrdersFinishAction: false,
+      kitchenDishesOrdersDisableAction: false,
+      kitchenDishesOrdersPublishAction: false,
+      kitchenDishesConfiguration: false,
+      kitchenDishesConfigurationSaveAction: false,
+      kitchenDishesConfigurationEditAction: false,
+
       
       kitchenOrders: false,
       kitchenOrdersDownloadAction: false,
       kitchenOrdersDetailsAction: false,
+      kitchenOrdersInputDetailsAction: false,
 
       
       kitchenPromos: false,
       kitchenPromosCreateAction: false,
       kitchenPromosDownloadAction: false,
-      kitchenPromosActions: false,
+      kitchenPromosEditAction: false,
+      kitchenPromosStateActions: false,
 
 
       warehouseSection: false,
@@ -207,19 +248,26 @@ export class CreateNewPermitComponent implements OnInit {
       
       adminSection: false,
       adminAccountsPayable: false,
-      adminAccountsPayableListAction: false,
-      adminAccountsPayablePaysAction: false,
+      adminAccountsPayableListButton: false,
+      adminAccountsPayablePaysButton: false,
       adminAccountsPayableTotalPayAction: false,
       adminAccountsPayablePartialPayAction: false,
 
       
       adminAccountsReceivable: false,
+      adminAccountsReceivableCreateAction: false,
+      adminAccountsReceivableItemButton: false,
+      adminAccountsReceivablePaymentButton: false,
+      adminAccountsReceivableTotalPayAction: false,
+      adminAccountsReceivablePartialPayAction: false,
 
       
       adminManageCash: false,
       adminManageCashCreateAction: false,
       adminManageCashEditAction: false,
       adminManageCashDeleteAction: false,
+      adminManageCashHistoryButton: false,
+      adminManageCashHistoryDownloadButton: false,
 
       
       thirdPartiesSection: false,

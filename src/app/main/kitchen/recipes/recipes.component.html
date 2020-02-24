@@ -10,6 +10,8 @@
             </h1>
             <mat-divider></mat-divider>
 
+            <ng-container *ngIf="auth.userAndRole$ | async as user; else defaultUser">
+
             <!-- Search Form -->
 
             <form [formGroup] = "searchForm" class="w3-margin-top">
@@ -39,14 +41,16 @@
                     </mat-form-field>
 
                     <div>
-                        <button mat-raised-button color="secondary" type="button" (click)="onCreateProduct()">
+                        <button *ngIf="user['role']['kitchenRecipesCreateAction']"
+                            mat-raised-button color="secondary" type="button" (click)="onCreateProduct()">
                             <mat-icon>add_circle</mat-icon>
                             Crear Nuevo
                         </button>
                     </div>
 
                     <div>
-                        <button mat-raised-button color="secondary" type="button" (click)="downloadXls()">
+                        <button *ngIf="user['role']['kitchenRecipesDownloadAction']"
+                            mat-raised-button color="secondary" type="button" (click)="downloadXls()">
                             <mat-icon>cloud_download</mat-icon>
                             Descargar
                         </button>
@@ -63,11 +67,13 @@
                 <div class="w3-padding" *ngIf="inputTableDataSource.data.length">
                     <h1 style="font-size:1.8em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
                         {{this.searchForm.get('productName').value.name | titlecase}}
-                        <button type="button" mat-icon-button style="vertical-align: top;" (click)="onDeleteRecipe()">
+                        <button *ngIf="user['role']['kitchenRecipesEditAction']"
+                            type="button" mat-icon-button style="vertical-align: top;" (click)="onDeleteRecipe()">
                             <mat-icon>delete</mat-icon>
                         </button>
 
-                        <button type="button" mat-icon-button style="vertical-align: top;" (click)="onEditRecipe()">
+                        <button *ngIf="user['role']['kitchenRecipesDeleteAction']"
+                            type="button" mat-icon-button style="vertical-align: top;" (click)="onEditRecipe()">
                             <mat-icon>edit</mat-icon>
                         </button>
                     </h1>
@@ -133,6 +139,12 @@
 
             </div>
 
+            </ng-container>
+
+            <ng-template #defaultUser>
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                <p class="mat-h2" style="font-family: Raleway; color: #2b2b2b">Cargando credenciales ...</p>
+            </ng-template>
         </div>
         <div class="w3-col s0 m1 l1">
             <p></p>

@@ -10,6 +10,7 @@ import { Input } from 'src/app/core/models/warehouse/input.model';
 import { EditNewRecipeDialogComponent } from './edit-new-recipe-dialog/edit-new-recipe-dialog.component';
 import { ConfirmRecipeDialogComponent } from './confirm-recipe-dialog/confirm-recipe-dialog.component';
 import * as XLSX from 'xlsx';
+import { AuthService } from 'src/app/core/auth.service';
 
 
 @Component({
@@ -49,7 +50,8 @@ export class RecipesComponent implements OnInit {
     private fb: FormBuilder,
     private dialog: MatDialog,
     private dbs: DatabaseService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public auth: AuthService
   ) { }
 
   ngOnInit() {

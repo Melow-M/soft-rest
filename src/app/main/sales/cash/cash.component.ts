@@ -135,7 +135,12 @@ export class CashComponent implements OnInit {
         )
       }),
       tap(res => {
-        this.dataSource.data = res.filter(el => el['status'] == 'PAGADO')
+        this.dataSource.data = res.filter(el => el['status'] == 'PAGADO').map((el, i) => {
+          return {
+            ...el,
+            index: i + 1
+          }
+        })
         this.data_xls = res.filter(el => el['status'] == 'PAGADO')
       })
     )

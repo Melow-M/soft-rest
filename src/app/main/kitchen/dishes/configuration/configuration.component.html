@@ -1,10 +1,10 @@
 <div *ngIf="menus$ | async" class="w3-margin-top">
-   <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
-    <span style="font-size:1.2em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
-        Configuración Menús</span>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+        <span style="font-size:1.2em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
+            Configuración Menús</span>
         <button mat-raised-button class="w3-margin-right" (click)="save()"
             style="background: #EE8434; color: white; font-family: Raleway;">Guardar</button>
-   </div>
+    </div>
     <div class="mat-elevation-z8 w3-margin-top w3-round" style="border-radius: 10px 10px 0 0; margin-top: 2vh;">
         <div class="w3-round-large" style="overflow:auto; border-radius: 10px 10px 0 0;">
             <table mat-table [dataSource]="dataMenu" style="width: 100%; font-family: Raleway;">
@@ -36,7 +36,8 @@
                     <td mat-cell *matCellDef="let element" style="color:#2b2b2b;"
                         class="w3-center w3-border-left off w3-border-bottom':'w3-border-bottom w3-center w3-border-left">
                         <span *ngIf="!element['edit']">{{element['price']}}</span>
-                        <mat-form-field appearance="legacy" style="width: 40px; text-align: center;" *ngIf="element['edit']">
+                        <mat-form-field appearance="legacy" style="width: 40px; text-align: center;"
+                            *ngIf="element['edit']">
                             <input matInput type="number" autocomplete="off" [(ngModel)]="element['price']">
                         </mat-form-field>
                     </td>
@@ -67,7 +68,8 @@
     </div>
 </div>
 <div *ngIf="dishes$ | async" style="margin-top: 5vh;">
-    <h2 style="font-size:1.2em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">Lista
+    <h2 style="font-size:1.2em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;"
+        *ngIf="dataDishSource.data.length">Lista
         Platos</h2>
     <div class="mat-elevation-z8 w3-margin-top w3-round" *ngIf="dataDishSource.data.length"
         style="border-radius: 10px 10px 0 0; margin-top: 2vh;">
@@ -77,9 +79,9 @@
                     <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
                         style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9; width: 4%;">
                         No. </th>
-                    <td mat-cell *matCellDef="let element; let i = index" style="color:#2b2b2b; padding-left: 0;"
+                    <td mat-cell *matCellDef="let element" style="color:#2b2b2b; padding-left: 0;"
                         class="w3-center w3-border-left off w3-border-bottom':'w3-border-bottom w3-center w3-border-left">
-                        {{i+1}}
+                        {{element['index']}}
                     </td>
                 </ng-container>
 
@@ -92,22 +94,6 @@
                         {{element['name'] | titlecase}}</td>
                 </ng-container>
 
-
-                <!--ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
-                    matColumnDef="recipe">
-                    <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
-                        style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9;">
-                        Receta
-                    </th>
-                    <td mat-cell *matCellDef="let element" style="color:#2b2b2b;"
-                        class="w3-center w3-border-left off w3-border-bottom':'w3-border-bottom w3-center w3-border-left">
-                        <button mat-raised-button style="background: #EE8434; color: white"
-                            (click)="viewRecipe(element)">
-                            <mat-icon style="vertical-align: middle;">format_list_bulleted</mat-icon>
-                            Receta
-                        </button>
-                    </td>
-                </ng-container-->
                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center"
                     matColumnDef="status">
                     <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
@@ -118,6 +104,17 @@
                         class="w3-center w3-border-left off w3-border-bottom':'w3-border-bottom w3-center w3-border-left">
                         {{element['status']}} </td>
                 </ng-container>
+
+                <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center" matColumnDef="cost">
+                    <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
+                        style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9;">
+                        Costo por plato
+                    </th>
+                    <td mat-cell *matCellDef="let element" style="color:#2b2b2b;"
+                        class="w3-center w3-border-left off w3-border-bottom':'w3-border-bottom w3-center w3-border-left">
+                        {{element['cost'] | number: '.2'}} </td>
+                </ng-container>
+
                 <ng-container class="mat-elevation-z8 w3-border-bottom w3-border-indigo w3-center" matColumnDef="stock">
                     <th mat-header-cell *matHeaderCellDef class="w3-center w3-border-left"
                         style="background: #C8C8C8;color: #828282;font-size: 0.9em;padding:0px 1em; border-left:1px solid #B9B9B9;">

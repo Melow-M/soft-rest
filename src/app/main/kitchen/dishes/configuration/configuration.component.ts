@@ -1,9 +1,9 @@
-import { tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AuthService } from './../../../../core/auth.service';
 import { DatabaseService } from 'src/app/core/database.service';
-import { MatTableDataSource, MatDialog, MatPaginator } from '@angular/material';
+import { MatTableDataSource, MatDialog, MatPaginator, MatSnackBar } from '@angular/material';
 import { Component, OnInit, ViewChild } from '@angular/core';
 
 @Component({
@@ -16,7 +16,7 @@ export class ConfigurationComponent implements OnInit {
   dataMenuSource = new MatTableDataSource();
   dataMenu: Array<any>
 
-  displayedDishColumns: string[] = ['index', 'name', 'status', 'stock'];
+  displayedDishColumns: string[] = ['index', 'name', 'status', 'cost', 'stock'];
   dataDishSource = new MatTableDataSource();
 
   @ViewChild(MatPaginator, { static: false }) set content(paginator: MatPaginator) {
@@ -31,6 +31,7 @@ export class ConfigurationComponent implements OnInit {
   constructor(
     public dbs: DatabaseService,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     public auth: AuthService,
     private af: AngularFirestore
   ) { }
@@ -38,8 +39,16 @@ export class ConfigurationComponent implements OnInit {
   ngOnInit() {
 
     this.dishes$ = this.dbs.onGetDishes().pipe(
+      map(dishes => {
+        return dishes.map((el, i) => {
+          return {
+            ...el,
+            index: i + 1
+          }
+        })
+      }),
       tap(res => {
-        this.dataDishSource.data = res
+        this.dataDishSource.data = res.filter(el => el['status'] != 'INACTIVO')
       })
     )
 
@@ -67,7 +76,11 @@ export class ConfigurationComponent implements OnInit {
         price: el['price']
       })
     })
-    batch.commit()
+    batch.commit().then(() => {
+      this.snackBar.open('Cambios Guardados', 'Aceptar', {
+        duration: 5000
+      });
+    })
   }
 
 }

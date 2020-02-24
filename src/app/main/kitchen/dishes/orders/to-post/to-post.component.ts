@@ -1,5 +1,5 @@
 import { take } from 'rxjs/operators';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { AuthService } from './../../../../../core/auth.service';
 import { DatabaseService } from './../../../../../core/database.service';
@@ -16,6 +16,7 @@ export class ToPostComponent implements OnInit {
     public dbs: DatabaseService,
     public auth: AuthService,
     private af: AngularFirestore,
+    private snackBar: MatSnackBar,
     private dialog: MatDialogRef<ToPostComponent>,
     @Inject(MAT_DIALOG_DATA) public data
   ) { }
@@ -48,7 +49,9 @@ export class ToPostComponent implements OnInit {
       })
 
       batch.commit().then(() => {
-        console.log('publicado');
+        this.snackBar.open('Menú publicado', 'Aceptar', {
+          duration: 5000
+        });
         this.dialog.close()
       })
     })

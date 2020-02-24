@@ -1462,12 +1462,6 @@ export class DatabaseService {
     return orderRef.valueChanges();
   }
 
-  getExtraOrdersKitchen(from: Date, to: Date): Observable<Order[]> {
-
-    let orderRef = this.af.collection<Order>(`db/deliciasTete/kitchenExtraOrders`, ref => ref.where('createdAt', '>=', from).where('createdAt', '<=', to));
-
-    return orderRef.valueChanges();
-  }
 
   getMenu() {
     return this.af.collection(`/db/deliciasTete/menuConfiguration`, ref => ref.orderBy('name', 'asc')).valueChanges().pipe(shareReplay(1));

@@ -27,9 +27,6 @@ export class OrderDetailsDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: Order
   ) { }
 
-  @ViewChild('ordersTablePaginator', {static: true}) set matPaginator(mp: MatPaginator){
-    this.ordersTableDataSource.paginator = mp;
-  }
   
   ngOnInit() {
     this.ordersTableDataSource.data = this.data.orderList;

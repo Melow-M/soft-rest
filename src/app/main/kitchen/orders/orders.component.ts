@@ -62,7 +62,7 @@ export class OrdersComponent implements OnInit {
           debounceTime(300),
           switchMap(date => {
             return combineLatest(
-              this.dbs.getExtraOrdersKitchen(date.begin, date.end),
+              this.dbs.getOrdersKitchen(date.begin, date.end),
               this.dbs.getCustomers(),
             ).pipe(
               map(([orders, customers]) => {
@@ -70,8 +70,7 @@ export class OrdersComponent implements OnInit {
                   let customer = el['customerId'] ? customers.filter(al => al['id'] == el['customerId'])[0] : ''
                   return {
                     ...el,
-                    customerName: customer ? customer['type'] == 'NATURAL' ? customer['name'] : customer['businessName'] : '',
-                    number: 'Pe-' + ("000" + index).slice(-4)
+                    customerName: customer ? customer['type'] == 'NATURAL' ? customer['name'] : customer['businessName'] : ''
                   }
                 })
                 return array
@@ -81,10 +80,6 @@ export class OrdersComponent implements OnInit {
             this.ordersTableDataSource.data = orders.reverse()
           }))
 
-    this.ordersData$.subscribe(res => {
-      console.log(res);
-
-    })
   }
 
   initForm() {

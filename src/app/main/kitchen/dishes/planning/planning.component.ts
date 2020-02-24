@@ -3,7 +3,7 @@ import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { MissingInputsComponent } from './../missing-inputs/missing-inputs.component';
 import { MatTableDataSource, MatDialog } from '@angular/material';
 import { startWith, distinctUntilChanged, debounceTime, map, filter, tap, take } from 'rxjs/operators';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators, AsyncValidatorFn, AbstractControl } from '@angular/forms';
 import { DatabaseService } from 'src/app/core/database.service';
 import { Observable, combineLatest } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
@@ -126,7 +126,7 @@ export class PlanningComponent implements OnInit {
   ngOnInit() {
     this.menuForm = this.fb.group({
       category: ['', Validators.required],
-      dish: ['', Validators.required],
+      dish: ['', [Validators.required], [this.validDish()]],
       amount: ['', Validators.required]
     })
 
@@ -168,6 +168,22 @@ export class PlanningComponent implements OnInit {
 
   }
 
+  validDish(): AsyncValidatorFn {
+    return (control: AbstractControl) => {
+      return control.valueChanges
+        .pipe(
+          debounceTime(500),
+          take(1),
+          map(type => {
+            return !type.id ? { passValid: true } : null
+
+          })
+        );
+
+    }
+
+  }
+
   showDish(dish): string | undefined {
     return dish ? dish['name'] : undefined;
   }
@@ -202,6 +218,12 @@ export class PlanningComponent implements OnInit {
     let ind = this.list.findIndex(el => el['value'] == menuType)
     this.menuList.splice(index, 1);
     this.list[ind]['list'] = this.menuList.filter(el => el['menuType'] == menuType)
+
+    if (this.menuList.filter(el => el['menuType'] == menuType).length == 0) {
+      this.list[ind]['view'] = false
+    }
+
+    this.verified()
 
   }
 

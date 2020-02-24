@@ -253,8 +253,7 @@ export class VoucherComponent implements OnInit {
     let batch = this.af.firestore.batch();
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/orders/`).doc();
     let transactionRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/${this.data['cashId']}/openings/${this.data['openingId']}/transactions`).doc(inputRef.id);
-    let kitchenOrderRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenExtraOrders`).doc(inputRef.id);
-
+    
     let inputData: Order;
     let transactionData: Transaction;
 
@@ -309,22 +308,6 @@ export class VoucherComponent implements OnInit {
           editedAt: new Date(),
           createdAt: new Date(),
           createdBy: user,
-        }
-
-        let kitchenOrderData = {
-          id: inputRef.id,
-          inputs: this.inputExtras,
-          dishes: this.extras,
-          documentType: this.data['documentType'],
-          documentNumber: this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
-          customerId: this.data['customerId'],
-          cashId: this.data['cashId'],
-          openingId: this.data['openingId'],
-          state: 'aprobado',
-          editedBy: user,
-          editedAt: new Date(),
-          createdAt: new Date(),
-          createdBy: user
         }
 
         if (this.data['receivable']) {
@@ -460,9 +443,7 @@ export class VoucherComponent implements OnInit {
           batch.set(kardexRef, inputKardex)
         })
 
-        if (this.extras.length) {
-          batch.set(kitchenOrderRef, kitchenOrderData)
-        }
+        
         //this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
 
         batch.commit().then(() => {

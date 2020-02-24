@@ -40,6 +40,7 @@
                     <strong>{{option['name']}}</strong>
                 </mat-option>
             </mat-autocomplete>
+            <mat-icon matSuffix style="vertical-align: middle;">arrow_drop_down</mat-icon>
             <mat-hint>Requerido*</mat-hint>
         </mat-form-field>
         <mat-form-field appearance="outline" style="width: 100px;" class="w3-margin-right">
@@ -47,8 +48,9 @@
             <input matInput type="number" min="0" placeholder="Cantidad" formControlName="amount" autocomplete="off">
             <mat-hint>Requerido*</mat-hint>
         </mat-form-field>
-        <button mat-raised-button style="background: #EE8434; color: white" class="w3-margin-left w3-margin-bottom"
-            (click)="add()" [disabled]="!menuForm.valid">
+        <button mat-raised-button color="secundary" class="w3-margin-left w3-margin-bottom"
+            style="background: #EE8434; color: white;" (click)="add()"
+            [disabled]="!menuForm.valid">
             <mat-icon style="vertical-align: middle;">add_circle</mat-icon>
         </button>
     </form>
@@ -141,10 +143,10 @@
                             [className]="element['orderStatus']=='ANULADO'?'w3-center off w3-border-bottom':'w3-border-bottom w3-center'"
                             style="color:#2b2b2b; padding:0px 1em; border-left:1px solid #B9B9B9">
                             <mat-menu #requestsMenu="matMenu">
-                                <button mat-menu-item (click)="editItem(element,i)">
+                                <button mat-menu-item (click)="editItem(element)">
                                     <mat-icon style="vertical-align: middle;">create</mat-icon> Editar
                                 </button>
-                                <button mat-menu-item (click)="deleteItem(i)">
+                                <button mat-menu-item (click)="deleteItem(element)">
                                     <mat-icon style="vertical-align: middle;">delete</mat-icon> Borrar
                                 </button>
                             </mat-menu>
@@ -164,7 +166,7 @@
 <div style="text-align: right;" class="w3-margin-top">
     <button mat-raised-button class="w3-margin-right" (click)="cancel()"
         style="background: #B70705; color: white; font-family: Raleway;">Cancelar</button>
-    <button mat-raised-button class="w3-margin-right" (click)="save()"
+    <button mat-raised-button class="w3-margin-right" (click)="save()" color="secundary"
         [disabled]="!(verifiedCheck['executive'] && verifiedCheck['simple']&&verifiedCheck['second'])"
         style="background: #EE8434; color: white; font-family: Raleway;">Generar Orden</button>
 </div>

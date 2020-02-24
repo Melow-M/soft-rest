@@ -1,7 +1,7 @@
 <div class="w3-container">
   <h1 style="font-size:1.8em; color: #2B2B2B; font-family: Raleway; font-weight: bolder;">
     <mat-icon style="vertical-align: middle; margin-right:0.2em">remove_circle
-    </mat-icon> Retirar Menaje
+    </mat-icon> Retirar Inventario
   </h1>
   <mat-divider></mat-divider>
   <mat-progress-bar mode="indeterminate" *ngIf="savingItems$ | async"></mat-progress-bar>
@@ -12,9 +12,9 @@
 
         <!-- Date Range -->
         <mat-form-field class="w3-margin-right" style="min-width:300px" appereance="outline">
-          <mat-label>Menaje</mat-label>
+          <mat-label>Inventario</mat-label>
           <input matInput type="text" [matAutocomplete]="autoHousehold" formControlName="household"
-            placeholder="Selecciones" autocomplete="off">
+            placeholder="Seleccione" autocomplete="off">
           <mat-autocomplete #autoHousehold="matAutocomplete" [displayWith]="showHousehold">
             <mat-option *ngFor="let item of households$ | async" [value]="item">
               {{item.name}} | {{item.sku}}

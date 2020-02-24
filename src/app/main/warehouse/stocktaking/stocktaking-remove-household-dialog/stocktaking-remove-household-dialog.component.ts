@@ -55,7 +55,7 @@ export class StocktakingRemoveHouseholdDialogComponent implements OnInit {
     this.createForm();
 
     this.households$ = combineLatest(
-      this.dbs.getItems('MENAJES'),
+      this.dbs.getItems('INVENTARIO'),
       this.dataFormGroup.get('household').valueChanges.pipe(
         startWith<any>(''),
         map(household => typeof household === 'string' ? household.toLowerCase() : household.name.toLowerCase())
@@ -169,7 +169,7 @@ export class StocktakingRemoveHouseholdDialogComponent implements OnInit {
           .then(() => {
             this.savingItems.next(false);
             this.snackbar.open('Listo!', 'Aceptar');
-            this.dialogRef.close('MENAJES');
+            this.dialogRef.close('INVENTARIO');
           })
           .catch(err => {
             console.log(err);

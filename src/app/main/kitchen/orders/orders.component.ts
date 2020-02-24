@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { DatabaseService } from 'src/app/core/database.service';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { Order } from 'src/app/core/models/sales/menu/order.model';
-import { tap } from 'rxjs/operators';
+import { tap, map, startWith, debounceTime, switchMap } from 'rxjs/operators';
 import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
 import { OrderDetailsDialogComponent } from './order-details-dialog/order-details-dialog.component';
 import { InputDetailsDialogComponent } from './input-details-dialog/input-details-dialog.component';
@@ -18,11 +18,11 @@ import { AuthService } from 'src/app/core/auth.service';
 })
 export class OrdersComponent implements OnInit {
   //Table
-  ordersTableDataSource= new MatTableDataSource();
+  ordersTableDataSource = new MatTableDataSource();
 
   ordersTableDisplayedColumns: string[] = [
-    'index', 'createdAt', 'orderCorrelative', 'documentSerialdocumentCorrelative', 'customerId', 
-    'orderListButton', /*'inputsButton', */'createdBy'
+    'index', 'createdAt', 'orderCorrelative', 'documentSerialdocumentCorrelative', 'customerId',
+    'orderListButton', 'inputsButton', 'createdBy'
   ]
 
   //Excel
@@ -46,51 +46,69 @@ export class OrdersComponent implements OnInit {
     public auth: AuthService
   ) { }
 
-  
-  @ViewChild('ordersTablePaginator', {static: false}) set matPaginator(mp: MatPaginator){
+
+  @ViewChild('ordersTablePaginator', { static: false }) set matPaginator(mp: MatPaginator) {
     this.ordersTableDataSource.paginator = mp;
   }
 
-  
+
   ngOnInit() {
     this.initForm();
+
+    this.ordersData$ =
+      this.searchForm.get('dateRange').valueChanges
+        .pipe(
+          startWith<any>({ begin: new Date().setHours(0, 0, 0, 0), end: new Date() }),
+          debounceTime(300),
+          switchMap(date => {
+            return combineLatest(
+              this.dbs.getExtraOrdersKitchen(date.begin, date.end),
+              this.dbs.getCustomers(),
+            ).pipe(
+              map(([orders, customers]) => {
+                let array = orders.map((el, index) => {
+                  let customer = el['customerId'] ? customers.filter(al => al['id'] == el['customerId'])[0] : ''
+                  return {
+                    ...el,
+                    customerName: customer ? customer['type'] == 'NATURAL' ? customer['name'] : customer['businessName'] : '',
+                    number: 'Pe-' + ("000" + index).slice(-4)
+                  }
+                })
+                return array
+              }))
+          }),
+          tap(orders => {
+            this.ordersTableDataSource.data = orders.reverse()
+          }))
+
+    this.ordersData$.subscribe(res => {
+      console.log(res);
+
+    })
   }
 
-  initForm(){
+  initForm() {
     this.searchForm = this.fb.group({
-      dateRange: [{begin: new Date(), end: new Date()}, Validators.required],
+      dateRange: [{ begin: new Date().setHours(0, 0, 0, 0), end: new Date() }],
       filterControl: [null]
     })
   }
 
-  onGetOrdersKitchen(){
-    this.ordersData$ = this.dbs.getOrdersKitchen(this.searchForm.get('dateRange').value['begin'],
-                        this.searchForm.get('dateRange').value['end']).pipe(tap(orders => {
-                          this.ordersTableDataSource.data = orders;
-                        }));
-  }
 
-  filter(){
+  filter() {
     this.ordersTableDataSource.filter = this.searchForm.get('filterControl').value;
   }
 
-  onGetOrderDetails(order: Order){
+  onGetOrderDetails(order: Order) {
     this.dialog.open(OrderDetailsDialogComponent, {
       data: order
     });
   }
 
-  onGetOrderInputs(order: Order){
+  onGetOrderInputs(order: Order) {
     this.dialog.open(InputDetailsDialogComponent, {
       data: order
     });
-  }
-
-  
-  formatDate(date: {seconds: number, nanoseconds: number}){
-    let t = new Date(1970);
-    t.setSeconds(date.seconds);
-    return t;
   }
 
   downloadXls(): void {
@@ -105,7 +123,7 @@ export class OrdersComponent implements OnInit {
       const temp = [
         this.datePipe.transform(this.getDate(element.createdAt['seconds']), 'dd/MM/yyyy'),
         element.orderCorrelative,
-        element.documentSerial+" - "+element.documentCorrelative,
+        element.documentSerial + " - " + element.documentCorrelative,
         "nombre de cliente",
         element.createdBy.displayName
       ];
@@ -122,7 +140,7 @@ export class OrdersComponent implements OnInit {
     XLSX.writeFile(wb, name);
   }
 
-  getDate(seconds: number){
+  getDate(seconds: number) {
     let date = new Date(1970);
     date.setSeconds(seconds);
     return date.valueOf();

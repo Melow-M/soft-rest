@@ -173,6 +173,8 @@ export class PlanningComponent implements OnInit {
   }
 
   deleteItem(index) {
+    console.log(this.menuList['index']);
+    
     let menuType = this.menuList[index]['menuType']
 
     let rrr = []
@@ -201,6 +203,10 @@ export class PlanningComponent implements OnInit {
   }
 
   editItem(element, index) {
+    console.log(element);
+    console.log(this.selectMenu);
+    
+    
     this.menuForm.get('dish').setValue(element['dish'])
     this.menuForm.get('category').setValue(element['category'])
     this.menuForm.get('amount').setValue(element['amount'])

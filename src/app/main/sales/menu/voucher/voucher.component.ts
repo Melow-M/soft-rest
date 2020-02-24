@@ -20,6 +20,7 @@ export class VoucherComponent implements OnInit {
   combos: Array<any> = []
   desserts: Array<any> = []
   extras: Array<any> = []
+  inputExtras: Array<any> = []
   countDishes: Array<any> = []
   print: Array<any>
 
@@ -145,9 +146,29 @@ export class VoucherComponent implements OnInit {
 
     this.extras = this.data['orderList'].filter(el => el['category'])
       .filter(el => el['category'].toLowerCase() == 'extras' || el['category'].toLowerCase() == 'piqueo' || el['category'].toLowerCase() == 'bebidas')
-      //.forEach()
+    //.forEach()
 
-    console.log(this.extras);
+    this.inputExtras = this.extras.map(el => {
+      return el['inputs'].map(al => {
+        return {
+          ...al,
+          required: al['quantity'] * el['amount']
+        }
+      })
+    }).reduce((a, b) => a.concat(b), [])
+      .map((el, index, array) => {
+        let counter = 0
+        array.forEach(al => {
+          if (al['id'] == el['id']) {
+            counter += al['quantity']
+          }
+        })
+        return {
+          ...el,
+          amount: counter
+        }
+      }).filter((dish, index, array) => array.findIndex(el => el['id'] === dish['id']) === index)
+
 
     this.print = this.data['orderList'].map(el => {
       return {
@@ -232,6 +253,7 @@ export class VoucherComponent implements OnInit {
     let batch = this.af.firestore.batch();
     let inputRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/orders/`).doc();
     let transactionRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/cashRegisters/${this.data['cashId']}/openings/${this.data['openingId']}/transactions`).doc(inputRef.id);
+    let kitchenOrderRef: DocumentReference = this.af.firestore.collection(`/db/deliciasTete/kitchenExtraOrders`).doc(inputRef.id);
 
     let inputData: Order;
     let transactionData: Transaction;
@@ -287,6 +309,22 @@ export class VoucherComponent implements OnInit {
           editedAt: new Date(),
           createdAt: new Date(),
           createdBy: user,
+        }
+
+        let kitchenOrderData = {
+          id: inputRef.id,
+          inputs: this.inputExtras,
+          dishes: this.extras,
+          documentType: this.data['documentType'],
+          documentNumber: this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
+          customerId: this.data['customerId'],
+          cashId: this.data['cashId'],
+          openingId: this.data['openingId'],
+          state: 'aprobado',
+          editedBy: user,
+          editedAt: new Date(),
+          createdAt: new Date(),
+          createdBy: user
         }
 
         if (this.data['receivable']) {
@@ -394,7 +432,37 @@ export class VoucherComponent implements OnInit {
           })
         })
 
-        
+        this.inputExtras.forEach(input => {
+          let ref = this.af.firestore.collection(`/db/deliciasTete/warehouseInputs/`).doc(input['id'])
+          let kardexRef = this.af.firestore.collection(`/db/deliciasTete/warehouseInputs/${input['id']}/kardex`).doc(inputRef.id)
+
+          let inputKardex = {
+            id: inputRef.id,
+            details: this.data['documentType'] + ': ' + this.data['documentSerial'] + '-' + this.data['documentCorrelative'],
+            insQuantity: 0,
+            insPrice: 0,
+            insTotal: 0,
+            outsQuantity: input['amount'],
+            outsPrice: 0,
+            outsTotal: input['amount'] * 0,
+            balanceQuantity: 0,
+            balancePrice: 0,
+            balanceTotal: 0,
+            type: 'SALIDA',
+            createdAt: new Date(),
+            createdBy: user
+          }
+
+          batch.update(ref, {
+            stock: firebase.firestore.FieldValue.increment(input['amount'] * (-1))
+          })
+
+          batch.set(kardexRef, inputKardex)
+        })
+
+        if (this.extras.length) {
+          batch.set(kitchenOrderRef, kitchenOrderData)
+        }
         //this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
 
         batch.commit().then(() => {

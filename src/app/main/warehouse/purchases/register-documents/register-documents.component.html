@@ -175,15 +175,18 @@
                         <!-- item -->
                         <mat-form-field appearance="outline" style="width: 45%;">
                             <mat-label>{{itemsListForm.get('type').value}}</mat-label>
-                            <mat-select formControlName="item" matInput placeholder="Seleccione Insumo">
-                                <mat-option (click)="onCreateInput()">
-                                    <mat-icon>add</mat-icon>Crear Item
-                                </mat-option>
-                                <mat-option *ngFor="let input of inputList | async" [value]="input">{{input.name}}
-                                </mat-option>
-                            </mat-select>
+                            <input 
+                                type="text" placeholder="Seleccione Item" matInput formControlName="item" [matAutocomplete]="autoInput">
+                            <mat-autocomplete [displayWith]="displayFn.bind(this)" #autoInput="matAutocomplete">
+                            <mat-option *ngFor="let input of inputList$ | async" [value]="input">
+                                {{input.name | titlecase }}
+                            </mat-option>
+                            </mat-autocomplete>
                             <mat-hint>*Requerido</mat-hint>
                         </mat-form-field>
+
+
+
                     </div>
                     <div style="display: flex; flex-direction: row; width: 100%; justify-content: space-between;">
                         <!-- quantity -->

@@ -9,6 +9,7 @@ import { switchMap, debounceTime, map, tap, filter } from 'rxjs/operators';
 import { Input } from 'src/app/core/models/warehouse/input.model';
 import { Combo, elementCombo, elementComboTable } from 'src/app/core/models/sales/menu/combo.model';
 import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
+import { Household } from 'src/app/core/models/warehouse/household.model';
 
 @Component({
   selector: 'app-create-new-combo-dialog',
@@ -25,7 +26,9 @@ export class CreateNewComboDialogComponent implements OnInit {
   inputTableDisplayedColumns: string[] = [
     'index', 'itemName', 'itemUnit', 'quantity', 'actions'
   ]
-  @ViewChild('inputTablePaginator', {static:false}) inputTablePaginator: MatPaginator;
+  @ViewChild('inputTablePaginator', {static:false}) set matPaginator(mp: MatPaginator){
+    this.inputTableDataSource.paginator = mp;
+  }
   
   //Variables
   productCategory: Array<string> = [
@@ -94,7 +97,7 @@ export class CreateNewComboDialogComponent implements OnInit {
   
       this.itemForm = this.fb.group({
         productCategory: [null, Validators.required],
-        product: [null, Validators.required],
+        product: [null, [Validators.required, this.dbs.notObjectValidator]],
         quantity: [null, Validators.required]
       })
       this.loadingTable.next(false);
@@ -154,7 +157,6 @@ export class CreateNewComboDialogComponent implements OnInit {
           )
       });
       this.inputTableDataSource.data = [...aux];
-      this.inputTableDataSource.paginator = this.inputTablePaginator;
       this.loadingTable.next(false);
 
     }));
@@ -211,8 +213,7 @@ export class CreateNewComboDialogComponent implements OnInit {
           )
       });
       this.inputTableDataSource.data = [...aux];
-      this.inputTableDataSource.paginator = this.inputTablePaginator;
-
+      this.loadingTable.next(false);
     }));
   }
 
@@ -234,8 +235,6 @@ export class CreateNewComboDialogComponent implements OnInit {
           )
       });
       this.inputTableDataSource.data = [...aux];
-      this.inputTableDataSource.paginator = this.inputTablePaginator;
-
       this.loadingTable.next(false);
     }));
   }
@@ -312,7 +311,7 @@ export class CreateNewComboDialogComponent implements OnInit {
     else return value;
   }
 
-  filterRecipe(recipeList: Array<Grocery | Recipe | Dessert>, recipeName: Grocery | Recipe | Dessert | string){
+  filterRecipe(recipeList: Array<Grocery | Recipe | Dessert | Household>, recipeName:  | Grocery | Recipe | Dessert | Household | string){
     if(typeof recipeName != 'string'){
       return recipeList.filter(recipe => recipe.name.toUpperCase().includes(recipeName.name.toUpperCase()))
     }

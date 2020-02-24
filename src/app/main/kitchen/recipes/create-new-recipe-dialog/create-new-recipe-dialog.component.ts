@@ -69,7 +69,7 @@ export class CreateNewRecipeDialogComponent implements OnInit {
     })
 
     this.itemForm = this.fb.group({
-      item: [null, Validators.required],
+      item: [null, [Validators.required, this.dbs.notObjectValidator]],
       quantity: [null, Validators.required]
     })
 

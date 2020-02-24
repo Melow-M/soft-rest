@@ -70,7 +70,7 @@ export class EditNewRecipeDialogComponent implements OnInit {
     })
 
     this.itemForm = this.fb.group({
-      item: [null, Validators.required],
+      item: [null, [Validators.required, this.dbs.notObjectValidator]],
       quantity: [null, Validators.required]
     })
 
@@ -200,7 +200,7 @@ export class EditNewRecipeDialogComponent implements OnInit {
       sku: this.data.sku,
       description: this.data.description,
       picture: this.data.picture,
-      category: this.productForm.get('productCategory').value,
+      category: this.data.category,
       inputs: [],
       createdAt: this.data.createdAt,
       createdBy: this.data.createdBy,

@@ -30,6 +30,7 @@ import { ReceivableUser } from './models/admin/receivableUser.model';
 
 import { saveAs } from 'file-saver';
 import { Menu } from './models/sales/menu/menu.model';
+import { FormControl } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -507,7 +508,7 @@ export class DatabaseService {
 
   //Warehouse purchases
   onGetPurchases(startDate: Date, endDate: Date): Observable<Payable[]> {
-    this.purchasesCollection = this.af.collection<Payable>(`/db/deliciasTete/accountsPayable`, ref => ref.where('documentDate', '>=', startDate).where('documentDate', '<=', endDate))
+    this.purchasesCollection = this.af.collection<Payable>(`/db/deliciasTete/accountsPayable`, ref => ref.where('documentDate', '>=', startDate).where('documentDate', '<=', endDate).orderBy('documentDate', 'desc'))
     this.purchases$ = this.purchasesCollection.valueChanges().pipe(shareReplay(1));
     return this.purchases$
   }
@@ -1321,16 +1322,22 @@ export class DatabaseService {
     }))
   }
 
-  onGetProductType(type: string): Observable<Array<Grocery | Recipe | Dessert>> {
-    switch (type) {
-      case 'Otros':
+  onGetProductType(type: string): Observable<Array<Grocery | Recipe | Dessert | Input | Household>> {
+    switch (type.toUpperCase()) {
+      case 'OTROS':
         return this.af.collection<Grocery>(`/db/deliciasTete/warehouseGrocery`).valueChanges();
         break;
-      case 'Postres':
+      case 'POSTRES':
         return this.af.collection<Dessert>(`/db/deliciasTete/warehouseDesserts`).valueChanges();
         break;
-      case 'Platos':
+      case 'PLATOS':
         return this.af.collection<Recipe>(`/db/deliciasTete/kitchenRecipes`).valueChanges();
+        break;
+      case 'INSUMOS':
+        return this.af.collection<Input>(`/db/deliciasTete/warehouseInputs`).valueChanges();
+        break;
+      case 'INVENTARIO':
+        return this.af.collection<Input>(`/db/deliciasTete/warehouseHousehold`).valueChanges();
         break;
     }
   }
@@ -1537,6 +1544,15 @@ export class DatabaseService {
         return 'warehouseGrocery';
       case 'POSTRES':
         return 'warehouseDesserts';
+    }
+  }
+
+  notObjectValidator(control: FormControl): {[s: string]: boolean}{
+    if(typeof control.value == 'object'){
+      return null;
+    }
+    else{
+      return {'notObject': true};
     }
   }
 

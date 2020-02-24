@@ -4,8 +4,8 @@ import { MatDialog, MatTableDataSource, MatPaginator, MatSnackBar, MatDialogRef 
 import { Provider } from 'src/app/core/models/third-parties/provider.model';
 import { KitchenInput } from 'src/app/core/models/warehouse/kitchenInput.model';
 import { DatabaseService } from 'src/app/core/database.service';
-import { Observable, of, BehaviorSubject } from 'rxjs';
-import { tap, map, debounceTime, take } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject, combineLatest } from 'rxjs';
+import { tap, map, debounceTime, take, switchMap, startWith } from 'rxjs/operators';
 import { PurchasesCreateProviderDialogComponent } from '../purchases-create-provider-dialog/purchases-create-provider-dialog.component';
 import { Payable, ItemModel, PayableLimited } from 'src/app/core/models/admin/payable.model';
 import { Household } from 'src/app/core/models/warehouse/household.model';
@@ -13,6 +13,7 @@ import { Grocery } from 'src/app/core/models/warehouse/grocery.model';
 import { Dessert } from 'src/app/core/models/warehouse/desserts.model';
 import { Input } from 'src/app/core/models/warehouse/input.model';
 import { CreateInputDialogComponent } from 'src/app/main/create-input-dialog/create-input-dialog.component';
+import { Recipe } from 'src/app/core/models/kitchen/recipe.model';
 
 @Component({
   selector: 'app-register-documents',
@@ -43,6 +44,9 @@ export class RegisterDocumentsComponent implements OnInit {
     'CREDITO', 'EFECTIVO', 'TARJETA'
   ]
   inputList: Observable<KitchenInput[]>;
+  inputList$: Observable<Array<Grocery | Input | Dessert | Household>>;
+
+
   providersList$: Observable<Provider[]>
   socialReason$: Observable<string>;
 
@@ -63,6 +67,23 @@ export class RegisterDocumentsComponent implements OnInit {
     this.initForms();
     this.providersList$ = this.dbs.getProviders();
     this.inputList = of([]);
+
+    this.inputList$ = combineLatest(this.itemsListForm.get('type').valueChanges, this.itemsListForm.get('item').valueChanges.pipe(startWith(''))).pipe(
+      map(([type, item])=> (item)),
+      startWith(''),
+      switchMap((productName)=> {
+        if(this.itemsListForm.get('type').value == null){
+          return of([]);
+        }
+        else{
+          return this.dbs.onGetProductType(this.itemsListForm.get('type').value).pipe(
+            debounceTime(100), 
+            map((inputList)=> {
+                return this.filterRecipe(inputList, productName)
+            }))
+        }
+      }));
+
   }
 
   initForms(){
@@ -87,8 +108,8 @@ export class RegisterDocumentsComponent implements OnInit {
     });
     this.itemsListForm = this.fb.group({
       kitchenInputId: null,
-      type: [null, Validators.required],
-      item: [{value: null, disabled: true}, Validators.required],
+      type: ['INSUMOS', Validators.required],
+      item: [{value: '', disabled: false}, [Validators.required, this.dbs.notObjectValidator]],
       quantity: [null, Validators.required],
       cost: [null, Validators.required]    //Have to check, if we need to disable
     })
@@ -97,9 +118,11 @@ export class RegisterDocumentsComponent implements OnInit {
     this.documentForm.get('documentDetails.paymentType').valueChanges.subscribe((obs)=>{
       if(obs == 'CREDITO'){
         this.documentForm.get('documentDetails.creditExpirationDate').enable();
-      }
+        this.documentForm.get('imports.paidImport').reset();
+    }
       else{
         this.documentForm.get('documentDetails.creditExpirationDate').disable();
+        this.documentForm.get('imports.paidImport').setValue(this.getTotalCost());
       }
     });
 
@@ -109,16 +132,6 @@ export class RegisterDocumentsComponent implements OnInit {
       }
     })
 
-    this.itemsListForm.get('type').valueChanges.subscribe((type: string)=> {
-      if(type!= null){
-        this.inputList = this.dbs.onGetElements(type);
-        this.itemsListForm.get('item').enable()
-      }
-      else{
-        this.inputList = of([]);
-        this.itemsListForm.get('item').disable();
-      }
-    })
 
     this.socialReason$ = this.documentForm.get('documentDetails.provider').valueChanges.pipe(map((provider: Provider)=> {
       if(provider != null){
@@ -158,13 +171,19 @@ export class RegisterDocumentsComponent implements OnInit {
       }
     ];
     this.inputsTableDataSource.paginator = this.inputsTablePaginator;
-    this.itemsListForm.reset();
+    this.itemsListForm.get('item').reset();
+    this.itemsListForm.get('quantity').reset();
+    this.itemsListForm.get('cost').reset();
+    if(this.documentForm.get('documentDetails.paymentType').value != 'CREDITO'){
+      this.documentForm.get('imports.paidImport').setValue(this.getTotalCost());
+    }
+
   }
 
   onDeleteInput(element){
     let aux = this.inputsTableDataSource.data;
     this.inputsTableDataSource.data = aux.filter(el => element!=el);
-
+    this.documentForm.get('imports.paidImport').setValue(this.getTotalCost());
   }
 
   getSubtotal() {
@@ -302,6 +321,26 @@ export class RegisterDocumentsComponent implements OnInit {
         }))
       }
     }
+  }
+
+  filterRecipe(recipeList: Array<Grocery | Input | Household | Dessert | Recipe>, recipeName: Grocery | Input | Household | Dessert | Recipe | string){
+    if(!!recipeName){
+      if(typeof recipeName != 'string'){
+        return recipeList.filter(recipe => recipe.name.toUpperCase().includes(recipeName.name.toUpperCase()))
+      }
+      else{
+        return recipeList.filter(recipe => recipe.name.toUpperCase().includes(recipeName.toUpperCase()))
+      }
+    }
+    else{
+      return recipeList;
+    }
+  }
+
+  displayFn(input: Input) {
+    console.log(input);
+    if (!input || input.name == undefined) return '';
+    return input.name.split('')[0].toUpperCase() + input.name.split('').slice(1).join('').toLowerCase();
   }
   
 }

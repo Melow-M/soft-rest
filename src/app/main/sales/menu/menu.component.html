@@ -7,13 +7,13 @@
             Menú
         </h1>
         <div style="display: flex; border-top: 1px solid;">
-            <div class="ticket" >
+            <div class="ticket">
                 <div class="header flex-div" *ngIf="numberOrder$ | async as number">
                     <span>Pedido</span>
                     <span style="flex: 1 1 auto;"></span>
                     <span>#{{("0000"+number).slice(-5)}}</span>
                 </div>
-                <div class="order-list"  *ngIf="plate$ | async">
+                <div class="order-list" *ngIf="plate$ | async">
                     <ol>
                         <li class="order" *ngFor="let plate of order; let i = index" (click)="selectPlate(plate, i)"
                             [ngStyle]="{'border':selectablePlate==plate?'1px solid black':'none'}">
@@ -123,7 +123,7 @@
                 </div>
             </div>
             <div *ngIf="MenuList" style="width:100%;">
-                <div style="height: 74vh;" >
+                <div style="height: 74vh;">
                     <div class="type">
                         <span class="header">Tipo</span>
                         <div class="flex-div" style="height: 19vh; overflow-x: auto;">
@@ -212,7 +212,8 @@
                                     </mat-icon>
                                 </span>
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of favorites" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of favorites"
+                                        (click)="plate['stock']>0?addOrder(plate):''">
                                         <span class="stock">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>
                                         <span class="price">S/. {{plate['price'] | number: '.2'}}</span>
@@ -234,10 +235,11 @@
                         </div>
                     </div>
                     <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Piqueos'">
-                        <div *ngIf="appetizer$ | async as piqueos">
-                            <div *ngIf="piqueos.length">
+                        <div *ngIf="appetizer$ | async">
+                            <div *ngIf="piqueo.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of piqueos" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of piqueo"
+                                        (click)="plate['stock']>0?addOrder(plate):''">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>
@@ -251,10 +253,11 @@
                         </div>
                     </div>
                     <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Bebidas'">
-                        <div *ngIf="drinks$ | async as others">
-                            <div *ngIf="others.length">
+                        <div *ngIf="drinks$ | async">
+                            <div *ngIf="bebidas.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of bebidas"
+                                        (click)="plate['stock']>0?addOrder(plate):''">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>
@@ -268,10 +271,11 @@
                         </div>
                     </div>
                     <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Promociones'">
-                        <div *ngIf="offers$ | async as others">
-                            <div *ngIf="others.length">
+                        <div *ngIf="offers$ | async">
+                            <div *ngIf="offers.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of offers"
+                                        (click)="plate['stock']>0?addOrder(plate):''">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>
@@ -288,7 +292,8 @@
                         <div *ngIf="dessert$ | async">
                             <div *ngIf="othersDesserts.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of othersDesserts" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of othersDesserts"
+                                        (click)="plate['stock']>0?addOrder(plate):''">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>
@@ -302,10 +307,11 @@
                         </div>
                     </div>
                     <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Extras'">
-                        <div *ngIf="extras$ | async as others">
-                            <div *ngIf="others.length">
+                        <div *ngIf="extras$ | async">
+                            <div *ngIf="extras.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of others" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of extras"
+                                        (click)="plate['stock']>0?addOrder(plate):''">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>
@@ -319,10 +325,12 @@
                         </div>
                     </div>
                     <div style="height: 63.4vh; overflow: auto;" *ngIf="otherTitle=='Combos'">
-                        <div *ngIf="combo$ | async as others">
-                            <div *ngIf="others.length">
+                        <div *ngIf="combo$ | async">
+                            <div *ngIf="combos.length">
                                 <div class="flex-div">
-                                    <div class="box" *ngFor="let plate of others" [ngStyle]="{'display': plate['state']=='Publicado'?'block':'none'}" (click)="addOrder(plate)">
+                                    <div class="box" *ngFor="let plate of combos"
+                                        [ngStyle]="{'display': plate['state']=='Publicado'?'block':'none'}"
+                                        (click)="plate['stock']>0?addOrder(plate):''">
                                         <span class="stock"
                                             *ngIf="plate['stock']">{{plate['stock'] | number: '2.0'}}</span>
                                         <p>{{plate['name']}}</p>

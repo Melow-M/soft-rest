@@ -174,11 +174,10 @@
 
 
                             </table>
+                            <mat-paginator #ordersTablePaginator [pageSizeOptions]="[5,10,25]" fixed
+                                class="mat-elevation-z8" style="border-radius: 0 0 20px 20px;">
+                            </mat-paginator>
                         </div>
-
-                        <mat-paginator #ordersTablePaginator [pageSizeOptions]="[5,10,25]" fixed
-                            class="mat-elevation-z8" style="border-radius: 0 0 20px 20px;">
-                        </mat-paginator>
                     </div>
                     <ng-template #default>
                         <div

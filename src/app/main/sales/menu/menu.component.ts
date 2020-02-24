@@ -56,10 +56,15 @@ export class MenuComponent implements OnInit {
   othersDesserts: Array<any>
 
   extras$: Observable<any>
+  extras: Array<any>
   combo$: Observable<any>
+  combos: Array<any>
   drinks$: Observable<any>
+  bebidas: Array<any>
   offers$: Observable<any>
+  offers: Array<any>
   appetizer$: Observable<any>
+  piqueo: Array<any>
 
   plate$: Observable<Meal[]>
   plates: Array<Meal> = []
@@ -273,6 +278,9 @@ export class MenuComponent implements OnInit {
           }
         })
         return array.filter(el => el['view'])
+      }),
+      tap(res => {
+        this.extras = res
       })
     )
 
@@ -316,6 +324,9 @@ export class MenuComponent implements OnInit {
             category: 'combos'
           }
         }).filter(el => el['view'])
+      }),
+      tap(res => {
+        this.combos = res
       })
     )
 
@@ -340,6 +351,9 @@ export class MenuComponent implements OnInit {
           }
         })
         return array.filter(el => el['view'])
+      }),
+      tap(res => {
+        this.bebidas = res
       })
     )
 
@@ -387,6 +401,9 @@ export class MenuComponent implements OnInit {
             category: 'offers'
           }
         }).filter(el => el['view'])
+      }),
+      tap(res => {
+        this.offers = res
       })
     )
 
@@ -411,6 +428,9 @@ export class MenuComponent implements OnInit {
           }
         })
         return array.filter(el => el['view'])
+      }),
+      tap(res => {
+        this.piqueo = res
       })
     )
 
@@ -624,7 +644,25 @@ export class MenuComponent implements OnInit {
         }
 
       } else {
-        console.log('extra');
+        switch (dish['category'].toLowerCase()) {
+          case 'extras':
+            this.extras.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
+            break;
+          case 'combos':
+            this.combos.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
+            break;
+          case 'offers':
+            this.offers.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
+            break;
+          case 'bebidas':
+            this.bebidas.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
+            break;
+          case 'piqueo':
+            this.piqueo.filter(el => el['id'] == dish['id'])[0]['stock'] += dish['amount']
+            break;
+          default:
+            break;
+        }
 
       }
     }

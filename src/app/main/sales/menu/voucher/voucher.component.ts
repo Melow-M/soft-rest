@@ -448,7 +448,7 @@ export class VoucherComponent implements OnInit {
         })
 
 
-        //this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
+        this.dbs.printTicket(this.print, this.data['documentSerial'] + '-' + this.data['documentCorrelative'])
 
         batch.commit().then(() => {
           console.log('orden guardada');

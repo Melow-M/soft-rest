@@ -202,10 +202,11 @@
                                         <mat-icon>more_vert</mat-icon>
                                     </button>
                                     <mat-menu #menu="matMenu">
-                                        <button *ngIf="user['role']['kitchenPromosActions'] && element.state == 'Inactivo'"
+                                        <button *ngIf="user['role']['kitchenPromosStateActions'] && element.state == 'Inactivo'"
                                             mat-menu-item (click)="changeOfferState(element, 'Activar')">Activar</button>
-                                        <button mat-menu-item *ngIf="user['role']['kitchenPromosActions'] && element.state == 'Publicado'" (click)="changeOfferState(element, 'Inactivar')">Inactivar</button>
-                                        <button mat-menu-item (click)="onEditPromo(element)">Editar</button>
+                                        <button mat-menu-item *ngIf="user['role']['kitchenPromosStateActions'] && element.state == 'Publicado'" (click)="changeOfferState(element, 'Inactivar')">Inactivar</button>
+                                        <button *ngIf="user['role']['kitchenPromosEditAction']"
+                                            mat-menu-item (click)="onEditPromo(element)">Editar</button>
                                     </mat-menu>
                                 </td>
                             </ng-container>

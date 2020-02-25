@@ -47,8 +47,6 @@ export class CreateNewPermitComponent implements OnInit {
     { name: 'Guardar Configuración', value: 'kitchenDishesConfigurationSaveAction' },
     { name: 'Editar Configuración de Menú', value: 'kitchenDishesConfigurationEditAction' },
 
-    //ACa me quede
-
     { name: 'Pedidos', value: 'kitchenOrders' },
     { name: 'Descargar Pedido', value: 'kitchenOrdersDownloadAction' },
     { name: 'Detalles de Pedido', value: 'kitchenOrdersDetailsAction' },
@@ -67,11 +65,15 @@ export class CreateNewPermitComponent implements OnInit {
     { name: 'Registrar Compra', value: 'warehousePurchasesRegisterAction' },
     { name: 'Descargar Compra', value: 'warehousePurchasesDownloadAction' },
     { name: 'Cancelar Compra', value: 'warehousePurchasesCancelAction' },
+
     { name: 'Inventario', value: 'warehouseStocktaking' },
     { name: 'Crear Nuevo', value: 'warehouseStocktakingCreateAction' },
     { name: 'Retirar Menaje', value: 'warehouseStocktakingRemoveAction' },
     { name: 'Descargar inventario', value: 'warehouseStocktakingDownloadAction' },
+    { name: 'Inventario Valorado', value: 'warehouseStocktakingValuedCheckbox' },
     { name: 'Kardex', value: 'warehouseStocktakingKardexAction' },
+    { name: 'Kardex Valorado', value: 'warehouseStocktakingKardexValuedCheckbox' },
+
     { name: 'Editar Item', value: 'warehouseStocktakingEditAction' },
     { name: 'Borrar item', value: 'warehouseStocktakingDeleteAction' },
   ]
@@ -111,7 +113,6 @@ export class CreateNewPermitComponent implements OnInit {
     { name: 'Crear', value: 'adminManageCashCreateAction' },
     { name: 'Editar', value: 'adminManageCashEditAction' },
     { name: 'Borrar', value: 'adminManageCashDeleteAction' },
-
     { name: 'Ver Historial', value: 'adminManageCashHistoryButton' },
     { name: 'Descargar Historial', value: 'adminManageCashHistoryDownloadButton' },
 
@@ -221,7 +222,9 @@ export class CreateNewPermitComponent implements OnInit {
       warehouseStocktakingCreateAction: false,
       warehouseStocktakingRemoveAction: false,
       warehouseStocktakingDownloadAction: false,
+      warehouseStocktakingValuedCheckbox: false,
       warehouseStocktakingKardexAction: false,
+      warehouseStocktakingKardexValuedCheckbox: false,
       warehouseStocktakingEditAction: false,
       warehouseStocktakingDeleteAction: false,
 

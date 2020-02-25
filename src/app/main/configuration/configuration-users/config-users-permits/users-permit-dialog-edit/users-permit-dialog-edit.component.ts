@@ -62,11 +62,14 @@ export class UsersPermitDialogEditComponent implements OnInit {
     { name: 'Registrar Compra', value: 'warehousePurchasesRegisterAction' },
     { name: 'Descargar Compra', value: 'warehousePurchasesDownloadAction' },
     { name: 'Cancelar Compra', value: 'warehousePurchasesCancelAction' },
+
     { name: 'Inventario', value: 'warehouseStocktaking' },
     { name: 'Crear Nuevo', value: 'warehouseStocktakingCreateAction' },
     { name: 'Retirar Menaje', value: 'warehouseStocktakingRemoveAction' },
     { name: 'Descargar inventario', value: 'warehouseStocktakingDownloadAction' },
+    { name: 'Inventario Valorado', value: 'warehouseStocktakingValuedCheckbox' },
     { name: 'Kardex', value: 'warehouseStocktakingKardexAction' },
+    { name: 'Kardex Valorado', value: 'warehouseStocktakingKardexValuedCheckbox' },
     { name: 'Editar Item', value: 'warehouseStocktakingEditAction' },
     { name: 'Borrar item', value: 'warehouseStocktakingDeleteAction' },
   ]
@@ -218,7 +221,9 @@ export class UsersPermitDialogEditComponent implements OnInit {
       warehouseStocktakingCreateAction: this.data['warehouseStocktakingCreateAction'] ? this.data['warehouseStocktakingCreateAction'] : false,
       warehouseStocktakingRemoveAction: this.data['warehouseStocktakingRemoveAction'] ? this.data['warehouseStocktakingRemoveAction'] : false,
       warehouseStocktakingDownloadAction: this.data['warehouseStocktakingDownloadAction'] ? this.data['warehouseStocktakingDownloadAction'] : false,
+      warehouseStocktakingValuedCheckbox: this.data['warehouseStocktakingValuedCheckbox'] ? this.data['warehouseStocktakingValuedCheckbox'] : false,
       warehouseStocktakingKardexAction: this.data['warehouseStocktakingKardexAction'] ? this.data['warehouseStocktakingKardexAction'] : false,
+      warehouseStocktakingKardexValuedCheckbox: this.data['warehouseStocktakingKardexValuedCheckbox'] ? this.data['warehouseStocktakingKardexValuedCheckbox'] : false,
       warehouseStocktakingEditAction: this.data['warehouseStocktakingEditAction'] ? this.data['warehouseStocktakingEditAction'] : false,
       warehouseStocktakingDeleteAction: this.data['warehouseStocktakingDeleteAction'] ? this.data['warehouseStocktakingDeleteAction'] : false,
 

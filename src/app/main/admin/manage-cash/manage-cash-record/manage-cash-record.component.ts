@@ -7,6 +7,7 @@ import { Observable, combineLatest } from 'rxjs';
 import { MatTableDataSource, MatPaginator, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import * as XLSX from 'xlsx';
+import { AuthService } from 'src/app/core/auth.service';
 
 @Component({
   selector: 'app-manage-cash-record',
@@ -42,7 +43,8 @@ export class ManageCashRecordComponent implements OnInit {
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data,
     private dialog: MatDialog,
-    public datePipe: DatePipe
+    public datePipe: DatePipe,
+    public auth: AuthService
   ) { }
 
   ngOnInit() {
